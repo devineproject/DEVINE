@@ -10,6 +10,8 @@ git clone --recursive git@github.com:FelixMartel/DEVINE.git
 
 Tip: Go to [http://cocodataset.org/#explore](http://cocodataset.org/#explore) and search for your image name
 
+This will require just under 3.5 Go of RAM
+
 ### From cli
 
 ```
@@ -17,9 +19,9 @@ Tip: Go to [http://cocodataset.org/#explore](http://cocodataset.org/#explore) an
 ./play_oracle_pretrained.sh
 ```
 
-### From docker (WIP)
+### From cli inside docker (WIP)
 
-Install nivdia-docker2 and the latest docker-compose (1.19.0-rc0 and up)
+Install, docker, nivdia-docker2 and the latest docker-compose (1.19.0-rc0 and up)
 
 ```
 sudo docker-compose up
