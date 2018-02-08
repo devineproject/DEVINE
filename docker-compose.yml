@@ -3,6 +3,5 @@ services:
   game:
     build: ./
     command: ./play_oracle_pretrained.sh
-    #runtime: nvidia
     stdin_open: true
     tty: true

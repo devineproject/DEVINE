@@ -31,6 +31,6 @@ echo "######Installing python dependencies######"
 
 pip install \
     nltk \
-    tensorflow-gpu \
+    $1 \
     tqdm \
     image

@@ -12,17 +12,25 @@ Tip: Go to [http://cocodataset.org/#explore](http://cocodataset.org/#explore) an
 
 This will require just under 3.5 Go of RAM
 
-### From cli
+### In your environment
 
 ```
-./install_pretrained.sh
+./install_pretrained.sh { tensorflow | tensorflow-gpu }
 ./play_oracle_pretrained.sh
 ```
 
-### From cli inside docker (WIP)
+### Inside docker
 
-Install, docker, nivdia-docker2 and the latest docker-compose (1.19.0-rc0 and up)
+Install docker and docker-compose
 
 ```
 sudo docker-compose up
+```
+
+### Inside gpu backed docker (WIP)
+
+Install docker, nivdia-docker2 and the latest docker-compose (1.19.0 and up)
+
+```
+sudo docker-compose -f docker-compose.gpu.yml up
 ```
