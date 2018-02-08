@@ -1,4 +1,4 @@
-ARG tensorflow_docker=latest-py3
+ARG tensorflow_docker=1.4.1-py3
 ARG tensorflow_package=tensorflow
 FROM tensorflow/tensorflow:${tensorflow_docker}
 

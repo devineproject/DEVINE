@@ -4,7 +4,7 @@ services:
     build:
       context: ./
       args:
-        -tensorflow_docker: latest-gpu-py3
+        -tensorflow_docker: 1.4.1-gpu-py3
         -tensorflow_package: tensorflow-gpu
     command: ./play_oracle_pretrained.sh
     runtime: nvidia
