@@ -24,7 +24,7 @@ This will require just under 3.5 Go of RAM
 Install docker and docker-compose
 
 ```
-sudo docker-compose up
+sudo docker-compose run --rm game
 ```
 
 ### Inside gpu backed docker (WIP)
@@ -32,5 +32,5 @@ sudo docker-compose up
 Install docker, nivdia-docker2 and the latest docker-compose (1.19.0 and up)
 
 ```
-sudo docker-compose -f docker-compose.gpu.yml up
+sudo docker-compose -f docker-compose.gpu.yml run --rm game
 ```
