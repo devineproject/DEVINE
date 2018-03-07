@@ -21,4 +21,4 @@ File `irl_constant.py` contains
 - Joints names
 - Joints limits
 
-See `package.xml` for dependancies
+See `package.xml` for dependencies
