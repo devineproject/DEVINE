@@ -11,6 +11,11 @@ catkin_make
 ```
 
 ## Usage Example
+### Run IRL-1
+```bash
+roslaunch jn0_gazebo jn0_empty_world.launch
+```
+### Run movement example
 ```bash
 rosrun irl_control example.py -r jn0 -c left_arm_controller -p [-0.5,0,-1,-1] -t 5
 ```
