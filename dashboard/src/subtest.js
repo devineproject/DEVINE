@@ -8,16 +8,16 @@ const listener = new ROSLIB.Topic({
     messageType : 'std_msgs/String'
 });
 
-$('input[type="checkbox"').on("change", function() {
+$('.command-view[name="test"]').find('input[type="checkbox"').on("change", function() {
   const view = $('.command-view[name="test"]').find('.subscriber-log')[0];
   if(this.checked) {
     listener.subscribe(function(message) {
-        view.innerHTML += `${message.data}\n`
+        view.innerText += `${message.data}\n`
         view.scrollTop = view.scrollHeight;
     });
   } else {
     listener.unsubscribe();
-    view.innerHTML += '=======Unsubscribed=======\n';
+    view.innerText += '=======Unsubscribed=======\n';
     view.scrollTop = view.scrollHeight;
   }
 });

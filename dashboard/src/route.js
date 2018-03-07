@@ -1,12 +1,12 @@
 import $ from 'cash-dom';
 
 export default function route(command, replace=false) {
-    if(command[0] === "/")
+    if(command[0] === '/')
         command = command.slice(1);
     if(replace)
-        history.replaceState({}, "", command);
+        history.replaceState({}, '', command);
     else
-        history.pushState({}, "", command);
+        history.pushState({}, '', command);
 
     const currentView = $(`.command-view.command-current`);
     const nextView = $(`.command-view[name="${command}"]`);
@@ -14,7 +14,7 @@ export default function route(command, replace=false) {
         currentView[0].setAttribute('hidden', true);
         nextView[0].removeAttribute('hidden');
         currentView[0].classList.remove('command-current');
-        currentView[0].classList.add('command-current');
+        nextView[0].classList.add('command-current');
     } else {
         console.log('No such command!');
     }
@@ -30,7 +30,7 @@ const views = $('.command-view');
 views.each((view) => {
     const link = $(`.command-menu.command-${view.getAttribute('name')}`);
     if(link.length > 0)
-        link.eq(0).on("click", "li", () => {
+        link.eq(0).on('click', 'li', () => {
             route(view.getAttribute('name'));
         });
 });
