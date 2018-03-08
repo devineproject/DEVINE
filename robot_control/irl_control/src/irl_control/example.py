@@ -1,12 +1,9 @@
 #! /usr/bin/env python
 
-import sys, argparse
+import argparse
 import rospy
 
-from irl_constant import ROBOT_NAME
-from irl_constant import ROBOT_CONTROLLER
-
-from trajectoryClient import TrajectoryClient
+from trajectory_client import TrajectoryClient
 from gripper import Gripper
 
 def main():
@@ -23,29 +20,32 @@ def main():
     args = parser.parse_args(rospy.myargv()[1:])
     robot = args.robot
     controller = args.controller
-    positions = list(map(float, args.positions.replace('[', '').replace(']', '').split(',')))
+    positions = [float(i) for i in args.positions.replace('[', '').replace(']', '').split(',')]
     time = float(args.time)
 
     print('Init node...')
-    nodeName = 'irl_control' + '_' + controller
-    rospy.init_node(nodeName)
-    print('Running node \'' + nodeName + '\'...')
-    
+    node_name = 'irl_control' + '_' + controller
+    rospy.init_node(node_name)
+    print('Running node \'' + node_name + '\'...')
+
     traj = TrajectoryClient(robot, controller)
-    rospy.on_shutdown(traj.stop)
-    
-    gripperLeft = Gripper(ROBOT_NAME, 'left')
+    gripper_left = Gripper(robot, 'left')
 
     traj.add_point(positions, time)
     traj.start()
     traj.wait(time)
 
     for i in range(3):
-        gripperLeft.open(0.3)
+        gripper_left.open(0.3)
         rospy.sleep(0.5)
-        gripperLeft.open(0.1)
+        gripper_left.open(0.1)
         rospy.sleep(0.5)
-    
+
+    traj.clear()
+    traj.add_point([0, 0, 0, 0], time)
+    traj.start()
+    traj.wait(time)
+
     print('Completed')
 
 if __name__ == '__main__':

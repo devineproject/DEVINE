@@ -1,6 +1,5 @@
 #! /usr/bin/env python
 
-import sys, argparse
 import rospy
 
 from std_msgs.msg import Float64
