@@ -1,3 +1,3 @@
 [submodule "guesswhat"]
-	path = guesswhat
+	path = guesswhat/guesswhat
 	url = git@github.com:FelixMartel/guesswhat.git
