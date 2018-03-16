@@ -16,11 +16,9 @@ class TrajectoryClient(object):
         self._goal = FollowJointTrajectoryGoal()
         self._goal_time_tolerance = rospy.Time(0.1)
         self._goal.goal_time_tolerance = self._goal_time_tolerance
-        server_up = self._client.wait_for_server(timeout=rospy.Duration(20.0))
+        server_up = self._client.wait_for_server(timeout=rospy.Duration(10.0))
         if not server_up:
-            rospy.logerr('Timed out waiting for Action Server')
-            rospy.signal_shutdown('Timed out waiting for Action Server')
-            raise Exception('Timed out waiting for Action Serve', controller_name)
+            raise RuntimeError('Timed out waiting for Action Serve', controller_name)
         self.clear()
         rospy.on_shutdown(self.stop)
 

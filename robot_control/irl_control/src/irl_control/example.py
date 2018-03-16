@@ -28,7 +28,12 @@ def main():
     rospy.init_node(node_name)
     print('Running node \'' + node_name + '\'...')
 
-    traj = TrajectoryClient(robot, controller)
+    try:
+        traj = TrajectoryClient(robot, controller)
+    except RuntimeError as err:
+        rospy.logerr(err)
+        rospy.signal_shutdown(err)
+
     gripper_left = Gripper(robot, 'left')
 
     traj.add_point(positions, time)
