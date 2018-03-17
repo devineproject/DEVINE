@@ -1,1 +1,4 @@
 *.pyc
+/dashboard/node_modules/*
+/dashboard/dist/*
+.idea/

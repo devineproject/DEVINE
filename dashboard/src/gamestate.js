@@ -4,12 +4,12 @@ import $ from 'cash-dom';
 
 const listener = new ROSLIB.Topic({
     ros : ros,
-    name : '/listener',
+    name : '/game_system_state',
     messageType : 'std_msgs/String'
 });
 
-$('.command-view[name="test"]').find('input[type="checkbox"').on("change", function() {
-  const view = $('.command-view[name="test"]').find('.subscriber-log')[0];
+$('.command-view[name="gamestate"]').find('input[type="checkbox"').on("change", function() {
+  const view = $('.command-view[name="gamestate"]').find('.subscriber-log')[0];
   if(this.checked) {
     listener.subscribe(function(message) {
         view.innerText += `${message.data}\n`
