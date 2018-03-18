@@ -2,15 +2,17 @@
 
 Install dependencies
 
-```
+``
+sudo npm i -g webpack
 npm install
-pip install -r requirements.txt
+pip3 install -r requirements.txt
+sudo apt-get install ros-kinetic-rosbridge-server
 ```
 
 Build
 
 ```
-webpack
+npm run build
 ```
 
 Run

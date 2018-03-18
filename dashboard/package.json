@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "webpack",
-    "start": "python serve.py",
+    "start": "python3 serve.py",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "DEVINE",

@@ -14,10 +14,14 @@
             </form>
           </li>
           <li class="command-gamestate command-menu">Game State</li>
+          <li class="command-kinect command-menu">Kinect</li>
         <ul>
       </div>
       <div class="uk-width-expand command-view command-current" name="gamestate" hidden>
         {% include 'subscriber.html' %}
+      </div>
+      <div class="uk-width-expand command-view" name="kinect" hidden>
+        {% include 'kinect_subscriber.html' %}
       </div>
     </div>
     <script src="dist/bundle.js"></script>
