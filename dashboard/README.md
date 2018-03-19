@@ -2,7 +2,7 @@
 
 Install dependencies
 
-``
+```bash
 sudo npm i -g webpack
 npm install
 pip3 install -r requirements.txt
@@ -11,18 +11,18 @@ sudo apt-get install ros-kinetic-rosbridge-server
 
 Build
 
-```
+```bash
 npm run build
 ```
 
 Run
 
-```
+```bash
 roslaunch rosbridge_server rosbridge_websocket.launch
 ```
 
-```
-python serve.py
+```bash
+npm start
 ```
 
 ## Adding a view
