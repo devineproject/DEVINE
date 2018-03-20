@@ -4,7 +4,7 @@ Kinect setup
 1. Install OpenNI
 ```bash
 sudo apt-get install ros-kinetic-openni-launch ros-kinetic-openni-camera ros-kinetic-openni-description
-sudo apt-get install ros-kinetic-compressed-image-transport ros-kinetic-compressed-image-transport-plugins #Image compression plugin
+sudo apt-get install ros-kinetic-compressed-image-transport #Image compression plugin
 ```
 
 2. Start OpenNI server
