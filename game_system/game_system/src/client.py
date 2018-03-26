@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 '''Example of how to trigger different states on the State Machine'''
 import rospy
 from std_msgs.msg import String
@@ -22,8 +23,6 @@ if __name__ == "__main__":
 
     gamesystem.ask_question()
 
-    gamesystem.listen_answer()
-
     gamesystem.analyse(ready_to_answer=True)
 
     gamesystem.point()
@@ -36,6 +35,4 @@ if __name__ == "__main__":
 
     gamesystem.move_back()
 
-    gamesystem.ready()
-
-    rospy.signal_shutdown('End of game');
+    rospy.signal_shutdown('End of game')
