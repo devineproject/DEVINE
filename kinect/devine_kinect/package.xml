@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>devine_kinect</name>
+  <version>0.0.1</version>
+  <description>The devine_kinect package</description>
+  <maintainer email="ismael.balafrej@usherbrooke.ca">Ismael Balafrej</maintainer>
+  <author email="ismael.balafrej@usherbrooke.ca">Ismael Balafrej</author>
+  <license>BSD License 2.0</license>
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>openni_camera</build_depend>
+  <build_depend>openni_launch</build_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>openni_camera</build_export_depend>
+  <build_export_depend>openni_launch</build_export_depend>
+  <build_export_depend>rospy</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <exec_depend>openni_camera</exec_depend>
+  <exec_depend>openni_launch</exec_depend>
+  <exec_depend>rospy</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+  <export>
+  </export>
+</package>
