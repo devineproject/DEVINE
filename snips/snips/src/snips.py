@@ -51,7 +51,7 @@ def on_snips_message(client, userdata, msg): # pylint: disable=W0613
     if data['slots']:
         rospy.loginfo("Received message %s, detected: %s", data['input'],
                       data['slots'][0]['value']['value'].lower())
-        ROS_PUBLISHER.publish(data['slots'][0]['value']['value'].lower())
+        ROS_PUBLISHER.publish(data['input'] + "|" + data['slots'][0]['value']['value'].lower())
 
 
 def create_ros_listener():
