@@ -8,4 +8,4 @@ sudo pip3 install Cython scikit-image bson pymongo pycocotools keras catkin_pkg 
 wget https://github.com/matterport/Mask_RCNN/releases/download/v2.1/mask_rcnn_coco.h5
 
 #Reload env
-bash
+exec bash

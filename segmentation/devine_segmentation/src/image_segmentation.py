@@ -5,6 +5,7 @@ import sys
 import os
 import datetime
 import queue
+from io import BytesIO
 #import pickle
 
 import rospy
@@ -12,7 +13,7 @@ from sensor_msgs.msg import CompressedImage
 from std_msgs.msg import String
 
 import numpy as np
-import skimage.io
+from PIL import Image
 from bson import json_util
 
 sys.path.append(os.path.join(sys.path[0], '../../Mask_RCNN'))
@@ -58,57 +59,50 @@ class RCNNSegmentation(object):
         self.model.load_weights(COCO_MODEL_PATH, by_name=True) #blocking I/O in constructor!
 
     def correct_array(self, bbox, im_height):
-        '''correct_array'''
+        '''Correct the bounding box position for usage in guesswhat'''
         correct_boxes = np.zeros(bbox.shape)
-        for counter, (original_array, new_array) in enumerate(zip(bbox, correct_boxes)):
+        for counter, (original_array, _) in enumerate(zip(bbox, correct_boxes)):
             width = original_array[3] - original_array[1]
             height = original_array[2] - original_array[0]
             left = original_array[1]
             top = im_height - original_array[2]
-            correct_boxes[counter][:] = np.array([left, top, height, width])
+            correct_boxes[counter] = np.array([left, top, height, width])
         return correct_boxes
 
     def segment(self, img):
         '''Actual segmentation of the image'''
-        #TODO: Don't use disk i/o...
-        image_name = '/tmp/segmentedimage.jpg'
-        image_file = open(image_name, 'wb')
-        image_file.write(img)
-        image = skimage.io.imread(image_name)
-        height, width, depth = image.shape
+        rospy.logdebug("Starting segmentation")
+        image = np.array(Image.open(BytesIO(img)))
+        height, width, _ = image.shape
+        timestamp = '{:%Y-%b-%d %H:%M:%S}'.format(datetime.datetime.now())
         results = self.model.detect([image])
-        result1 = results[0]
+        if len(results) != 1:
+            rospy.logerr("Couldn't segment image")
+            return "{}"
+        rospy.logdebug("Segmentation done")
+        result = results[0]
         result_obj = {
-            "status": "success" if result1 else "failure",
-            "qas": [],
-            "questioner_id": 2,
-            "timestamp": '{:%Y-%b-%d %H:%M:%S}'.format(datetime.datetime.now()),
+            "timestamp": timestamp,
             "image": {
-                "file_name": image_name,
-                "coco_url": None,
                 "height": height,
-                "width": width,
-                "flickr_url": None,
-                "id": 1
+                "width": width
             },
-            "objects": [],
-            "object_id": 0,
-            "id": 1
+            "objects": []
         }
-        corrected_bounding_box = self.correct_array(result1['rois'], height)
+        corrected_bounding_box = self.correct_array(result['rois'], height)
         object_array = []
 
         # Debug file dump
         # with open('id.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result1['class_ids'], pickle_file)
+        #     pickle.dump(result['class_ids'], pickle_file)
         # with open('scores.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result1['scores'], pickle_file)
+        #     pickle.dump(result['scores'], pickle_file)
         # with open('masks.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result1['masks'], pickle_file)
+        #     pickle.dump(result['masks'], pickle_file)
         # with open('rois.pkl','wb') as pickle_file:
-        #     result1['rois'].dump(pickle_file)
+        #     result['rois'].dump(pickle_file)
 
-        for current_id, (class_id, bounding_box) in enumerate(zip(result1['class_ids'], corrected_bounding_box)):
+        for current_id, (class_id, bounding_box) in enumerate(zip(result['class_ids'], corrected_bounding_box)):
             object_area = 0 # figure out if we ever use the area
             # According the MsCoco api this seems to be the mask area
             # (check if maskrcnn can produce this)
@@ -156,6 +150,10 @@ class ROSRCNNSegmentation(RCNNSegmentation):
             self.publisher.publish(json)
             rate.sleep()
 
-if __name__ == '__main__':
+def main():
+    '''Entry point of this file'''
     ros_segmentation = ROSRCNNSegmentation()
     ros_segmentation.loop()
+
+if __name__ == '__main__':
+    main()
