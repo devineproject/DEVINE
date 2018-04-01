@@ -1,3 +1,6 @@
 [submodule "guesswhat/guesswhat"]
 	path = guesswhat/guesswhat
 	url = git@github.com:FelixMartel/guesswhat.git
+[submodule "segmentation/Mask_RCNN"]
+	path = segmentation/Mask_RCNN
+	url = git@github.com:matterport/Mask_RCNN.git
