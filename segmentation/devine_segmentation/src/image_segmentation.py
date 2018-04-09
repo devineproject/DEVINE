@@ -26,7 +26,7 @@ COCO_MODEL_PATH = os.path.join(ROOT_DIR, "../../mask_rcnn_coco.h5")
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
 #topics
-IMAGE_TOPIC = '/camera/rgb/image_color/compressed'
+IMAGE_TOPIC = '/devine/image' # or directly from openni: '/camera/rgb/image_color/compressed'
 SEGMENTATION_TOPIC = '/rcnn_segmentation'
 
 class RCNNSegmentation(object):
@@ -125,30 +125,28 @@ class RCNNSegmentation(object):
 
 class ROSRCNNSegmentation(RCNNSegmentation):
     '''ROS Wrapper of RCNN Segmentation'''
-    image_queue = queue.Queue(2)
+    image_queue = queue.Queue(2) #Images must be segmented on the main thread
 
     def __init__(self):
         super(ROSRCNNSegmentation, self).__init__()
         rospy.init_node('image_segmentation')
         rospy.Subscriber(IMAGE_TOPIC, CompressedImage,
-                         self.image_received_callback, queue_size=2)
+                         self.image_received_callback, queue_size=1)
         self.publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10)
 
     def image_received_callback(self, data):
         '''Callback when a new image is received from the topic'''
         if self.image_queue.full():
+            rospy.logwarn("image_segmentation: image receiving rate is too high !")
             self.image_queue.get()
         self.image_queue.put(data.data)
-        rospy.sleep(10.) #in seconds
 
     def loop(self):
         '''Looping method to segment every image'''
-        rate = rospy.Rate(0.1) #0.1 Hz publishing rate
         while True:
             img = self.image_queue.get() #blocking
             json = self.segment(img)
             self.publisher.publish(json)
-            rate.sleep()
 
 def main():
     '''Entry point of this file'''
