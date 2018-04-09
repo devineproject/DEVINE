@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
-import rospy
-import actionlib
+import rospy, actionlib
 
 from control_msgs.msg import (FollowJointTrajectoryAction, FollowJointTrajectoryGoal)
 from trajectory_msgs.msg import (JointTrajectoryPoint)
