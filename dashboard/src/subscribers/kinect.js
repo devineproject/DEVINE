@@ -2,74 +2,150 @@ import ros from '../ros';
 import ROSLIB from 'roslib';
 import $ from 'cash-dom';
 
-var listener = new ROSLIB.Topic({
-  ros: ros,
-  name: '/camera/rgb/image_color/compressed',
-  messageType: 'sensor_msgs/CompressedImage'
+const subscribeCheckbox = $("#subscribe_checkbox");
+const segmentationCheckbox = $("#segmentation_checkbox");
+const objectPos2d = $("#kinect_pos_found");
+const objectPos3d = $("#kinect_pos_calc");
+const image = $("#kinect_image")[0].getContext("2d");
+const history = $('#kinect_image_history');
+
+const topicListeners = {
+  image: new ROSLIB.Topic({
+    ros: ros,
+    name: '/camera/rgb/image_color/compressed',
+    messageType: 'sensor_msgs/CompressedImage'
+  }),
+  segmentation_image: new ROSLIB.Topic({
+    ros: ros,
+    name: '/devine/image',
+    messageType: 'sensor_msgs/CompressedImage'
+  }),
+  segmentation: new ROSLIB.Topic({
+    ros: ros,
+    name: "/rcnn_segmentation",
+    messageType: 'std_msgs/String'
+  }),
+  object_position_2d: new ROSLIB.Topic({
+    ros: ros,
+    name: '/object_found',
+    messageType: 'std_msgs/Int32MultiArray'
+  }),
+  object_position_3d: new ROSLIB.Topic({
+    ros: ros,
+    name: '/object_location',
+    messageType: 'std_msgs/Float32MultiArray'
+  })
+};
+
+const topicHistory = {
+  image: [],
+  segmentation_image: [],
+  segmentation: [],
+  object_position_2d: [],
+  object_position_3d: [],
+  position: 1
+};
+
+subscribeCheckbox.on("change", function() {
+  if (this.checked) {
+    topicListeners.image.subscribe(handleTopicData.bind(this, 'image'));
+    topicListeners.object_position_2d.subscribe(handleTopicData.bind(this, 'object_position_2d'));
+    topicListeners.object_position_3d.subscribe(handleTopicData.bind(this, 'object_position_3d'));
+    if (segmentationCheckbox.is(":checked")) {
+      topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
+      topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+    }
+  } else {
+    for (let i in topicListeners) {
+      topicListeners[i].unsubscribe();
+    }
+  }
 });
 
-var posListener = new ROSLIB.Topic({
-  ros: ros,
-  name: '/object_found',
-  messageType: 'std_msgs/Int32MultiArray'
-});
-
-var calcListener = new ROSLIB.Topic({
-  ros: ros,
-  name: '/object_location',
-  messageType: 'std_msgs/Float32MultiArray'
-});
-
-$('.command-view[name="kinect"]').find('input[type="checkbox"]').on("change", function () {
-  toggle_video(this.checked);
+segmentationCheckbox.on("change", function() {
+  if (this.checked && subscribeCheckbox.is(":checked")) {
+    topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
+    topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+  } else {
+    topicListeners.segmentation.unsubscribe();
+    topicListeners.segmentation_image.unsubscribe();
+  }
 });
 
 $('#kinect_image_type').on("change", function () {
-  toggle_video(false);
-  listener.name = this.value;
-  toggle_video($('.command-view[name="kinect"]')
-    .find('input[type="checkbox"]')
-    .is(":checked"));
+  topicListeners.image.name = this.value;
 });
 
-function toggle_video(play) {
-  if (play) {
-    var pos_found = null;
-    const found_ctx = document.getElementById("kinect_pos_found");
-    const found_pos_ctx = document.getElementById("kinect_image_obj_position");
-    const calc_ctx = document.getElementById("kinect_pos_calc");
-    const ctx = document.getElementById("kinect_image");
-    listener.subscribe(throttle(function (message) {
-      ctx.src = "data:image/jpg;base64, " + message.data;
-      if (pos_found !== null) {
-        found_pos_ctx.style.visibility = "visible";
-        found_pos_ctx.style.left = `${pos_found[0]}px`;
-        found_pos_ctx.style.top = `${pos_found[1]}px`;
-      }
-    }, 100));
+history.on("change", function() {
+  topicHistory.position = Math.max(this.value, 1);
+  draw();
+});
 
-    posListener.subscribe(throttle(function (message) {
-      if (message && message.data) {
-        console.log(`Position Found: (${message.data[0]}, ${message.data[1]})`);
-        found_ctx.innerText = `(${message.data[0]}, ${message.data[1]})`;
-        pos_found = message.data;
-      }
-    }, 1000));
+//We want to limit drawing for performance, yet we might want to keep all data
+const draw = throttle(function draw() {
+  let obj_pos_2d = getElem(topicHistory.object_position_2d);
+  let obj_pos_3d = getElem(topicHistory.object_position_3d);
+  let image_length = 0, seg, img;
 
-    var cleanFloat = number => number===null ? "N/A" : number.toFixed(2);
-
-    calcListener.subscribe(throttle(function (message) {
-      if (message && message.data) {
-        console.log(`Position Calculated: (${message.data[0]}, ${message.data[1]})`);
-        calc_ctx.innerText = `(${cleanFloat(message.data[0])}, `+
-        `${cleanFloat(message.data[1])}, ${cleanFloat(message.data[2])})`;
-      }
-    }, 1000));
+  if (segmentationCheckbox.is(":checked")) {
+    image_length = topicHistory.segmentation_image.length;
+    seg = getSeg();
+    img = getElem(topicHistory.segmentation_image);
   } else {
-    listener.unsubscribe();
-    posListener.unsubscribe();
-    calcListener.unsubscribe();
+    image_length = topicHistory.image.length;
+    img = getElem(topicHistory.image);
+  } 
+
+  if (obj_pos_2d != undefined) {
+    objectPos2d.innerText = `(${obj_pos_2d[0]}, ${obj_pos_2d[1]})`;
   }
+
+  if (obj_pos_3d != undefined) {
+    let cleanFloat = number => number===null ? "N/A" : number.toFixed(2);
+    objectPos3d.innerText = `(${cleanFloat(obj_pos_3d[0])}, ` +
+      `${cleanFloat(obj_pos_3d[1])}, ${cleanFloat(obj_pos_3d[2])})`;
+  }
+
+  if (img != undefined) {
+    history.prop('max', image_length);
+    let imageObject = new Image();
+    imageObject.onload = function() {
+      image.clearRect(0, 0, 640, 480);
+      image.beginPath();
+      image.drawImage(imageObject, 0, 0);
+      image.font = "12px arial";
+      if (seg != undefined) {
+        let segmentedDataObj = JSON.parse(seg);
+        let objs = segmentedDataObj.objects;
+        if (objs) {
+          objs.forEach(obj => {
+            let [left, top, height, width] = obj.bbox;
+            image.rect(left, 480-top-height, width, height);
+            image.fillText(obj.category, left, 480-top-height-1);
+          });
+        }
+      }
+      image.stroke();
+    };
+    imageObject.src = "data:image/jpg;base64, " + img;  
+  }  
+}, 100);
+
+function handleTopicData(topic, msg) {
+  topicHistory[topic].push(msg.data);
+  // 50 kinect images ~= 2.6 mb
+  if (topicHistory[topic].length >= 50) {
+    topicHistory[topic].shift();
+  }
+  draw();
+}
+
+function getElem(arr) {
+  return arr[arr.length - topicHistory.position];
+}
+
+function getSeg() {
+  return topicHistory.segmentation[topicHistory.segmentation_image.length - topicHistory.position];
 }
 
 // Taken from underscore.js

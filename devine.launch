@@ -2,10 +2,10 @@
   <arg name="kinect" default="true"/>
   <arg name="snips" default="true"/>
   <arg name="gameSystem" default="true"/>
+  <arg name="dashboard" default="true" />
   <group if="$(arg kinect)">
-    <include file="$(find openni_launch)/launch/openni.launch">
-      <arg name="camera" value="openni"/>
-    </include>
+    <include file="$(find openni_launch)/launch/openni.launch" />
+    <node name="img_throttle" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.03 /devine/image" />
     <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
     <node name="image_segmentation" pkg="devine_segmentation" type="image_segmentation.py" respawn="true" />
   </group>
@@ -14,5 +14,8 @@
   </group>
   <group if="$(arg gameSystem)">
     <node name="game_system" pkg="game_system" type="client.py" respawn="true" />
+  </group>
+  <group if="$(arg dashboard)">
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
   </group>
 </launch>
