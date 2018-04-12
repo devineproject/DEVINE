@@ -3,8 +3,8 @@
   <name>snips</name>
   <version>0.0.0</version>
   <description>The unofficial snips.ai package</description>
-  <maintainer email="ismael.balafrej@usherbrooke.ca">Ismael Balafrej</maintainer>
-  <author email="ismael.balafrej@usherbrooke.ca">Ismael Balafrej</author>
+  <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
+  <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
   <license>BSD License 2.0</license>
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
