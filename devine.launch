@@ -7,7 +7,8 @@
     <include file="$(find openni_launch)/launch/openni.launch" />
     <node name="img_throttle" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.03 /devine/image" />
     <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
-    <node name="image_segmentation" pkg="devine_segmentation" type="image_segmentation.py" respawn="true" />
+    <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
+    <node name="segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
   </group>
   <group if="$(arg snips)">
     <node name="snips" pkg="snips" type="snips.py" respawn="true" />

@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>devine_segmentation</name>
+  <name>devine_image_processing</name>
   <version>0.0.1</version>
-  <description>The devine_segmentation package</description>
+  <description>The devine_image_processing package</description>
   <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
   <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
   <license>BSD License 2.0</license>
