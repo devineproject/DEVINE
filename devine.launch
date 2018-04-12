@@ -3,6 +3,7 @@
   <arg name="snips" default="true"/>
   <arg name="gameSystem" default="true"/>
   <arg name="dashboard" default="true" />
+  <arg name="guesswhat" default="true" />
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
     <node name="img_throttle" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.03 /devine/image" />
@@ -18,5 +19,8 @@
   </group>
   <group if="$(arg dashboard)">
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+  </group>
+  <group if="$(arg guesswhat)">
+    <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
   </group>
 </launch>
