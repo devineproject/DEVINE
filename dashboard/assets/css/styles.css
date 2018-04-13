@@ -1,0 +1,24 @@
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.kinect-logo {
+    max-height: 60px;
+}
+
+.card {
+    margin-top: 16px;
+}
+
+.card-header {
+    color: white;
+}
+
+#kinect_image {
+    background-color: grey;
+}
+
+.card .uk-checkbox {
+    margin-left: 15px;
+}

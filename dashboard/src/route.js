@@ -1,6 +1,8 @@
 import $ from 'cash-dom';
 
 export default function route(command, replace = false) {
+  return;
+  
   if (command[0] === '/')
     command = command.slice(1);
   if (replace)

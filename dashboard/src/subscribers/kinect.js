@@ -2,12 +2,17 @@ import ros from '../ros';
 import ROSLIB from 'roslib';
 import $ from 'cash-dom';
 
-const subscribeCheckbox = $("#subscribe_checkbox");
+const cameraCheckbox = $("#camera_checkbox");
 const segmentationCheckbox = $("#segmentation_checkbox");
 const objectPos2d = $("#kinect_pos_found");
 const objectPos3d = $("#kinect_pos_calc");
-const image = $("#kinect_image")[0].getContext("2d");
+const canvas = $("#kinect_image")[0];
+const image = canvas.getContext("2d");
 const history = $('#kinect_image_history');
+
+image.fillStyle = "red";
+image.font = "bold 20pt Arial";
+image.fillText("< No Camera Feed />", 200, (canvas.height / 2));
 
 const topicListeners = {
   image: new ROSLIB.Topic({
@@ -46,7 +51,7 @@ const topicHistory = {
   position: 1
 };
 
-subscribeCheckbox.on("change", function() {
+cameraCheckbox.on("change", function() {
   if (this.checked) {
     topicListeners.image.subscribe(handleTopicData.bind(this, 'image'));
     topicListeners.object_position_2d.subscribe(handleTopicData.bind(this, 'object_position_2d'));
@@ -63,7 +68,7 @@ subscribeCheckbox.on("change", function() {
 });
 
 segmentationCheckbox.on("change", function() {
-  if (this.checked && subscribeCheckbox.is(":checked")) {
+  if (this.checked && cameraCheckbox.is(":checked")) {
     topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
     topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
   } else {
