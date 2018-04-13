@@ -10,10 +10,6 @@ const canvas = $("#kinect_image")[0];
 const image = canvas.getContext("2d");
 const history = $('#kinect_image_history');
 
-image.fillStyle = "red";
-image.font = "bold 20pt Arial";
-image.fillText("< No Camera Feed />", 200, (canvas.height / 2));
-
 const topicListeners = {
   image: new ROSLIB.Topic({
     ros: ros,
@@ -64,6 +60,7 @@ cameraCheckbox.on("change", function() {
     for (let i in topicListeners) {
       topicListeners[i].unsubscribe();
     }
+    setTimeout(() => drawNoFeed(), 200);
   }
 });
 
@@ -85,6 +82,14 @@ history.on("change", function() {
   topicHistory.position = Math.max(this.value, 1);
   draw();
 });
+
+function drawNoFeed() {
+  image.fillStyle = "red";
+  image.font = "bold 20pt Arial";
+  image.fillText("< No Camera Feed />", 190, (canvas.height / 2));
+}
+
+drawNoFeed(); // No feed at boot
 
 //We want to limit drawing for performance, yet we might want to keep all data
 const draw = throttle(function draw() {
@@ -118,7 +123,6 @@ const draw = throttle(function draw() {
       image.clearRect(0, 0, 640, 480);
       image.beginPath();
       image.drawImage(imageObject, 0, 0);
-      image.font = "12px arial";
       if (seg != undefined) {
         let segmentedDataObj = JSON.parse(seg);
         let objs = segmentedDataObj.objects;

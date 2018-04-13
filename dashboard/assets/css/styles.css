@@ -3,8 +3,22 @@ html, body {
     width: 100%;
 }
 
-.kinect-logo {
-    max-height: 60px;
+::-moz-selection {
+    background-color: #317572 !important;
+    color: #fff !important;
+ }
+ ::selection {
+     background-color: #317572 !important;
+     color: #fff !important;
+ }
+
+#console {
+    overflow-x: auto;
+    height: 600px;
+    max-width: 600px;
+    background-color: transparent;
+    border: none;
+    color: white;
 }
 
 .card {
