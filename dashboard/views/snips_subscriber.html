@@ -1,5 +1,22 @@
-<label><input type="checkbox" class="uk-checkbox"> Subscribe</label>
-<br />
-<input type="text" id="snips_ask" placeholder="Is the object blue ?"><button id="snips_ask_btn">Ask</button>
-<br />
-<pre class="subscriber-log" style="overflow-x:auto; height:600px;"></pre>
+<div class="card border-warning mb-3">
+    <h3 class="card-header">
+        Snips
+    </h3>
+    <ul class="list-group list-group-flush mt-0">
+        <li class="list-group-item">
+            <label class="mb-0">
+                <input id="snips_checkbox" type="checkbox" class="uk-checkbox"> Subscribe</label>
+        </li>
+        <li class="list-group-item">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text" id="btnGroupAddon">Question</div>
+                </div>
+                <input id="snips_ask" placeholder="Is the object blue ?" type="text" class="form-control" style="border: none;">
+                <div class="input-group-append">
+                    <button id="snips_ask_btn" type="button" class="btn btn-primary">Ask</button>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>

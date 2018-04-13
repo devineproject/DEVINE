@@ -1,6 +1,15 @@
-html, body {
+/* html, body {
     height: 100%;
     width: 100%;
+} */
+
+body, html {
+    height: 100%;
+}
+
+
+body > div {
+    background-color: #222;
 }
 
 ::-moz-selection {

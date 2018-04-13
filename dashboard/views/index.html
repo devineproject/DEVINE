@@ -16,13 +16,17 @@
       <div class="col-sm">
         {% include 'console.html' %}
       </div>
-      <div class="col-sm border border-info">
-        One of three columns
+      <div class="col-sm">
+        {% include 'gamestate_subscriber.html' %}
+        {% include 'snips_subscriber.html' %}
       </div>
       <div class="col-sm">
         {% include 'kinect_subscriber.html' %}
       </div>
+      <div class="clear" style="clear: both;"></div>
+
     </div>
+
   </div>
 
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"

@@ -1,11 +1,14 @@
 import ROSLIB from 'roslib';
+import LogConsole from './console'
+
+const cons = new LogConsole("ROS", "grey")
 
 const ros = new ROSLIB.Ros({
   url: `ws://${window.location.hostname}:9090`
 });
 
-ros.on('connection', () => console.log('Rosbridge connection established'))
-ros.on('error', () => console.log('Rosbridge connection error'))
-ros.on('close', () => console.log('Rosbridge connection closed'))
+ros.on('connection', () => cons.log('Rosbridge connection established'))
+ros.on('error', () => cons.log('Rosbridge connection error'))
+ros.on('close', () => cons.log('Rosbridge connection closed'))
 
 export default ros;

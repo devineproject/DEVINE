@@ -1,7 +1,9 @@
 import ros from '../ros';
+import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'cash-dom';
 
+const cons = new LogConsole("Kinect", "#3498DB");
 const cameraCheckbox = $("#camera_checkbox");
 const segmentationCheckbox = $("#segmentation_checkbox");
 const objectPos2d = $("#kinect_pos_found");
@@ -56,10 +58,12 @@ cameraCheckbox.on("change", function() {
       topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
       topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
     }
+    cons.log("Camera subscribed")
   } else {
     for (let i in topicListeners) {
       topicListeners[i].unsubscribe();
     }
+    cons.log("Camera unsubscribed")
     setTimeout(() => drawNoFeed(), 200);
   }
 });
@@ -68,9 +72,11 @@ segmentationCheckbox.on("change", function() {
   if (this.checked && cameraCheckbox.is(":checked")) {
     topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
     topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+    cons.log("Segmentation subscribed")
   } else {
     topicListeners.segmentation.unsubscribe();
     topicListeners.segmentation_image.unsubscribe();
+    cons.log("Segmentation unsubscribed")
   }
 });
 
