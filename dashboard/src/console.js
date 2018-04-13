@@ -1,7 +1,6 @@
 import $ from 'cash-dom';
 
 export default class LogConsole {
-
     constructor(source, color) {
         this.console = document.getElementById("console");
         this.source = source;

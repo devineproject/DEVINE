@@ -1,3 +1,4 @@
+// File unused
 import $ from 'cash-dom';
 
 export default function route(command, replace = false) {

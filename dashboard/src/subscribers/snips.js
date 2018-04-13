@@ -19,6 +19,7 @@ const ask_listener = new ROSLIB.Topic({
 });
 
 snipsCheckbox.on("change", function () {
+  $('#snips_ask_btn').prop('disabled', !this.checked);
   if (this.checked) {
     answer_listener.subscribe(function (message) {
       if (message.data && message.data.indexOf("|") !== -1) {

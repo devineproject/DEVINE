@@ -95,7 +95,7 @@ function drawNoFeed() {
   image.fillText("< No Camera Feed />", 190, (canvas.height / 2));
 }
 
-drawNoFeed(); // No feed at boot
+drawNoFeed(); // No feed at startup
 
 //We want to limit drawing for performance, yet we might want to keep all data
 const draw = throttle(function draw() {
