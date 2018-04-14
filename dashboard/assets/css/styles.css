@@ -47,6 +47,7 @@ body > div {
 
 #publisher_topics {
     max-height: 500px;
+    max-width: 450px;
     overflow: auto;
 }
 

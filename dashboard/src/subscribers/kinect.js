@@ -1,5 +1,5 @@
 import ros from '../ros';
-import { distinctColors } from '../colors'
+import { distinctColors } from '../vars'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';

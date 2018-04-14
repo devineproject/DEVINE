@@ -1,4 +1,5 @@
 import ROSLIB from 'roslib';
+import { devineTopics } from './vars'
 import LogConsole from './console'
 import $ from 'jquery';
 
@@ -15,17 +16,21 @@ ros.on('connection', () => {
 ros.on('error', () => cons.log('Rosbridge connection error'));
 ros.on('close', () => cons.log('Rosbridge connection closed'));
 
-function setTopicsList(topics) {
-  for (var i in topics.topics) {
-    $("#publisher_topics").append(`<a class="dropdown-item">${topics.topics[i]}</a>`);
+function setTopicsList(rosTopics) {
+  for (var i in rosTopics.topics) {
+    $(`<a class="dropdown-item">${rosTopics.topics[i]}</a>`).insertAfter(".all-topics");
   }
 }
 
-$("#publisher_topics .dropdown-item").on("click", function() {
+for (var i in devineTopics) {
+  $(`<a class="dropdown-item">${devineTopics[i]}</a>`).insertAfter(".common-topics");
+}
+
+$("#publisher_topics .dropdown-item").on("click", function () {
   $("#publisher_topic").val(this.text);
 });
 
-$("#publisher_publish").on("click", function() {
+$("#publisher_publish").on("click", function () {
   var topic = $("#publisher_topic").val() || $("#publisher_topic").attr("placeholder");
   var message = $("#publisher_message").val() || $("#publisher_message").attr("placeholder");
 
@@ -34,7 +39,7 @@ $("#publisher_publish").on("click", function() {
     name: topic,
     messageType: 'std_msgs/String'
   });
-  cmdTopic.publish({data:message});
+  cmdTopic.publish({ data: message });
   cons.log(`[${topic}] ${message}`);
 });
 
