@@ -31,16 +31,16 @@ snipsCheckbox.on("change", function () {
     ask_listener.subscribe(function (message) {
       cons.log(`Question sent: ${message.data}`)
     });
-    cons.log("Subscribed")
+    cons.log("Subscribed");
   } else {
     answer_listener.unsubscribe();
     ask_listener.unsubscribe();
-    cons.log("Unsubscribed")
+    cons.log("Unsubscribed");
   }
 });
 
 $("#snips_ask_btn").on("click", function() {
-  var val = $("#snips_ask").val();
+  var val = $("#snips_ask").val() || $("#snips_ask").attr("placeholder");
   ask_listener.publish({data:val});
 });
 
