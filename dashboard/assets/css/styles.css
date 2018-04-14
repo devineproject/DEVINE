@@ -18,7 +18,7 @@ body > div {
 #console {
     overflow-x: auto;
     height: 630px;
-    max-width: 600px;
+    max-width: 500px;
     background-color: transparent;
     border: none;
     color: white;
@@ -54,4 +54,9 @@ body > div {
 .btn {
     /* Fix bug with overlapping dropdown menu */
     z-index: 0 !important;
+}
+
+#clear_console {
+    padding-top: 3px;
+    padding-bottom: 3px;
 }

@@ -34,12 +34,13 @@ $("#publisher_publish").on("click", function () {
   var topic = $("#publisher_topic").val() || $("#publisher_topic").attr("placeholder");
   var message = $("#publisher_message").val() || $("#publisher_message").attr("placeholder");
 
-  const cmdTopic = new ROSLIB.Topic({
+  new ROSLIB.Topic({
     ros: ros,
     name: topic,
+    latch: true,
     messageType: 'std_msgs/String'
-  });
-  cmdTopic.publish({ data: message });
+  }).publish({ data: message });
+
   cons.log(`[${topic}] ${message}`);
 });
 

@@ -13,7 +13,6 @@ const listener = new ROSLIB.Topic({
 });
 
 gameStateCheckbox.on("change", function () {
-  
   const view = $('.command-view[name="gamestate"]').find('.subscriber-log')[0];
   if (this.checked) {
     listener.subscribe(function (message) {

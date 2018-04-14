@@ -117,8 +117,8 @@ function drawObjectsRectangles(objects) {
 
     image.beginPath();
     let [left, top, width, height] = objects[i].bbox;
-    image.rect(left, 480 - top - height, width, height);
-    image.fillText(objects[i].category, left, 480 - top - height - 1);
+    image.rect(left, top, width, height);
+    image.fillText(objects[i].category, left, top - 1);
     image.stroke();
     image.closePath();
   }
@@ -159,7 +159,7 @@ const draw = throttle(function draw() {
       image.lineWidth = "2";
 
       if (obj_pos_2d != undefined) {
-        drawPositionFound(obj_pos_2d[0], obj_pos_2d[1]);
+        drawPositionFound(obj_pos_2d[0], 480 - obj_pos_2d[1]);
       }
 
       if (seg != undefined) {
