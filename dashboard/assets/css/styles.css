@@ -44,3 +44,13 @@ body > div {
 .card .custom-checkbox:first-child {
     margin-left: 0;
 }
+
+#publisher_topics {
+    max-height: 500px;
+    overflow: auto;
+}
+
+.btn {
+    /* Fix bug with overlapping dropdown menu */
+    z-index: 0 !important;
+}

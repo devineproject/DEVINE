@@ -8,9 +8,18 @@ const ros = new ROSLIB.Ros({
   url: `ws://${window.location.hostname}:9090`
 });
 
-ros.on('connection', () => cons.log('Rosbridge connection established'));
+ros.on('connection', () => {
+  cons.log('Rosbridge connection established');
+  ros.getTopics(setTopicsList);
+});
 ros.on('error', () => cons.log('Rosbridge connection error'));
 ros.on('close', () => cons.log('Rosbridge connection closed'));
+
+function setTopicsList(topics) {
+  for (var i in topics.topics) {
+    $("#publisher_topics").append(`<a class="dropdown-item">${topics.topics[i]}</a>`);
+  }
+}
 
 $("#publisher_topics .dropdown-item").on("click", function() {
   $("#publisher_topic").val(this.text);
