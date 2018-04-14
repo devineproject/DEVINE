@@ -1,6 +1,10 @@
 import ros from '../ros';
+import LogConsole from '../console'
 import ROSLIB from 'roslib';
-import $ from 'cash-dom';
+import $ from 'jquery';
+
+const cons = new LogConsole("Snips", "#F39C12");
+const snipsCheckbox = $("#snips_checkbox");
 
 const answer_listener = new ROSLIB.Topic({
   ros: ros,
@@ -14,31 +18,29 @@ const ask_listener = new ROSLIB.Topic({
   messageType: 'std_msgs/String'
 });
 
-$('.command-view[name="snips"]').find('input[type="checkbox"]').on("change", function () {
-  const view = $('.command-view[name="snips"]').find('.subscriber-log')[0];
+snipsCheckbox.on("change", function () {
+  $('#snips_ask_btn').prop('disabled', !this.checked);
   if (this.checked) {
     answer_listener.subscribe(function (message) {
       if (message.data && message.data.indexOf("|") !== -1) {
         var [receivedMessage, detectedMessage] = message.data.split("|");
-        view.innerText += `Answer received: ${receivedMessage}\n`;
-        view.innerText += `Answer detected: ${detectedMessage}\n`;
-        view.scrollTop = view.scrollHeight;
+        cons.log(`Answer received: ${receivedMessage}`)
+        cons.log(`Answer detected: ${detectedMessage}`)
       }
     });
     ask_listener.subscribe(function (message) {
-      view.innerText += `Question sent: ${message.data}\n`;
-      view.scrollTop = view.scrollHeight;
+      cons.log(`Question sent: ${message.data}`)
     });
+    cons.log("Subscribed");
   } else {
-    answer_listener.unsubscribe();
-    ask_listener.unsubscribe();
-    view.innerText += '=======Unsubscribed=======\n';
-    view.scrollTop = view.scrollHeight;
+    answer_listener.removeAllListeners();
+    ask_listener.removeAllListeners();
+    cons.log("Unsubscribed");
   }
 });
 
 $("#snips_ask_btn").on("click", function() {
-  var val = $("#snips_ask").val();
+  var val = $("#snips_ask").val() || $("#snips_ask").attr("placeholder");
   ask_listener.publish({data:val});
 });
 

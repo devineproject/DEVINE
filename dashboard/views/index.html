@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>🤖 Robot dashboard</title>
-  </head>
-  <body>
-    <div class="uk-grid" uk-grid>
-      <div class="uk-width-1-6">
-        <ul class="uk-list">
-          <li>
-            <form class="uk-search">
-              <input class="uk-search-input command-search" type="search" placeholder="Search... (Todo)">
-            </form>
-          </li>
-          <li class="command-gamestate command-menu">Game State</li>
-          <li class="command-kinect command-menu">Kinect</li>
-          <li class="command-snips command-menu">Snips</li>
-        <ul>
+
+<head>
+  <meta charset="UTF-8">
+  <title>🤖 DEVINE Dashboard</title>
+
+  <!-- https://bootswatch.com/darkly/ -->
+  <link rel="stylesheet" href="/assets/css/bootstrap.darkly.min.css">
+  <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm">
+        {% include 'console.html' %}
       </div>
-      <div class="uk-width-expand command-view command-current" name="gamestate" hidden>
-        {% include 'subscriber.html' %}
-      </div>
-      <div class="uk-width-expand command-view" name="kinect" hidden>
-        {% include 'kinect_subscriber.html' %}
-      </div>
-      <div class="uk-width-expand command-view" name="snips" hidden>
+      <div class="col-sm">
+        {% include 'publisher.html' %}
+        {% include 'gamestate_subscriber.html' %}
         {% include 'snips_subscriber.html' %}
       </div>
+      <div class="col-sm">
+        {% include 'kinect_subscriber.html' %}
+      </div>
     </div>
-    <script src="dist/bundle.js"></script>
-  </body>
+  </div>
+
+  <script src="dist/bundle.js"></script>
+</body>
+
 </html>

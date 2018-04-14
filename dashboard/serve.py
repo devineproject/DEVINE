@@ -12,6 +12,7 @@ aiohttp_jinja2.setup(
 async def index(request):
     return aiohttp_jinja2.render_template('index.html', request, {})
 
+app.router.add_static('/assets', 'assets')
 app.router.add_static('/dist', 'dist')
 app.router.add_get('/', index)
 app.router.add_get('/{name}', index) # anything else is frontend routed

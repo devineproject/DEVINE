@@ -1,12 +1,15 @@
 import ros from '../ros';
+import LogConsole from '../console'
 import ROSLIB from 'roslib';
-import $ from 'cash-dom';
+import $ from 'jquery';
 
-const subscribeCheckbox = $("#subscribe_checkbox");
+const cons = new LogConsole("Kinect", "#3498DB");
+const cameraCheckbox = $("#camera_checkbox");
 const segmentationCheckbox = $("#segmentation_checkbox");
 const objectPos2d = $("#kinect_pos_found");
 const objectPos3d = $("#kinect_pos_calc");
-const image = $("#kinect_image")[0].getContext("2d");
+const canvas = $("#kinect_image")[0];
+const image = canvas.getContext("2d");
 const history = $('#kinect_image_history');
 
 const topicListeners = {
@@ -46,7 +49,7 @@ const topicHistory = {
   position: 1
 };
 
-subscribeCheckbox.on("change", function() {
+cameraCheckbox.on("change", function() {
   if (this.checked) {
     topicListeners.image.subscribe(handleTopicData.bind(this, 'image'));
     topicListeners.object_position_2d.subscribe(handleTopicData.bind(this, 'object_position_2d'));
@@ -55,20 +58,25 @@ subscribeCheckbox.on("change", function() {
       topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
       topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
     }
+    cons.log("Camera subscribed");
   } else {
     for (let i in topicListeners) {
-      topicListeners[i].unsubscribe();
+      topicListeners[i].removeAllListeners();
     }
+    cons.log("Camera unsubscribed");
+    setTimeout(() => drawNoFeed(), 200);
   }
 });
 
 segmentationCheckbox.on("change", function() {
-  if (this.checked && subscribeCheckbox.is(":checked")) {
+  if (this.checked && cameraCheckbox.is(":checked")) {
     topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
     topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+    cons.log("Segmentation subscribed");
   } else {
-    topicListeners.segmentation.unsubscribe();
-    topicListeners.segmentation_image.unsubscribe();
+    topicListeners.segmentation.removeAllListeners();
+    topicListeners.segmentation_image.removeAllListeners();
+    cons.log("Segmentation unsubscribed");
   }
 });
 
@@ -80,6 +88,14 @@ history.on("change", function() {
   topicHistory.position = Math.max(this.value, 1);
   draw();
 });
+
+function drawNoFeed() {
+  image.fillStyle = "red";
+  image.font = "bold 20pt Arial";
+  image.fillText("< No Camera Feed />", 190, (canvas.height / 2));
+}
+
+drawNoFeed(); // No feed at startup
 
 //We want to limit drawing for performance, yet we might want to keep all data
 const draw = throttle(function draw() {
@@ -113,7 +129,6 @@ const draw = throttle(function draw() {
       image.clearRect(0, 0, 640, 480);
       image.beginPath();
       image.drawImage(imageObject, 0, 0);
-      image.font = "12px arial";
       if (seg != undefined) {
         let segmentedDataObj = JSON.parse(seg);
         let objs = segmentedDataObj.objects;

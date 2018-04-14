@@ -1,6 +1,9 @@
-import $ from 'cash-dom';
+// File unused
+import $ from 'jquery';
 
 export default function route(command, replace = false) {
+  return;
+  
   if (command[0] === '/')
     command = command.slice(1);
   if (replace)

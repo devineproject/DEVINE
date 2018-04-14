@@ -1,6 +1,10 @@
 import ros from '../ros';
+import LogConsole from '../console'
 import ROSLIB from 'roslib';
-import $ from 'cash-dom';
+import $ from 'jquery';
+
+const cons = new LogConsole("Game State", "#E74C3C");
+const gameStateCheckbox = $("#gamestate_checkbox");
 
 const listener = new ROSLIB.Topic({
   ros: ros,
@@ -8,17 +12,17 @@ const listener = new ROSLIB.Topic({
   messageType: 'std_msgs/String'
 });
 
-$('.command-view[name="gamestate"]').find('input[type="checkbox"]').on("change", function () {
+gameStateCheckbox.on("change", function () {
+  
   const view = $('.command-view[name="gamestate"]').find('.subscriber-log')[0];
   if (this.checked) {
     listener.subscribe(function (message) {
-      view.innerText += `${message.data}\n`;
-      view.scrollTop = view.scrollHeight;
+      cons.log(message.data);
     });
+    cons.log("Subscribed")
   } else {
-    listener.unsubscribe();
-    view.innerText += '=======Unsubscribed=======\n';
-    view.scrollTop = view.scrollHeight;
+    listener.removeAllListeners();
+    cons.log("Unsubscribed")
   }
 });
 
