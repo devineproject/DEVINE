@@ -1,7 +1,7 @@
 import ros from '../ros';
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
-import $ from 'cash-dom';
+import $ from 'jquery';
 
 const cons = new LogConsole("Game State", "#E74C3C");
 const gameStateCheckbox = $("#gamestate_checkbox");

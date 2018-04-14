@@ -1,4 +1,4 @@
-import $ from 'cash-dom';
+import $ from 'jquery'
 
 export default class LogConsole {
     constructor(source, color) {

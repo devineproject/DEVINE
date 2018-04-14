@@ -1,5 +1,5 @@
 // File unused
-import $ from 'cash-dom';
+import $ from 'jquery';
 
 export default function route(command, replace = false) {
   return;

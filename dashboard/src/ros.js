@@ -1,6 +1,6 @@
 import ROSLIB from 'roslib';
 import LogConsole from './console'
-import $ from 'cash-dom';
+import $ from 'jquery';
 
 const cons = new LogConsole("ROS", "grey")
 

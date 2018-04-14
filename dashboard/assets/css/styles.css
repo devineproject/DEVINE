@@ -1,12 +1,6 @@
-/* html, body {
-    height: 100%;
-    width: 100%;
-} */
-
 body, html {
     height: 100%;
 }
-
 
 body > div {
     background-color: #222;
@@ -23,7 +17,7 @@ body > div {
 
 #console {
     overflow-x: auto;
-    height: 600px;
+    height: 630px;
     max-width: 600px;
     background-color: transparent;
     border: none;
@@ -42,6 +36,11 @@ body > div {
     background-color: grey;
 }
 
-.card .uk-checkbox {
+.card .custom-checkbox {
+    display: inline-block;
     margin-left: 15px;
+}
+
+.card .custom-checkbox:first-child {
+    margin-left: 0;
 }

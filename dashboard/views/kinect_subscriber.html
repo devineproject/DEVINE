@@ -1,7 +1,7 @@
 <div class="card mb-3 border-info">
   <h3 class="card-header">
     <span>Kinect Camera</span>
-    <select id="kinect_image_type" class="float-right">
+    <select id="kinect_image_type" class="float-right" style="font-size: 11pt;">
       <option value="/camera/rgb/image_color/compressed">Color Image</option>
       <option value="/camera/rgb/image_mono/compressed">Mono Image</option>
       <option value="/camera/ir/image_raw/compressed">IR</option>
@@ -9,10 +9,14 @@
   </h3>
   <div class="card-body">
     <b class="text-info">Subscriptions:</b>
-    <label class="mb-0">
-      <input id="camera_checkbox" type="checkbox" checked="" class="uk-checkbox"> Camera</label>
-    <label class="mb-0">
-      <input id="segmentation_checkbox" type="checkbox" checked="" class="uk-checkbox"> Segmentation</label>
+      <div class="custom-control custom-checkbox">
+        <input class="custom-control-input" id="camera_checkbox" checked="" type="checkbox">
+        <label class="custom-control-label" for="camera_checkbox">Camera</label>
+      </div>
+      <div class="custom-control custom-checkbox">
+        <input class="custom-control-input" id="segmentation_checkbox" checked="" type="checkbox">
+        <label class="custom-control-label" for="segmentation_checkbox">Segmentation</label>
+      </div>
   </div>
 
 
