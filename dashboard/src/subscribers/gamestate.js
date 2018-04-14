@@ -21,7 +21,7 @@ gameStateCheckbox.on("change", function () {
     });
     cons.log("Subscribed")
   } else {
-    listener.unsubscribe();
+    listener.removeAllListeners();
     cons.log("Unsubscribed")
   }
 });

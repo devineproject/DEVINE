@@ -61,7 +61,7 @@ cameraCheckbox.on("change", function() {
     cons.log("Camera subscribed");
   } else {
     for (let i in topicListeners) {
-      topicListeners[i].unsubscribe();
+      topicListeners[i].removeAllListeners();
     }
     cons.log("Camera unsubscribed");
     setTimeout(() => drawNoFeed(), 200);
@@ -74,8 +74,8 @@ segmentationCheckbox.on("change", function() {
     topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
     cons.log("Segmentation subscribed");
   } else {
-    topicListeners.segmentation.unsubscribe();
-    topicListeners.segmentation_image.unsubscribe();
+    topicListeners.segmentation.removeAllListeners();
+    topicListeners.segmentation_image.removeAllListeners();
     cons.log("Segmentation unsubscribed");
   }
 });

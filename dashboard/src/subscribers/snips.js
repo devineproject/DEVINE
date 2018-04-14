@@ -33,8 +33,8 @@ snipsCheckbox.on("change", function () {
     });
     cons.log("Subscribed");
   } else {
-    answer_listener.unsubscribe();
-    ask_listener.unsubscribe();
+    answer_listener.removeAllListeners();
+    ask_listener.removeAllListeners();
     cons.log("Unsubscribed");
   }
 });
