@@ -1,4 +1,5 @@
 import ros from '../ros';
+import { distinctColors } from '../vars'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
@@ -6,8 +7,8 @@ import $ from 'jquery';
 const cons = new LogConsole("Kinect", "#3498DB");
 const cameraCheckbox = $("#camera_checkbox");
 const segmentationCheckbox = $("#segmentation_checkbox");
-const objectPos2d = $("#kinect_pos_found");
-const objectPos3d = $("#kinect_pos_calc");
+const objectPos2d = $("#kinect_pos_found")[0];
+const objectPos3d = $("#kinect_pos_calc")[0];
 const canvas = $("#kinect_image")[0];
 const image = canvas.getContext("2d");
 const history = $('#kinect_image_history');
@@ -49,7 +50,7 @@ const topicHistory = {
   position: 1
 };
 
-cameraCheckbox.on("change", function() {
+cameraCheckbox.on("change", function () {
   if (this.checked) {
     topicListeners.image.subscribe(handleTopicData.bind(this, 'image'));
     topicListeners.object_position_2d.subscribe(handleTopicData.bind(this, 'object_position_2d'));
@@ -68,7 +69,7 @@ cameraCheckbox.on("change", function() {
   }
 });
 
-segmentationCheckbox.on("change", function() {
+segmentationCheckbox.on("change", function () {
   if (this.checked && cameraCheckbox.is(":checked")) {
     topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
     topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
@@ -84,18 +85,44 @@ $('#kinect_image_type').on("change", function () {
   topicListeners.image.name = this.value;
 });
 
-history.on("change", function() {
+history.on("change", function () {
   topicHistory.position = Math.max(this.value, 1);
   draw();
 });
 
+function setColor(color) {
+  image.strokeStyle = color;
+  image.fillStyle = color;
+}
+
 function drawNoFeed() {
-  image.fillStyle = "red";
+  setColor("red");
   image.font = "bold 20pt Arial";
   image.fillText("< No Camera Feed />", 190, (canvas.height / 2));
 }
 
 drawNoFeed(); // No feed at startup
+
+function drawPositionFound(x, y) {
+  setColor("#3498DB");
+  image.fillText("Found!", x + 8, y - 8);
+  image.fillRect(x - 3, y - 3, 6, 6);
+  image.fillRect(x - 20, y - 1, 40, 2);
+  image.fillRect(x - 1, y - 20, 2, 40);
+}
+
+function drawObjectsRectangles(objects) {
+  for (var i = 0; i < objects.length; i++) {
+    setColor(distinctColors[i % 14]);
+
+    image.beginPath();
+    let [left, top, width, height] = objects[i].bbox;
+    image.rect(left, top, width, height);
+    image.fillText(objects[i].category, left, top - 1);
+    image.stroke();
+    image.closePath();
+  }
+}
 
 //We want to limit drawing for performance, yet we might want to keep all data
 const draw = throttle(function draw() {
@@ -110,14 +137,14 @@ const draw = throttle(function draw() {
   } else {
     image_length = topicHistory.image.length;
     img = getElem(topicHistory.image);
-  } 
+  }
 
   if (obj_pos_2d != undefined) {
     objectPos2d.innerText = `(${obj_pos_2d[0]}, ${obj_pos_2d[1]})`;
   }
 
   if (obj_pos_3d != undefined) {
-    let cleanFloat = number => number===null ? "N/A" : number.toFixed(2);
+    let cleanFloat = number => number === null ? "N/A" : number.toFixed(2);
     objectPos3d.innerText = `(${cleanFloat(obj_pos_3d[0])}, ` +
       `${cleanFloat(obj_pos_3d[1])}, ${cleanFloat(obj_pos_3d[2])})`;
   }
@@ -125,25 +152,23 @@ const draw = throttle(function draw() {
   if (img != undefined) {
     history.prop('max', image_length);
     let imageObject = new Image();
-    imageObject.onload = function() {
+    imageObject.onload = function () {
       image.clearRect(0, 0, 640, 480);
-      image.beginPath();
       image.drawImage(imageObject, 0, 0);
+      image.font = "bold 12pt Arial";
+      image.lineWidth = "2";
+
+      if (obj_pos_2d != undefined) {
+        drawPositionFound(obj_pos_2d[0], 480 - obj_pos_2d[1]);
+      }
+
       if (seg != undefined) {
         let segmentedDataObj = JSON.parse(seg);
-        let objs = segmentedDataObj.objects;
-        if (objs) {
-          objs.forEach(obj => {
-            let [left, top, height, width] = obj.bbox;
-            image.rect(left, 480-top-height, width, height);
-            image.fillText(obj.category, left, 480-top-height-1);
-          });
-        }
+        drawObjectsRectangles(segmentedDataObj.objects);
       }
-      image.stroke();
     };
-    imageObject.src = "data:image/jpg;base64, " + img;  
-  }  
+    imageObject.src = "data:image/jpg;base64, " + img;
+  }
 }, 100);
 
 function handleTopicData(topic, msg) {

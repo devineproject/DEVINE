@@ -5,10 +5,16 @@ export default class LogConsole {
         this.console = document.getElementById("console");
         this.source = source;
         this.color = color;
+
+        $("#clear_console").on("click", () => this.clear());
     }
 
     log(message) {
         this.console.innerHTML += `<b><font color="${this.color}">${this.source}</font></b> > ${message}<br/>`;
         this.console.scrollTop = this.console.scrollHeight;
+    }
+
+    clear() {
+        this.console.innerHTML = "";
     }
 }

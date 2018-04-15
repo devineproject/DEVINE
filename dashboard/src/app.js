@@ -3,6 +3,7 @@ import ROSLIB from 'roslib';
 import gamestate from './subscribers/gamestate';
 import kinect from './subscribers/kinect';
 import snips from './subscribers/snips';
+import guesswhat from './subscribers/guesswhat';
 import $ from 'jquery'
 
 try {
