@@ -1,20 +1,24 @@
 import $ from 'jquery'
 
 export default class LogConsole {
-    constructor(source, color) {
-        this.console = document.getElementById("console");
-        this.source = source;
-        this.color = color;
+  constructor(source, color) {
+    this.console = $("#console");
+    this.source = source;
+    this.color = color;
 
-        $("#clear_console").on("click", () => this.clear());
-    }
+    $("#clear_console").on("click", () => this.clear());
+  }
 
-    log(message) {
-        this.console.innerHTML += `<b><font color="${this.color}">${this.source}</font></b> > ${message}<br/>`;
-        this.console.scrollTop = this.console.scrollHeight;
-    }
+  log(message) {
+    var logMessage = $('<span><b><font></font></b><span></span><br/></span>');
+    $("font", logMessage).text(this.source).prop("color", this.color);
+    $("span", logMessage).text(` > ${message}`);
 
-    clear() {
-        this.console.innerHTML = "";
-    }
+    this.console.append(logMessage);
+    this.console.scrollTop = this.console.scrollHeight;
+  }
+
+  clear() {
+    this.console.html("");
+  }
 }

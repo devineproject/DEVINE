@@ -56,7 +56,7 @@ body > div {
     z-index: 0 !important;
 }
 
-#clear_console {
+#clear_console, #reconnect_to_ros {
     padding-top: 3px;
     padding-bottom: 3px;
 }
