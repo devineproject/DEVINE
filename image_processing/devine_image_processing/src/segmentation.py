@@ -65,8 +65,8 @@ class RCNNSegmentation(object):
             width = original_array[3] - original_array[1]
             height = original_array[2] - original_array[0]
             left = original_array[1]
-            top = im_height - original_array[2]
-            correct_boxes[counter] = np.array([left, top, height, width])
+            top = original_array[0]
+            correct_boxes[counter] = np.array([left, top, width, height])
         return correct_boxes
 
     def segment(self, img):
@@ -132,7 +132,7 @@ class ROSRCNNSegmentation(RCNNSegmentation):
         rospy.init_node('image_segmentation')
         rospy.Subscriber(IMAGE_TOPIC, CompressedImage,
                          self.image_received_callback, queue_size=1)
-        self.publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10)
+        self.publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10, latch=True)
 
     def image_received_callback(self, data):
         '''Callback when a new image is received from the topic'''

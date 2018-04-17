@@ -5,8 +5,6 @@ export const devineTopics = [
     "/vgg16_features",
     "/rcnn_segmentation",
     "/devine/image",
-    "/snips_answer",
-    "/snips_ask",
     "/answer",
     "/question",
 ];

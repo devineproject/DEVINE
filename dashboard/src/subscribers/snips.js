@@ -9,14 +9,14 @@ const snipsCheckbox = $("#snips_checkbox");
 const answer_listener = new ROSLIB.Topic({
   ros: ros,
   latch: true,
-  name: '/snips_answer',
+  name: '/answer',
   messageType: 'std_msgs/String'
 });
 
 const ask_listener = new ROSLIB.Topic({
   ros: ros,
   latch: true,
-  name: '/snips_ask',
+  name: '/question',
   messageType: 'std_msgs/String'
 });
 

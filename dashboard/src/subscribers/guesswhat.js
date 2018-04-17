@@ -6,6 +6,18 @@ import $ from 'jquery';
 const cons = new LogConsole("GuessWhat", "#00bc8c");
 const guesswhatCheckbox = $("#guesswhat_checkbox");
 
+const state_listener = new ROSLIB.Topic({
+  ros: ros,
+  name: '/guesswhat_state',
+  messageType: 'std_msgs/String'
+});
+
+const category_listener = new ROSLIB.Topic({
+  ros: ros,
+  name: '/found_category',
+  messageType: 'std_msgs/String'
+});
+
 const question_listener = new ROSLIB.Topic({
   ros: ros,
   name: '/question',
@@ -21,6 +33,12 @@ const answer_listener = new ROSLIB.Topic({
 guesswhatCheckbox.on("change", function () {
   $('#guesswhat_ask_btn').prop('disabled', !this.checked);
   if (this.checked) {
+    state_listener.subscribe(function (message) {
+      cons.log(`State: ${message.data}`)
+    });
+    category_listener.subscribe(function (message) {
+      cons.log(`<b>Game ended!</b> Found: ${message.data}`)
+    });
     answer_listener.subscribe(function (message) {
       cons.log(`Answer: ${message.data}`)
     });
@@ -31,6 +49,8 @@ guesswhatCheckbox.on("change", function () {
   } else {
     answer_listener.removeAllListeners();
     question_listener.removeAllListeners();
+    category_listener.removeAllListeners();
+    state_listener.removeAllListeners();
     cons.log("Unsubscribed");
   }
 });
