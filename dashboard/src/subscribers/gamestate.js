@@ -6,14 +6,20 @@ import $ from 'jquery';
 const cons = new LogConsole("Game State", "#E74C3C");
 const subscriber = $("#gamestate_checkbox");
 
-const listener = new RosTopic('/game_system_state', 'std_msgs/String');
+const topics = {
+  category: new RosTopic('/found_category', 'std_msgs/String'),
+};
 
 subscriber.on("change", function () {
   if (this.checked) {
-    listener.subscribe((message) => cons.log(message.data));
+    topics.category.subscribe(message => cons.log(`Game ended! Found the ${message.data}.`));
+    
     cons.log("Subscribed");
   } else {
-    listener.removeAllListeners();
+    for (let i in topics) {
+      topics[i].removeAllListeners();
+    }
+
     cons.log("Unsubscribed");
   }
 });

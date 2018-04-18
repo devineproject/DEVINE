@@ -46,7 +46,7 @@ cameraSubscriber.on("change", function () {
     topics.image.subscribe(handleTopicData.bind(this, history.image));
     topics.object_position_2d.subscribe(handleTopicData.bind(this, history.object_position_2d));
     topics.object_position_3d.subscribe(handleTopicData.bind(this, history.object_position_3d));
-    if (segmentationSubscriber.checked) {
+    if (segmentationSubscriber.is(':checked')) {
       topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
       topics.segmentation_image.subscribe(handleTopicData.bind(this, history.segmentation_image));
     }
@@ -63,7 +63,7 @@ cameraSubscriber.on("change", function () {
 });
 
 segmentationSubscriber.on("change", function () {
-  if (this.checked && cameraSubscriber.checked) {
+  if (this.checked && cameraSubscriber.is(':checked')) {
     topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
     topics.segmentation_image.subscribe(handleTopicData.bind(this, history.segmentation_image));
 
@@ -150,7 +150,7 @@ const draw = throttle(function draw() {
   let obj_pos_3d = getCurrentElement(history.object_position_3d);
   let image_length = 0, seg, img;
 
-  if (segmentationSubscriber.checked) {
+  if (segmentationSubscriber.is(':checked')) {
     image_length = history.segmentation_image.length;
     seg = getSegmentation();
     img = getCurrentElement(history.segmentation_image);

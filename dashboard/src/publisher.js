@@ -13,7 +13,7 @@ function publish() {
 
   new RosTopic(topic, 'std_msgs/String').publish({ data: message });
 
-  if ($("#show_pub_checkbox").checked) {
+  if ($("#show_pub_checkbox").is(':checked')) {
     cons.log(`[${topic}] ${message}`);
   }
 }
