@@ -36,12 +36,12 @@ body > div {
     background-color: grey;
 }
 
-.card .custom-checkbox {
+.custom-checkbox {
     display: inline-block;
     margin-left: 15px;
 }
 
-.card .custom-checkbox:first-child {
+.custom-checkbox:first-child {
     margin-left: 0;
 }
 
@@ -56,7 +56,7 @@ body > div {
     z-index: 0 !important;
 }
 
-#clear_console, #reconnect_to_ros {
+.card .console .float-right {
     padding-top: 3px;
     padding-bottom: 3px;
 }

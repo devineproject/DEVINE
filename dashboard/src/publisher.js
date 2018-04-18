@@ -13,7 +13,9 @@ function publish() {
 
   new RosTopic(topic, 'std_msgs/String').publish({ data: message });
 
-  cons.log(`[${topic}] ${message}`);
+  if ($("#show_pub_checkbox").checked) {
+    cons.log(`[${topic}] ${message}`);
+  }
 }
 
 $("#publisher_publish").on("click", publish);
