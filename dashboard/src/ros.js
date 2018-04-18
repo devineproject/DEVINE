@@ -1,5 +1,4 @@
 import ROSLIB from 'roslib';
-import { devineTopics } from './vars'
 import LogConsole from './console'
 import $ from 'jquery';
 
@@ -10,11 +9,11 @@ const rosUrl = `ws://${window.location.hostname}:9090`;
 export const ros = new ROSLIB.Ros({ url: rosUrl });
 
 export class RosTopic extends ROSLIB.Topic {
-  constructor(name, messageType) {
+  constructor(topic) {
     super({
       ros: ros,
-      name: name,
-      messageType: messageType
+      name: topic.name,
+      messageType: topic.type
     });
   }
 }

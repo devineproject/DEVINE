@@ -1,5 +1,6 @@
 import { RosTopic } from '../ros';
-import { distinctColors } from '../vars'
+import { distinctColors } from '../vars/colors'
+import { devineTopics } from '../vars/devine_topics'
 import throttle from '../throttle'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
@@ -16,11 +17,11 @@ const imageSize = { x: 640, y: 480 }
 const delay = $('#kinect_image_delay');
 
 const topics = {
-  image: new RosTopic('/camera/rgb/image_color/compressed', 'sensor_msgs/CompressedImage'),
-  segmentation_image: new RosTopic('/devine/image', 'sensor_msgs/CompressedImage'),
-  segmentation: new RosTopic('/rcnn_segmentation', 'std_msgs/String'),
-  object_position_2d: new RosTopic('/object_found', 'std_msgs/Int32MultiArray'),
-  object_position_3d: new RosTopic('/object_location', 'std_msgs/Float32MultiArray')
+  image:              new RosTopic(devineTopics.image),
+  segmentation_image: new RosTopic(devineTopics.segmentation_image),
+  segmentation:       new RosTopic(devineTopics.segmentation),
+  object_position_2d: new RosTopic(devineTopics.object_found),
+  object_position_3d: new RosTopic(devineTopics.object_location)
 };
 
 const history = {

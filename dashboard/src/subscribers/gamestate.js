@@ -1,4 +1,5 @@
 import { RosTopic } from '../ros';
+import { devineTopics } from '../vars/devine_topics'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
@@ -7,7 +8,7 @@ const cons = new LogConsole("Game State", "#E74C3C");
 const subscriber = $("#gamestate_checkbox");
 
 const topics = {
-  category: new RosTopic('/found_category', 'std_msgs/String'),
+  category: new RosTopic(devineTopics.found_category),
 };
 
 subscriber.on("change", function () {

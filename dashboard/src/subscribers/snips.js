@@ -1,4 +1,5 @@
 import { RosTopic } from '../ros';
+import { devineTopics } from '../vars/devine_topics'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
@@ -7,7 +8,7 @@ const cons = new LogConsole("Snips", "#F39C12");
 const subscriber = $("#snips_checkbox");
 
 const topics = {
-  detected_answer: new RosTopic('/answer', 'std_msgs/String'),
+  detected_answer: new RosTopic(devineTopics.answer),
 };
 
 subscriber.on("change", function () {

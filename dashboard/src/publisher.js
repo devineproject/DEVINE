@@ -1,6 +1,6 @@
 import ROSLIB from 'roslib';
 import { RosTopic, ros } from './ros';
-import { devineTopics } from './vars'
+import { devineTopics } from './vars/devine_topics'
 import LogConsole from './console'
 import $ from 'jquery';
 
@@ -11,7 +11,10 @@ function publish() {
   var topic = $("#publisher_topic").val() || $("#publisher_topic").attr("placeholder");
   var message = $("#publisher_message").val() || $("#publisher_message").attr("placeholder");
 
-  new RosTopic(topic, 'std_msgs/String').publish({ data: message });
+  new RosTopic({
+    name: topic,
+    type: 'std_msgs/String'
+  }).publish({ data: message });
 
   if ($("#show_pub_checkbox").is(':checked')) {
     cons.log(`[${topic}] ${message}`);
@@ -48,6 +51,6 @@ function setTopicsList(rosTopics) {
   }
 }
 
-insertTopics(devineTopics, ".common-topics");
+insertTopics(Object.keys(devineTopics).map((key) => devineTopics[key].name), ".common-topics");
 ros.getTopics(setTopicsList);
 

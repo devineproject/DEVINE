@@ -1,4 +1,5 @@
 import { RosTopic } from '../ros';
+import { devineTopics } from '../vars/devine_topics'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
@@ -7,8 +8,8 @@ const cons = new LogConsole("GuessWhat", "#00bc8c");
 const subscriber = $("#guesswhat_checkbox");
 
 const topics = {
-  state:    new RosTopic('/guesswhat_state', 'std_msgs/String'),
-  question: new RosTopic('/question', 'std_msgs/String'),
+  state:    new RosTopic(devineTopics.guesswhat_state),
+  question: new RosTopic(devineTopics.question),
 };
 
 subscriber.on("change", function () {
