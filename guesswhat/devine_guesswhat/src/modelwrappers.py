@@ -16,7 +16,7 @@ class GuesserROSWrapper(GuesserWrapper):
     '''Wraps the guesser model and publishes confidence levels'''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.confidence = rospy.Publisher(CONFIDENCE_TOPIC, Float64MultiArray, queue_size=1)
+        self.confidence = rospy.Publisher(CONFIDENCE_TOPIC, Float64MultiArray, queue_size=1, latch=True)
 
     def find_object(self, *args, **kwargs):
         '''find_object interface for the looper'''
@@ -32,7 +32,7 @@ class OracleROSWrapper(object):
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
         self.answers = Queue(1)
-        self.questions = rospy.Publisher(QUESTION_TOPIC, String, queue_size=1)
+        self.questions = rospy.Publisher(QUESTION_TOPIC, String, queue_size=1, latch=True)
         rospy.Subscriber(ANSWER_TOPIC, String, self.answer_callback)
 
     def initialize(self, sess):

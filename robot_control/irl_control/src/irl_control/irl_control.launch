@@ -1,0 +1,10 @@
+<launch>
+  <arg name="control" default="true"/>
+  <arg name="marker" default="true"/>
+  <group if="$(arg control)">
+    <node name="control_marker" pkg="irl_control" type="node_marker.py" respawn="true" />
+    <node name="control_tf" pkg="irl_control" type="node_object_tf.py" respawn="true" />
+    <node name="control_error" pkg="irl_control" type="node_error.py" respawn="true" />
+    <node name="control" pkg="irl_control" type="node_control.py" respawn="false" />
+  </group>
+</launch>

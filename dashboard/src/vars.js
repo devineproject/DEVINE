@@ -1,14 +1,12 @@
 export const devineTopics = [
-  "/object_found",
-  "/object_location",
-  "/confidence",
-  "/vgg16_features",
-  "/rcnn_segmentation",
-  "/devine/image",
-  "/snips_answer",
-  "/snips_ask",
-  "/answer",
-  "/question",
+    "/object_found",
+    "/object_location",
+    "/confidence",
+    "/vgg16_features",
+    "/rcnn_segmentation",
+    "/devine/image",
+    "/answer",
+    "/question",
 ];
 
 // 14 distincs colors 

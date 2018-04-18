@@ -26,7 +26,7 @@ CHANNEL_MEAN = np.array([123.68, 116.779, 103.939])
 
 if __name__ == '__main__':
     rospy.init_node('features_extraction')
-    features = rospy.Publisher(FEATURES_TOPIC, Float64MultiArray, queue_size=1)
+    features = rospy.Publisher(FEATURES_TOPIC, Float64MultiArray, queue_size=1, latch=True)
 
     image_queue = Queue(2)
 
@@ -56,7 +56,7 @@ if __name__ == '__main__':
                 img = Image.open(BytesIO(img))
                 img = img.resize((IMAGE_SIZE, IMAGE_SIZE), resample=Image.BILINEAR)
                 img = np.array(img, dtype=np.float32)
-                img -= channel[None, None, :]
+                img -= CHANNEL_MEAN[None, None, :]
 
                 ft_output = end_points['vgg_16/fc8']
                 feat = sess.run(ft_output, feed_dict={holder: np.array([img])})

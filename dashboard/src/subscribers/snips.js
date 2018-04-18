@@ -7,8 +7,8 @@ const cons = new LogConsole("Snips", "#F39C12");
 const subscriber = $("#snips_checkbox");
 
 const topics = {
-  ask: new RosTopic('/snips_ask', 'std_msgs/String'),
-  answer: new RosTopic('/snips_answer', 'std_msgs/String'),
+  ask: new RosTopic('/question', 'std_msgs/String'),
+  answer: new RosTopic('/answer', 'std_msgs/String'),
 };
 
 subscriber.on("change", function () {

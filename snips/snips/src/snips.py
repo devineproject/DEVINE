@@ -3,8 +3,8 @@
 Snips ROS integration
 
 ROS Topics
-snips_ask -> question as string input
-snips_answer -> answer as string output
+question -> question as string input
+answer -> answer as string output
 """
 import json
 import paho.mqtt.client as mqtt
@@ -18,7 +18,7 @@ SNIPS_TOPICS = ['hermes/intent/TSchmidty:YesNoResponse']
 MQTT_CLIENT = mqtt.Client()
 
 # ROS
-ROS_PUBLISHER = rospy.Publisher('/snips_answer', String, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher('/answer', String, queue_size=10)
 
 
 def snips_ask_callback(data):
@@ -51,14 +51,14 @@ def on_snips_message(client, userdata, msg): # pylint: disable=W0613
     if data['slots']:
         rospy.loginfo("Received message %s, detected: %s", data['input'],
                       data['slots'][0]['value']['value'].lower())
-        ROS_PUBLISHER.publish(data['input'] + "|" + data['slots'][0]['value']['value'].lower())
+        ROS_PUBLISHER.publish(data['slots'][0]['value']['value'].lower())
 
 
 def create_ros_listener():
     """
     Create the ROS listeners
     """
-    rospy.Subscriber('/snips_ask', String, snips_ask_callback)
+    rospy.Subscriber('/question', String, snips_ask_callback)
 
 
 def on_snips_disconnect():
