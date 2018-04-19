@@ -1,6 +1,6 @@
 import { RosTopic } from '../ros';
 import { distinctColors } from '../vars/colors'
-import { devineTopics } from '../vars/devine_topics'
+import devineTopics from '../vars/devine_topics.json'
 import throttle from '../throttle'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
