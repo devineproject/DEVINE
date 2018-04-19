@@ -1,49 +1,28 @@
-import ros from '../ros';
+import { RosTopic } from '../ros';
+import devineTopics from '../vars/devine_topics.json'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
 
 const cons = new LogConsole("Snips", "#F39C12");
-const snipsCheckbox = $("#snips_checkbox");
+const subscriber = $("#snips_checkbox");
 
-const answer_listener = new ROSLIB.Topic({
-  ros: ros,
-  latch: true,
-  name: '/answer',
-  messageType: 'std_msgs/String'
-});
+const topics = {
+  detected_answer: new RosTopic(devineTopics.answer),
+};
 
-const ask_listener = new ROSLIB.Topic({
-  ros: ros,
-  latch: true,
-  name: '/question',
-  messageType: 'std_msgs/String'
-});
-
-snipsCheckbox.on("change", function () {
+subscriber.on("change", function () {
   $('#snips_ask_btn').prop('disabled', !this.checked);
+
   if (this.checked) {
-    answer_listener.subscribe(function (message) {
-      if (message.data && message.data.indexOf("|") !== -1) {
-        var [receivedMessage, detectedMessage] = message.data.split("|");
-        cons.log(`Answer received: ${receivedMessage}`)
-        cons.log(`Answer detected: ${detectedMessage}`)
-      }
-    });
-    ask_listener.subscribe(function (message) {
-      cons.log(`Question sent: ${message.data}`)
-    });
+    topics.detected_answer.subscribe(message => cons.log(`Answer: ${message.data}`));
+
     cons.log("Subscribed");
   } else {
-    answer_listener.removeAllListeners();
-    ask_listener.removeAllListeners();
+    for (let i in topics) {
+      topics[i].removeAllListeners();
+    }
+
     cons.log("Unsubscribed");
   }
 });
-
-$("#snips_ask_btn").on("click", function() {
-  var val = $("#snips_ask").val() || $("#snips_ask").attr("placeholder");
-  ask_listener.publish({data:val});
-});
-
-

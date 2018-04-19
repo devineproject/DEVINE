@@ -1,47 +1,33 @@
 import ROSLIB from 'roslib';
-import { devineTopics } from './vars'
 import LogConsole from './console'
 import $ from 'jquery';
 
 const cons = new LogConsole("ROS", "grey")
+const btnReconnect = $("#reconnect_to_ros");
+const rosUrl = `ws://${window.location.hostname}:9090`;
 
-const ros = new ROSLIB.Ros({
-  url: `ws://${window.location.hostname}:9090`
-});
+export const ros = new ROSLIB.Ros({ url: rosUrl });
 
-ros.on('connection', () => {
-  cons.log('Rosbridge connection established');
-  ros.getTopics(setTopicsList);
-});
-ros.on('error', () => cons.log('Rosbridge connection error'));
-ros.on('close', () => cons.log('Rosbridge connection closed'));
-
-function setTopicsList(rosTopics) {
-  for (var i in rosTopics.topics) {
-    $(`<a class="dropdown-item">${rosTopics.topics[i]}</a>`).insertAfter(".all-topics");
+export class RosTopic extends ROSLIB.Topic {
+  constructor(topic) {
+    super({
+      ros: ros,
+      name: topic.name,
+      messageType: topic.type
+    });
   }
 }
 
-for (var i in devineTopics) {
-  $(`<a class="dropdown-item">${devineTopics[i]}</a>`).insertAfter(".common-topics");
+function logAndShowReconnect(message) {
+  cons.log(message);
+  btnReconnect.show();
 }
 
-$("#publisher_topics .dropdown-item").on("click", function () {
-  $("#publisher_topic").val(this.text);
+ros.on('connection', () => cons.log('Rosbridge connection established'));
+ros.on('error', () => logAndShowReconnect('Rosbridge connection error'));
+ros.on('close', () => logAndShowReconnect('Rosbridge connection closed'));
+
+btnReconnect.on("click", function () {
+  ros.connect(rosUrl);
+  btnReconnect.hide();
 });
-
-$("#publisher_publish").on("click", function () {
-  var topic = $("#publisher_topic").val() || $("#publisher_topic").attr("placeholder");
-  var message = $("#publisher_message").val() || $("#publisher_message").attr("placeholder");
-
-  new ROSLIB.Topic({
-    ros: ros,
-    name: topic,
-    latch: true,
-    messageType: 'std_msgs/String'
-  }).publish({ data: message });
-
-  cons.log(`[${topic}] ${message}`);
-});
-
-export default ros;

@@ -1,27 +1,27 @@
-import ros from '../ros';
+import { RosTopic } from '../ros';
+import devineTopics from '../vars/devine_topics.json'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
 
 const cons = new LogConsole("Game State", "#E74C3C");
-const gameStateCheckbox = $("#gamestate_checkbox");
+const subscriber = $("#gamestate_checkbox");
 
-const listener = new ROSLIB.Topic({
-  ros: ros,
-  name: '/game_system_state',
-  messageType: 'std_msgs/String'
-});
+const topics = {
+  category: new RosTopic(devineTopics.found_category),
+};
 
-gameStateCheckbox.on("change", function () {
-  const view = $('.command-view[name="gamestate"]').find('.subscriber-log')[0];
+subscriber.on("change", function () {
   if (this.checked) {
-    listener.subscribe(function (message) {
-      cons.log(message.data);
-    });
-    cons.log("Subscribed")
+    topics.category.subscribe(message => cons.log(`Game ended! Found the ${message.data}.`));
+    
+    cons.log("Subscribed");
   } else {
-    listener.removeAllListeners();
-    cons.log("Unsubscribed")
+    for (let i in topics) {
+      topics[i].removeAllListeners();
+    }
+
+    cons.log("Unsubscribed");
   }
 });
 

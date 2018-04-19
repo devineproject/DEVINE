@@ -1,47 +1,30 @@
-import ros from '../ros';
-import { distinctColors } from '../vars'
+import { RosTopic } from '../ros';
+import { distinctColors } from '../vars/colors'
+import devineTopics from '../vars/devine_topics.json'
+import throttle from '../throttle'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
 
 const cons = new LogConsole("Kinect", "#3498DB");
-const cameraCheckbox = $("#camera_checkbox");
-const segmentationCheckbox = $("#segmentation_checkbox");
+const cameraSubscriber = $("#camera_checkbox");
+const segmentationSubscriber = $("#segmentation_checkbox");
+
 const objectPos2d = $("#kinect_pos_found")[0];
 const objectPos3d = $("#kinect_pos_calc")[0];
-const canvas = $("#kinect_image")[0];
-const image = canvas.getContext("2d");
-const history = $('#kinect_image_history');
+const image = $("#kinect_image")[0].getContext("2d");
+const imageSize = { x: 640, y: 480 }
+const delay = $('#kinect_image_delay');
 
-const topicListeners = {
-  image: new ROSLIB.Topic({
-    ros: ros,
-    name: '/camera/rgb/image_color/compressed',
-    messageType: 'sensor_msgs/CompressedImage'
-  }),
-  segmentation_image: new ROSLIB.Topic({
-    ros: ros,
-    name: '/devine/image',
-    messageType: 'sensor_msgs/CompressedImage'
-  }),
-  segmentation: new ROSLIB.Topic({
-    ros: ros,
-    name: "/rcnn_segmentation",
-    messageType: 'std_msgs/String'
-  }),
-  object_position_2d: new ROSLIB.Topic({
-    ros: ros,
-    name: '/object_found',
-    messageType: 'std_msgs/Int32MultiArray'
-  }),
-  object_position_3d: new ROSLIB.Topic({
-    ros: ros,
-    name: '/object_location',
-    messageType: 'std_msgs/Float32MultiArray'
-  })
+const topics = {
+  image:              new RosTopic(devineTopics.image),
+  segmentation_image: new RosTopic(devineTopics.segmentation_image),
+  segmentation:       new RosTopic(devineTopics.segmentation),
+  object_position_2d: new RosTopic(devineTopics.object_found),
+  object_position_3d: new RosTopic(devineTopics.object_location)
 };
 
-const topicHistory = {
+const history = {
   image: [],
   segmentation_image: [],
   segmentation: [],
@@ -50,43 +33,56 @@ const topicHistory = {
   position: 1
 };
 
-cameraCheckbox.on("change", function () {
+function handleTopicData(historyTopic, msg) {
+  historyTopic.push(msg.data);
+  // 50 kinect images ~= 2.6 mb
+  if (historyTopic.length >= 50) {
+    historyTopic.shift();
+  }
+  draw();
+}
+
+cameraSubscriber.on("change", function () {
   if (this.checked) {
-    topicListeners.image.subscribe(handleTopicData.bind(this, 'image'));
-    topicListeners.object_position_2d.subscribe(handleTopicData.bind(this, 'object_position_2d'));
-    topicListeners.object_position_3d.subscribe(handleTopicData.bind(this, 'object_position_3d'));
-    if (segmentationCheckbox.is(":checked")) {
-      topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
-      topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+    topics.image.subscribe(handleTopicData.bind(this, history.image));
+    topics.object_position_2d.subscribe(handleTopicData.bind(this, history.object_position_2d));
+    topics.object_position_3d.subscribe(handleTopicData.bind(this, history.object_position_3d));
+    if (segmentationSubscriber.is(':checked')) {
+      topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
+      topics.segmentation_image.subscribe(handleTopicData.bind(this, history.segmentation_image));
     }
+
     cons.log("Camera subscribed");
   } else {
-    for (let i in topicListeners) {
-      topicListeners[i].removeAllListeners();
+    for (let i in topics) {
+      topics[i].removeAllListeners();
     }
+
     cons.log("Camera unsubscribed");
     setTimeout(() => drawNoFeed(), 200);
   }
 });
 
-segmentationCheckbox.on("change", function () {
-  if (this.checked && cameraCheckbox.is(":checked")) {
-    topicListeners.segmentation.subscribe(handleTopicData.bind(this, 'segmentation'));
-    topicListeners.segmentation_image.subscribe(handleTopicData.bind(this, 'segmentation_image'));
+segmentationSubscriber.on("change", function () {
+  if (this.checked && cameraSubscriber.is(':checked')) {
+    topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
+    topics.segmentation_image.subscribe(handleTopicData.bind(this, history.segmentation_image));
+
     cons.log("Segmentation subscribed");
   } else {
-    topicListeners.segmentation.removeAllListeners();
-    topicListeners.segmentation_image.removeAllListeners();
+    topics.segmentation.removeAllListeners();
+    topics.segmentation_image.removeAllListeners();
+
     cons.log("Segmentation unsubscribed");
   }
 });
 
 $('#kinect_image_type').on("change", function () {
-  topicListeners.image.name = this.value;
+  topics.image.name = this.value;
 });
 
-history.on("change", function () {
-  topicHistory.position = Math.max(this.value, 1);
+delay.on("change", function () {
+  history.position = Math.max(this.value, 1);
   draw();
 });
 
@@ -98,10 +94,8 @@ function setColor(color) {
 function drawNoFeed() {
   setColor("red");
   image.font = "bold 20pt Arial";
-  image.fillText("< No Camera Feed />", 190, (canvas.height / 2));
+  image.fillText("< No Camera Feed />", 190, (imageSize.y / 2));
 }
-
-drawNoFeed(); // No feed at startup
 
 function drawPositionFound(x, y) {
   setColor("#3498DB");
@@ -124,21 +118,22 @@ function drawObjectsRectangles(objects) {
   }
 }
 
-//We want to limit drawing for performance, yet we might want to keep all data
-const draw = throttle(function draw() {
-  let obj_pos_2d = getElem(topicHistory.object_position_2d);
-  let obj_pos_3d = getElem(topicHistory.object_position_3d);
-  let image_length = 0, seg, img;
+function getCurrentElement(array) {
+  return array[array.length - history.position];
+}
 
-  if (segmentationCheckbox.is(":checked")) {
-    image_length = topicHistory.segmentation_image.length;
-    seg = getSeg();
-    img = getElem(topicHistory.segmentation_image);
-  } else {
-    image_length = topicHistory.image.length;
-    img = getElem(topicHistory.image);
-  }
+function getSegmentation() {
+  return topicHistory.segmentation[topicHistory.segmentation_image.length - topicHistory.position];
+}
 
+function resetImage(image, imageObject) {
+  image.clearRect(0, 0, imageSize.x, imageSize.y);
+  image.drawImage(imageObject, 0, 0);
+  image.font = "bold 12pt Arial";
+  image.lineWidth = "2";
+}
+
+function writePositions(obj_pos_2d, obj_pos_3d) {
   if (obj_pos_2d != undefined) {
     objectPos2d.innerText = `(${obj_pos_2d[0]}, ${obj_pos_2d[1]})`;
   }
@@ -148,80 +143,42 @@ const draw = throttle(function draw() {
     objectPos3d.innerText = `(${cleanFloat(obj_pos_3d[0])}, ` +
       `${cleanFloat(obj_pos_3d[1])}, ${cleanFloat(obj_pos_3d[2])})`;
   }
+}
+
+//We want to limit drawing for performance, yet we might want to keep all data
+const draw = throttle(function draw() {
+  let obj_pos_2d = getCurrentElement(history.object_position_2d);
+  let obj_pos_3d = getCurrentElement(history.object_position_3d);
+  let image_length = 0, seg, img;
+
+  if (segmentationSubscriber.is(':checked')) {
+    image_length = history.segmentation_image.length;
+    seg = getSegmentation();
+    img = getCurrentElement(history.segmentation_image);
+  } else {
+    image_length = history.image.length;
+    img = getCurrentElement(history.image);
+  }
+
+  writePositions(obj_pos_2d, obj_pos_3d);
 
   if (img != undefined) {
-    history.prop('max', image_length);
+    delay.prop('max', image_length);
     let imageObject = new Image();
+
     imageObject.onload = function () {
-      image.clearRect(0, 0, 640, 480);
-      image.drawImage(imageObject, 0, 0);
-      image.font = "bold 12pt Arial";
-      image.lineWidth = "2";
+      resetImage(image, imageObject);
 
       if (obj_pos_2d != undefined) {
-        drawPositionFound(obj_pos_2d[0], 480 - obj_pos_2d[1]);
+        drawPositionFound(obj_pos_2d[0], imageSize.y - obj_pos_2d[1]);
       }
 
       if (seg != undefined) {
-        let segmentedDataObj = JSON.parse(seg);
-        drawObjectsRectangles(segmentedDataObj.objects);
+        drawObjectsRectangles(JSON.parse(seg).objects);
       }
     };
     imageObject.src = "data:image/jpg;base64, " + img;
   }
 }, 100);
 
-function handleTopicData(topic, msg) {
-  topicHistory[topic].push(msg.data);
-  // 50 kinect images ~= 2.6 mb
-  if (topicHistory[topic].length >= 50) {
-    topicHistory[topic].shift();
-  }
-  draw();
-}
-
-function getElem(arr) {
-  return arr[arr.length - topicHistory.position];
-}
-
-function getSeg() {
-  return topicHistory.segmentation[topicHistory.segmentation_image.length - topicHistory.position];
-}
-
-// Taken from underscore.js
-// Returns a function, that, when invoked, will only be triggered at most once
-// during a given window of time. Normally, the throttled function will run
-// as much as it can, without ever going more than once per `wait` duration;
-// but if you'd like to disable the execution on the leading edge, pass
-// `{leading: false}`. To disable execution on the trailing edge, ditto.
-function throttle(func, wait, options) {
-  var context, args, result;
-  var timeout = null;
-  var previous = 0;
-  if (!options) options = {};
-  var later = function () {
-    previous = options.leading === false ? 0 : Date.now();
-    timeout = null;
-    result = func.apply(context, args);
-    if (!timeout) context = args = null;
-  };
-  return function () {
-    var now = Date.now();
-    if (!previous && options.leading === false) previous = now;
-    var remaining = wait - (now - previous);
-    context = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(context, args);
-      if (!timeout) context = args = null;
-    } else if (!timeout && options.trailing !== false) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-}
+drawNoFeed(); // No feed at startup
