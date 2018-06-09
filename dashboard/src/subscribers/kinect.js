@@ -110,7 +110,9 @@ function drawObjectsRectangles(objects) {
     setColor(distinctColors[i % 14]);
 
     image.beginPath();
-    let [left, top, width, height] = objects[i].bbox;
+    let [left, top, right, bottom] = objects[i].bbox;
+    let width = right - left;
+    let height = bottom - top;
     image.rect(left, top, width, height);
     image.fillText(objects[i].category, left, top - 1);
     image.stroke();
@@ -123,7 +125,7 @@ function getCurrentElement(array) {
 }
 
 function getSegmentation() {
-  return topicHistory.segmentation[topicHistory.segmentation_image.length - topicHistory.position];
+  return history.segmentation[history.segmentation_image.length - history.position];
 }
 
 function resetImage(image, imageObject) {

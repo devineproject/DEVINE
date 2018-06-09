@@ -14,7 +14,7 @@ from std_msgs.msg import String
 # Snips settings
 SNIPS_HOST = "localhost"
 SNIPS_PORT = 1883
-SNIPS_TOPICS = ['hermes/intent/TSchmidty:YesNoResponse']
+SNIPS_TOPICS = ['hermes/intent/TSchmidty:YesNoResponse', 'hermes/intent/Picnic8:YesNoAnswer']
 MQTT_CLIENT = mqtt.Client()
 
 # ROS
