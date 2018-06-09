@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <title>🤖 DEVINE Dashboard</title>
-
   <!-- https://bootswatch.com/darkly/ -->
   <link rel="stylesheet" href="/assets/css/bootstrap.darkly.min.css">
   <link rel="stylesheet" href="/assets/css/styles.css">
@@ -12,22 +11,14 @@
 
 <body>
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm">
-        {% include 'console.html' %}
-      </div>
-      <div class="col-sm">
-        {% include 'publisher.html' %}
-        {% include 'subscribers/guesswhat.html' %}
-        {% include 'subscribers/snips.html' %}
-        {% include 'subscribers/gamestate.html' %}
-      </div>
-      <div class="col-sm">
-        {% include 'subscribers/kinect.html' %}
-      </div>
-    </div>
+    {% if path == "index" %}
+      {% include 'dashboard/dashboard.html' %} 
+    {% elif path == "scoreboard" %}
+      {% include 'scoreboard/scoreboard.html' %} 
+    {% else %}
+      <span>Erreur 404 :(</span>
+    {% endif %}
   </div>
-
   <script src="dist/bundle.js"></script>
 </body>
 
