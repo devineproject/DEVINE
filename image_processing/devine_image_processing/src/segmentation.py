@@ -58,17 +58,6 @@ class RCNNSegmentation(object):
         self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=self.config)
         self.model.load_weights(COCO_MODEL_PATH, by_name=True) #blocking I/O in constructor!
 
-    def correct_array(self, bbox, im_height):
-        '''Correct the bounding box position for usage in guesswhat'''
-        correct_boxes = np.zeros(bbox.shape)
-        for counter, (original_array, _) in enumerate(zip(bbox, correct_boxes)):
-            width = original_array[3] - original_array[1]
-            height = original_array[2] - original_array[0]
-            left = original_array[1]
-            top = original_array[0]
-            correct_boxes[counter] = np.array([left, top, width, height])
-        return correct_boxes
-
     def segment(self, img):
         '''Actual segmentation of the image'''
         rospy.logdebug("Starting segmentation")
@@ -89,7 +78,6 @@ class RCNNSegmentation(object):
             },
             "objects": []
         }
-        corrected_bounding_box = self.correct_array(result['rois'], height)
         object_array = []
 
         # Debug file dump
@@ -102,7 +90,7 @@ class RCNNSegmentation(object):
         # with open('rois.pkl','wb') as pickle_file:
         #     result['rois'].dump(pickle_file)
 
-        for current_id, (class_id, bounding_box) in enumerate(zip(result['class_ids'], corrected_bounding_box)):
+        for current_id, (class_id, bounding_box) in enumerate(zip(result['class_ids'], result['rois'])):
             object_area = 0 # figure out if we ever use the area
             # According the MsCoco api this seems to be the mask area
             # (check if maskrcnn can produce this)
@@ -115,10 +103,6 @@ class RCNNSegmentation(object):
                 "area": object_area
             }
             object_array.append(current_object)
-
-            # Currently there is an issue with Numpy integers
-            # (probably orginating from the bounding box)
-            # Also make sure the bounding box being created is correct
 
         result_obj['objects'] = object_array
         return json_util.dumps(result_obj)
