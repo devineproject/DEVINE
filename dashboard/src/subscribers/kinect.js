@@ -9,6 +9,7 @@ import $ from 'jquery';
 const cons = new LogConsole("Kinect", "#3498DB");
 const cameraSubscriber = $("#camera_checkbox");
 const segmentationSubscriber = $("#segmentation_checkbox");
+const bodyTrackingSubscriber = $("#body_tracking_checkbox");
 
 const objectPos2d = $("#kinect_pos_found")[0];
 const objectPos3d = $("#kinect_pos_calc")[0];
@@ -21,7 +22,8 @@ const topics = {
   segmentation_image: new RosTopic(devineTopics.segmentation_image),
   segmentation:       new RosTopic(devineTopics.segmentation),
   object_position_2d: new RosTopic(devineTopics.object_found),
-  object_position_3d: new RosTopic(devineTopics.object_location)
+  object_position_3d: new RosTopic(devineTopics.object_location),
+  body_position:      new RosTopic(devineTopics.body_position)
 };
 
 const history = {
@@ -30,7 +32,8 @@ const history = {
   segmentation: [],
   object_position_2d: [],
   object_position_3d: [],
-  position: 1
+  position: 1,
+  body_tracking: []
 };
 
 function handleTopicData(historyTopic, msg) {
@@ -50,6 +53,9 @@ cameraSubscriber.on("change", function () {
     if (segmentationSubscriber.is(':checked')) {
       topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
       topics.segmentation_image.subscribe(handleTopicData.bind(this, history.segmentation_image));
+    } 
+    if (bodyTrackingSubscriber.is(":checked")) {
+      topics.body_position.subscribe(handleTopicData.bind(this, history.body_tracking));
     }
 
     cons.log("Camera subscribed");
@@ -74,6 +80,16 @@ segmentationSubscriber.on("change", function () {
     topics.segmentation_image.removeAllListeners();
 
     cons.log("Segmentation unsubscribed");
+  }
+});
+
+bodyTrackingSubscriber.on("change", function () {
+  if (this.checked && cameraSubscriber.is(':checked')) {
+    topics.body_position.subscribe(handleTopicData.bind(this, history.body_tracking));
+    cons.log("Body tracking subscribed");
+  } else {
+    topics.body_position.removeAllListeners();
+    cons.log("Body tracking unsubscribed");
   }
 });
 
@@ -120,6 +136,35 @@ function drawObjectsRectangles(objects) {
   }
 }
 
+function drawBodyTracking(humans) {
+  const BodyPartsAggr = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17]];
+  for (let i in humans) {
+    let centers = {};
+    let human = humans[i];
+    let partsIds = human.body_parts.map(bp => bp.index);
+    for (let j in human.body_parts) {
+      let bp = human.body_parts[j];
+      centers[bp.index] = {
+        x: bp.x * imageSize.x + 0.5,
+        y: bp.y * imageSize.y + 0.5
+      };
+    }
+    
+    for (let j in BodyPartsAggr) {
+      let pair = BodyPartsAggr[j];
+      if (!centers[pair[0]] || !centers[pair[1]]) {
+        continue;
+      }
+      setColor(distinctColors[j % 14]);
+      image.beginPath();
+      image.moveTo(centers[pair[0]].x, centers[pair[0]].y);
+      image.lineTo(centers[pair[1]].x, centers[pair[1]].y);
+      image.stroke();
+      image.closePath();
+    }
+  }
+}
+
 function getCurrentElement(array) {
   return array[array.length - history.position];
 }
@@ -151,6 +196,7 @@ function writePositions(obj_pos_2d, obj_pos_3d) {
 const draw = throttle(function draw() {
   let obj_pos_2d = getCurrentElement(history.object_position_2d);
   let obj_pos_3d = getCurrentElement(history.object_position_3d);
+  let body_tracking = getCurrentElement(history.body_tracking);
   let image_length = 0, seg, img;
 
   if (segmentationSubscriber.is(':checked')) {
@@ -177,6 +223,10 @@ const draw = throttle(function draw() {
 
       if (seg != undefined) {
         drawObjectsRectangles(JSON.parse(seg).objects);
+      }
+
+      if (body_tracking != undefined) {
+        drawBodyTracking(JSON.parse(body_tracking));
       }
     };
     imageObject.src = "data:image/jpg;base64, " + img;

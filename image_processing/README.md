@@ -3,7 +3,8 @@ Image Segmentation
 
 ## Installation
 1. Run the install script `source install_package.bash`
-2. Build the module using catkin\_make:
+2. Install [tf-pose-estimation](https://github.com/ildoonet/tf-pose-estimation) for python 2.
+3. Build the module using catkin\_make:
 ```bash
 roscd
 cd ..
