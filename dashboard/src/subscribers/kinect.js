@@ -138,6 +138,7 @@ function drawObjectsRectangles(objects) {
 
 function drawBodyTracking(humans) {
   const BodyPartsAggr = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17]];
+  const leftEyeId = 15, rightEyeId = 14;
   for (let i in humans) {
     let centers = {};
     let human = humans[i];
@@ -161,6 +162,18 @@ function drawBodyTracking(humans) {
       image.lineTo(centers[pair[1]].x, centers[pair[1]].y);
       image.stroke();
       image.closePath();
+    }
+
+
+    if (centers[leftEyeId]) {
+      image.beginPath();
+      image.arc(centers[leftEyeId].x, centers[leftEyeId].y, 10, 0, 2*Math.PI);
+      image.stroke();
+    }
+    if (centers[rightEyeId]) {
+      image.beginPath();
+      image.arc(centers[rightEyeId].x, centers[rightEyeId].y, 10, 0, 2*Math.PI);
+      image.stroke();
     }
   }
 }
