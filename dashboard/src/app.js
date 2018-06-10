@@ -1,10 +1,7 @@
 import ROSLIB from 'roslib';
-import publisher from './publisher';
-import gamestate from './subscribers/gamestate';
-import kinect from './subscribers/kinect';
-import snips from './subscribers/snips';
-import guesswhat from './subscribers/guesswhat';
-import $ from 'jquery'
+import $ from 'jquery';
+import dashboard from "./dashboard/dashboard";
+import scoreboard from "./scoreboard/scoreboard";
 
 try {
   // Fix popper.js for Bootstrap4
@@ -13,7 +10,12 @@ try {
   require('bootstrap');
 } catch (e) { console.error(e); }
 
-$(document).ready(function () {
-  // Uncheck all subscriptions
-  $('[type="checkbox"]').prop('checked', false);
-})
+switch (window.route) {
+case "scoreboard":
+  scoreboard();
+  break;
+case "index": //Passthrough as default
+default:
+  dashboard();
+  break;
+}

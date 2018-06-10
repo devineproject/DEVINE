@@ -1,8 +1,8 @@
-import ROSLIB from 'roslib';
-import LogConsole from './console'
 import $ from 'jquery';
+import ROSLIB from 'roslib';
+import LogConsole from './console';
 
-const cons = new LogConsole("ROS", "grey")
+const cons = new LogConsole("ROS", "grey");
 const btnReconnect = $("#reconnect_to_ros");
 const rosUrl = `ws://${window.location.hostname}:9090`;
 

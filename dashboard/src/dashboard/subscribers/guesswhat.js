@@ -1,5 +1,5 @@
 import { RosTopic } from '../ros';
-import devineTopics from '../vars/devine_topics.json'
+import devineTopics from '../../vars/devine_topics.json'
 import LogConsole from '../console'
 import ROSLIB from 'roslib';
 import $ from 'jquery';
