@@ -137,12 +137,15 @@ function drawObjectsRectangles(objects) {
 }
 
 function drawBodyTracking(humans) {
+  //Adaptation and refactor of function draw_humans in tf_pose/estimator.py
+  //Map body part with one another (e.g.: ear with eye); see CocoPairs in tf_pose/common.py
   const BodyPartsAggr = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17]];
   const leftEyeId = 15, rightEyeId = 14;
   for (let i in humans) {
     let centers = {};
     let human = humans[i];
     let partsIds = human.body_parts.map(bp => bp.index);
+    //For each body parts, find its pixel location in the image
     for (let j in human.body_parts) {
       let bp = human.body_parts[j];
       centers[bp.index] = {
@@ -151,6 +154,7 @@ function drawBodyTracking(humans) {
       };
     }
     
+    //For each body parts that should be linked, draw a line between these two
     for (let j in BodyPartsAggr) {
       let pair = BodyPartsAggr[j];
       if (!centers[pair[0]] || !centers[pair[1]]) {
