@@ -34,5 +34,9 @@
     "question": {
         "name": "/question",
         "type": "std_msgs/String"
+    },
+    "body_position": {
+        "name": "/body_tracking",
+        "type": "std_msgs/String"
     }
 }
