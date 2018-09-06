@@ -1,10 +1,10 @@
 import ROSLIB from 'roslib';
 import { RosTopic, ros } from './ros';
-import devineTopics from "./vars/devine_topics.json";
+import devineTopics from "../vars/devine_topics.json";
 import LogConsole from './console'
 import $ from 'jquery';
 
-const cons = new LogConsole("ROS", "grey")
+const cons = new LogConsole("ROS", "grey");
 
 /** Send message to selected topic */
 function publish() {
