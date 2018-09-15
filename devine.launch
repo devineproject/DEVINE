@@ -2,7 +2,6 @@
   <arg name="robot_control" default="true"/>
   <arg name="kinect" default="true"/>
   <arg name="snips" default="true"/>
-  <arg name="gameSystem" default="true"/>
   <arg name="dashboard" default="true" />
   <arg name="guesswhat" default="true" />
   <arg name="image_processing" default="true" />
@@ -10,13 +9,11 @@
   <group if="$(arg robot_control)">
     <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
     <include file="$(find irl_control)/src/irl_control/irl_control.launch" />
+    <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
   </group>
   <group if="$(arg kinect)">
-    <include file="$(find openni_launch)/launch/openni.launch">
-      <!-- <arg name="camera" value="openni"/> -->
-    </include>
+    <include file="$(find openni_launch)/launch/openni.launch" />
     <node name="img_throttle" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image" />
-  <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
   </group>
   <group if="$(arg snips)">
     <node name="snips" pkg="snips" type="snips.py" respawn="true" />
@@ -24,9 +21,6 @@
   <group if="$(arg image_processing)">
     <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
     <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
-  </group>
-  <group if="$(arg gameSystem)">
-    <node name="game_system" pkg="game_system" type="client.py" respawn="true" />
   </group>
   <group if="$(arg dashboard)">
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
