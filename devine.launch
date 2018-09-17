@@ -7,7 +7,6 @@
   <arg name="image_processing" default="true" />
 
   <group if="$(arg robot_control)">
-    <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
     <include file="$(find irl_control)/src/irl_control/irl_control.launch" />
     <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
   </group>

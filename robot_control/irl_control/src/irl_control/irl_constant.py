@@ -1,6 +1,6 @@
 ROBOT_NAME = 'jn0'
 ROBOT_CONTROLLER = {
-    'head_controller':  {
+    'neck_controller':  {
         'joints_name': ['neck_pan_joint', 'neck_tilt_joint'],
         'joints_limit' : [[-1.57, 1.57], [-0.17, 0.79]]
     },

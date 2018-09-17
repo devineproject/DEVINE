@@ -35,7 +35,7 @@ def main(args):
     # Init TrajectoryClient
     try:
         traj_arm = TrajectoryClient(robot, controller)
-        traj_head = TrajectoryClient(robot, 'head_controller')
+        traj_head = TrajectoryClient(robot, 'neck_controller')
     except RuntimeError as err:
         rospy.logerr(err)
         rospy.signal_shutdown(err)
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=arg_fmt, description=main.__doc__)
     required = parser.add_argument_group('required arguments')
     required.add_argument('-r', '--robot', required=True, choices=['jn0'], help='Which robot?')
-    required.add_argument('-c', '--controller', required=True, choices=['head_controller', 'left_arm_controller', 'right_arm_controller'], help='Which controller?')
+    required.add_argument('-c', '--controller', required=True, choices=['neck_controller', 'left_arm_controller', 'right_arm_controller'], help='Which controller?')
     required.add_argument('-j', '--joints', required=False, help='What joints positions?')
     required.add_argument('-p', '--point', required=False, help='What 3D point to point?')
     required.add_argument('-t', '--time', required=True, help='How much seconds?')
