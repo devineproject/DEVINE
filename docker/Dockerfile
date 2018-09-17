@@ -42,6 +42,6 @@ RUN \
 # catkin
 RUN cd /usr \
     && echo ". /opt/ros/kinetic/setup.sh" >> ~/.bashrc \
-    && echo "export ROS_PACKAGE_PATH=/usr/src:$ROS_PACKAGE_PATH" >> ~/.bashrc \
+    && echo "export ROS_PACKAGE_PATH=/usr/src:\$ROS_PACKAGE_PATH" >> ~/.bashrc \
     && rosdep init && rosdep update \
     && bash -ci catkin_make
