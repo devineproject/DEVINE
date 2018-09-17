@@ -10,9 +10,8 @@ import rospy
 from std_msgs.msg import Bool 
 from sensor_msgs.msg import CompressedImage
 
+IMAGE_TOPIC = '/devine/image/blur_detection'
 BLUR_DETECTION_TOPIC = '/blur_detection'
-IMAGE_TOPIC = 'camera/rgb/image_color/compressed'  
-#IMAGE_TOPIC = '/devine/image'
 DETECTION_THRESHOLD = 200 #Can be changed if need be
 
     

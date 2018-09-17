@@ -19,7 +19,7 @@ ROOT_DIR = sys.path[0]
 VGG16_NTW_PATH = os.path.join(ROOT_DIR, '../../vgg_16.ckpt')
 
 FEATURES_TOPIC = '/vgg16_features'
-IMAGE_TOPIC = '/devine/image'
+IMAGE_TOPIC = '/devine/image/features_extraction'
 
 IMAGE_SIZE = 224
 CHANNEL_MEAN = np.array([123.68, 116.779, 103.939])
