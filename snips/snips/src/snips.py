@@ -1,11 +1,11 @@
 #!/usr/bin/env python2
-"""
+'''
 Snips ROS integration
 
 ROS Topics
 question -> question as string input
 answer -> answer as string output
-"""
+'''
 import json
 import paho.mqtt.client as mqtt
 import rospy
@@ -14,39 +14,39 @@ from std_msgs.msg import String
 # Snips settings
 SNIPS_HOST = "localhost"
 SNIPS_PORT = 1883
-SNIPS_TOPICS = ['hermes/intent/TSchmidty:YesNoResponse', 'hermes/intent/Picnic8:YesNoAnswer']
+SNIPS_TOPICS = ['hermes/intent/#'] # Wild card for every intents
 MQTT_CLIENT = mqtt.Client()
 
 # ROS
 ROS_PUBLISHER = rospy.Publisher('/answer', String, queue_size=10)
 
-
 def snips_ask_callback(data):
-    """
+    '''
     Callback executed when a question is received from ROS
-    """
+    '''
     question = data.data
     rospy.loginfo("%s received: %s", rospy.get_name(), question)
-    args = {'init': {'type': 'action', 'text': question, 'canBeEnqueued': True}}
+    args = {'init': {'type': 'action', 'text': question, 'canBeEnqueued': True}} # TODO: Add an intentFilter
     MQTT_CLIENT.publish(
         'hermes/dialogueManager/startSession', json.dumps(args))
 
 
-def on_snips_connect(client, userdata, flags, connection_result): # pylint: disable=W0613
-    """
+# Args: client, userdata, flags, connection_result
+def on_snips_connect(*_):
+    '''
     Callback executed when snips is connected
-    """
+    '''
     rospy.loginfo("Connected to snips at %s:%i", SNIPS_HOST, SNIPS_PORT)
     for topic in SNIPS_TOPICS:
         MQTT_CLIENT.subscribe(topic)
 
 
-def on_snips_message(client, userdata, msg): # pylint: disable=W0613
-    """
+# Args: client, userdata, msg
+def on_snips_message(_client, _userdata, msg):
+    '''
     Callback executed when snips receive an answer
-    """
-    if msg.topic not in SNIPS_TOPICS:
-        return
+    '''
+    rospy.loginfo("Received intent from snips: %s", msg.payload)
     data = json.loads(msg.payload)
     if data['slots']:
         rospy.loginfo("Received message %s, detected: %s", data['input'],
@@ -55,23 +55,23 @@ def on_snips_message(client, userdata, msg): # pylint: disable=W0613
 
 
 def create_ros_listener():
-    """
+    '''
     Create the ROS listeners
-    """
+    '''
     rospy.Subscriber('/question', String, snips_ask_callback)
 
 
 def on_snips_disconnect():
-    """
+    '''
     Callback executed when snips is disconnected
-    """
+    '''
     rospy.loginfo("Disconnected from snips")
 
 
 def setup_snips():
-    """
+    '''
     Snips setup function
-    """
+    '''
     MQTT_CLIENT.on_connect = on_snips_connect
     MQTT_CLIENT.on_message = on_snips_message
     MQTT_CLIENT.on_disconnect = on_snips_disconnect
