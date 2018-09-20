@@ -2,3 +2,5 @@
 /dashboard/node_modules/*
 /dashboard/dist/*
 .idea/
+/docs/build/
+/docs/source/.doctrees/
