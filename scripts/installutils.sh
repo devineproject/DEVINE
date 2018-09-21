@@ -35,13 +35,11 @@ install_devine() {
   bash -ci 'npm install && npm run build'
   cd ../guesswhat
   unzip "$datapath/weights.zip" -d devine_guesswhat/data
-  rm -f "$datapath/weights.zip"
   cd ../image_processing
   python3 -m pip install --user Cython
   python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
-  rm -f "$datapath/vgg_16_2016_08_28.tar.gz"
   git clone https://github.com/ildoonet/tf-pose-estimation.git
   cd tf-pose-estimation
   # hack remove this once body tracking is updated to a python3 node
