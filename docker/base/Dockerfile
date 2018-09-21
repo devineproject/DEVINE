@@ -1,6 +1,8 @@
 FROM devineproject/guesswhat
 
-ENV LIBGL_ALWAYS_SOFTWARE=1
+ENTRYPOINT []
+
+ENV LIBGL_ALWAYS_SOFTWARE=1 PATH=/root/.local/bin:$PATH
 
 WORKDIR /usr/src
 

@@ -1,4 +1,4 @@
-FROM devine-base
+FROM devineproject/devine-base
 
 COPY . /usr/src/DEVINE
 

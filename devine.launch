@@ -8,7 +8,7 @@
 
   <group if="$(arg robot_control)">
     <include file="$(find irl_control)/src/irl_control/irl_control.launch" />
-    <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" />
+    <!-- <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" /> -->
   </group>
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
