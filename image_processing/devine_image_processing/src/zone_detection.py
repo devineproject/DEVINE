@@ -89,6 +89,7 @@ class ZoneDetection(ImageProcessor):
         '''Process a new image by detecting possible zones'''
         bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) if COLOR_DEBUG_MODE or COLOR_PICKER_MODE else None
         hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+        result = {}
 
         [width, height, _] = hls.shape
 
