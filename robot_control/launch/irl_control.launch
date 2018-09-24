@@ -12,8 +12,7 @@
   </group>
   
   <group if="$(arg point)">
-      <node name="control_marker" pkg="irl_control" type="node_marker.py" respawn="true" />
-      <node name="control_tf" pkg="irl_control" type="node_object_tf.py" respawn="true" />
+      <node name="control_object" pkg="irl_control" type="node_object.py" respawn="true" />
       <node name="control_error" pkg="irl_control" type="node_error.py" respawn="true" />
   </group>
   

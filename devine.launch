@@ -5,9 +5,12 @@
   <arg name="dashboard" default="true" />
   <arg name="guesswhat" default="true" />
   <arg name="image_processing" default="true" />
+  <arg name="jn0" default="true" />
 
   <group if="$(arg robot_control)">
-    <include file="$(find irl_control)/src/irl_control/irl_control.launch" />
+    <include file="$(find irl_control)/launch/irl_control.launch">
+      <arg name="jn0" value="$(arg jn0)"/>
+    </include>
     <!-- <node name="pos_lib" pkg="devine_kinect" type="pos_lib.py" respawn="true" /> -->
   </group>
   <group if="$(arg kinect)">

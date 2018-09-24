@@ -1,3 +1,5 @@
+''' Hardcoded movements to display emotions '''
+
 import rospy
 
 from std_msgs.msg import Float32MultiArray
@@ -7,6 +9,8 @@ TOPIC_GUESSWHAT_CONFIDENCE = '/confidence'
 TOPIC_GUESSWHAT_SUCCEED = '/is_guesswhat_succeed'
 
 class Movement(object):
+    ''' According to game state, emote emotion with complex movement '''
+
     def __init__(self, controller):
         self.controller = controller
         self.confidence_max = None
@@ -18,12 +22,16 @@ class Movement(object):
 
 
     def confidence_callback(self, msg):
+        ''' GuessWhat confidence level '''
+
         rospy.loginfo(msg.data)
         if msg.data:
             self.confidence_max = max(msg.data)
 
 
     def is_guesswhat_succeed_callback(self, msg):
+        ''' GuessWhat succeeded or not '''
+
         rospy.loginfo(msg.data)
         if msg.data != None:
             self.is_guesswhat_succeed = msg.data
@@ -31,6 +39,8 @@ class Movement(object):
 
 
     def choose_move(self):
+        ''' Select the emotion to emote '''
+
         seuil = 0.75
         if not self.is_guesswhat_succeed and self.confidence_max >= seuil:
             rospy.loginfo('Sad')
@@ -47,15 +57,17 @@ class Movement(object):
 
         elif self.is_guesswhat_succeed and self.confidence_max >= seuil:
             rospy.loginfo('Happy')
-            self.dab_left()
+            self.dab('left')
             rospy.sleep(3)
-            self.dab_right()
+            self.dab('right')
             rospy.sleep(3)
 
         self.controller.move_init(5)
 
 
     def head_down_shoulder_in(self):
+        ''' Sad emotion movement'''
+
         right_joints_position = ui_to_traj([-0.22, 0.47, 0.18, -0.4])
         left_joints_position = ui_to_traj([-0.70, -0.62, -0.31, -0.67])
         head_joints_position = [-0.15, 0.79]
@@ -87,6 +99,8 @@ class Movement(object):
 
 
     def head_shake_hand_up(self):
+        ''' Disappointed emotion movement'''
+
         right_joints_position = ui_to_traj([-0.75, -0.31, 0.31, -1.07])
         left_joints_position = ui_to_traj([-0.75, 0.31, -0.31, -1.07])
         head_joints_position = [0.4, 0.47]
@@ -116,6 +130,8 @@ class Movement(object):
 
 
     def head_up_arm_up(self):
+        ''' Satisfied emotion movement'''
+
         right_joints_position = ui_to_traj([-0.34, -0.22, 0, -2.48])
         left_joints_position = ui_to_traj([-0.34, 0.22, 0, -2.48])
         head_joints_position = [-0.5, -0.17]
@@ -144,22 +160,17 @@ class Movement(object):
         rospy.sleep(0.5)
 
 
-    def dab_left(self):
-        right_joints_position = [-1.57, -1.87, 0, -0.16]
-        left_joints_position = [0, -2.0, 1.57, 1.22]
-        head_joints_position = [0.31, 0.79]
-        time = 3
+    def dab(self, direction):
+        ''' Happy emotion movement '''
 
-        self.controller.move({'head': head_joints_position,
-                              'arm_left': left_joints_position,
-                              'arm_right': right_joints_position
-                             },
-                             time)
-
-    def dab_right(self):
-        left_joints_position = [1.57, -1.87, 0, -0.16]
-        right_joints_position = [0, -2, -1.57, 1.22]
-        head_joints_position = [-0.31, 0.79]
+        if direction is 'right':
+            left_joints_position = [1.57, -1.87, 0, -0.16]
+            right_joints_position = [0, -2, -1.57, 1.22]
+            head_joints_position = [-0.31, 0.79]
+        elif direction is 'left':
+            right_joints_position = [-1.57, -1.87, 0, -0.16]
+            left_joints_position = [0, -2.0, 1.57, 1.22]
+            head_joints_position = [0.31, 0.79]
         time = 3
 
         self.controller.move({'head': head_joints_position,
@@ -169,10 +180,13 @@ class Movement(object):
                              time)
 
 def ui_to_traj(joints_position):
+    ''' Convert position from rqt_joint_trajectory_controller UI to JointTrajectoryController'''
+
     # in: UI Joints Position
     # L_elbow_tilt_joint, L_shoulder_pan_joint, L_shoulder_roll_joint, L_shoulder_tilt_joint
     # out: Trajectory Client
     # L_shoulder_pan_joint, L_shoulder_tilt_joint, L_shoulder_roll_joint, L_elbow_tilt_joint
+
     joints_position_out = [0, 0, 0, 0]
     joints_position_out[0] = joints_position[1]
     joints_position_out[1] = joints_position[3]

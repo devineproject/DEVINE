@@ -54,7 +54,7 @@ install_devine() {
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
   mkdir ~/.rviz
-  cp irl_control/irl_point.rviz ~/.rviz/default.rviz
+  cp launch/irl_point.rviz ~/.rviz/default.rviz
 
   cd ../../..
   bash -ci catkin_make

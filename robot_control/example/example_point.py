@@ -1,13 +1,15 @@
 #! /usr/bin/env python
 
+''' Script to point with command line '''
+
 import argparse
 import rospy
 
 from std_msgs.msg import Float32MultiArray
 
 def main(args):
-    """Example to control head, arms and gripper with command line
-    """
+    ''' Publish on the 3D position from /base_link to point '''
+
     # Parse arguments
     point = [float(i) for i in args.point.split(',')]
 
@@ -25,11 +27,15 @@ def main(args):
         rospy.loginfo(point)
         rate.sleep()
 
-if __name__ == '__main__':
-    arg_fmt = argparse.RawDescriptionHelpFormatter
-    parser = argparse.ArgumentParser(formatter_class=arg_fmt, description=main.__doc__)
-    required = parser.add_argument_group('required arguments')
-    required.add_argument('-p', '--point', required=True, help='What 3D position to point?')
-    args = parser.parse_args(rospy.myargv()[1:])
+def parser():
+    ''' Command Line Parser'''
 
-    main(args)
+    arg_fmt = argparse.RawDescriptionHelpFormatter
+    arg_parser = argparse.ArgumentParser(formatter_class=arg_fmt, description=main.__doc__)
+    required = arg_parser.add_argument_group('required arguments')
+    required.add_argument('-p', '--point', required=True, help='What 3D position to point?')
+    arguments = arg_parser.parse_args(rospy.myargv()[1:])
+    return arguments
+
+if __name__ == '__main__':
+    main(parser())
