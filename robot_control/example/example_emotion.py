@@ -6,7 +6,7 @@ import argparse
 import rospy
 
 from std_msgs.msg import Bool
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float64MultiArray
 
 TOPIC_GUESSWHAT_CONFIDENCE = '/confidence'
 TOPIC_GUESSWHAT_SUCCEED = '/is_guesswhat_succeed'
@@ -26,9 +26,9 @@ def main(arguments):
 
     while not rospy.is_shutdown():
         pub_confidence = rospy.Publisher(TOPIC_GUESSWHAT_CONFIDENCE,
-                                         Float32MultiArray,
+                                         Float64MultiArray,
                                          queue_size=10)
-        ros_packet_float = Float32MultiArray()
+        ros_packet_float = Float64MultiArray()
         ros_packet_float.data = confidence_array
         pub_confidence.publish(ros_packet_float)
 
