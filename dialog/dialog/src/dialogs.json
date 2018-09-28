@@ -21,7 +21,7 @@
         "Great, {first_name}! Are you ready to start?"
     ],
     "instructions": [
-        "Good! So now think about one of the objects on the table, and I will aks you some question in order to find it."
+        "Good! So now think about one of the objects on the table, and I will ask you some question in order to find it."
     ],
     "bye_bye": [
         "All right, good bye."
