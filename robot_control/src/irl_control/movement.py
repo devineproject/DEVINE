@@ -2,7 +2,7 @@
 
 import rospy
 
-from std_msgs.msg import Float32MultiArray
+from std_msgs.msg import Float64MultiArray
 from std_msgs.msg import Bool
 
 TOPIC_GUESSWHAT_CONFIDENCE = '/confidence'
@@ -17,7 +17,7 @@ class Movement(object):
         self.is_guesswhat_succeed = None
 
         # TODO verify if mutex needed
-        rospy.Subscriber(TOPIC_GUESSWHAT_CONFIDENCE, Float32MultiArray, self.confidence_callback)
+        rospy.Subscriber(TOPIC_GUESSWHAT_CONFIDENCE, Float64MultiArray, self.confidence_callback)
         rospy.Subscriber(TOPIC_GUESSWHAT_SUCCEED, Bool, self.is_guesswhat_succeed_callback)
 
 
