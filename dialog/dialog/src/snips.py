@@ -10,6 +10,7 @@ import json
 import paho.mqtt.client as mqtt
 import rospy
 from std_msgs.msg import String
+from devine_config import topicname
 
 # Snips settings
 SNIPS_HOST = "localhost"
@@ -17,8 +18,12 @@ SNIPS_PORT = 1883
 SNIPS_TOPICS = ['hermes/intent/#'] # Wild card for every intents
 MQTT_CLIENT = mqtt.Client()
 
+#Topics
+SNIPS_ANSWER = topicname('answer')
+SNIPS_QUESTION = topicname('question')
+
 # ROS
-ROS_PUBLISHER = rospy.Publisher('/answer', String, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(SNIPS_ANSWER, String, queue_size=10)
 
 def snips_ask_callback(data):
     '''
@@ -58,7 +63,7 @@ def create_ros_listener():
     '''
     Create the ROS listeners
     '''
-    rospy.Subscriber('/question', String, snips_ask_callback)
+    rospy.Subscriber(SNIPS_QUESTION, String, snips_ask_callback)
 
 
 def on_snips_disconnect():

@@ -3,10 +3,14 @@
 import rospy
 from std_msgs.msg import String
 from game_system import GameSystem
+from devine_config import topicname
+
+#Topics
+GAME_SYSTEM_STATE = topicname('game_system_state')
 
 if __name__ == "__main__":
 
-    pub = rospy.Publisher('/game_system_state', String, queue_size=10)
+    pub = rospy.Publisher(GAME_SYSTEM_STATE, String, queue_size=10)
     rospy.init_node('game_system', anonymous=False)
     # pylint: disable=no-member
     gamesystem = GameSystem("DEVINE State Machine", pub)

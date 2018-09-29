@@ -30,10 +30,7 @@ install_devine() {
   fi
 
   # TODO move pip installs to respective catkin package dep?
-  cd DEVINE/dashboard
-  python3 -m pip install --user -r requirements.txt
-  bash -ci 'npm install && npm run build'
-  cd ../guesswhat
+  cd DEVINE/guesswhat
   unzip "$datapath/weights.zip" -d devine_guesswhat/data
   cd ../image_processing
   python3 -m pip install --user Cython
@@ -58,6 +55,11 @@ install_devine() {
 
   cd ../../..
   bash -ci catkin_make
+
+  cd src/DEVINE/dashboard
+  bash -ci 'rosrun devine_config devinetopics.py > src/vars/devine_topics.json'
+  python3 -m pip install --user -r requirements.txt
+  bash -ci 'npm install && npm run build'
 
   popd
 }
@@ -99,6 +101,7 @@ install_base() {
   ensure_line ". /opt/ros/kinetic/setup.sh" ~/.bashrc
   ensure_line "export \"ROS_PACKAGE_PATH=$(pwd):\$ROS_PACKAGE_PATH\"" ~/.bashrc
   cd ..
+  ensure_line "export \"PYTHONPATH=$(pwd)/devel/lib/python2.7/dist-packages:\$PYTHONPATH\"" ~/.bashrc
   if [ ! -d /etc/ros/rosdep ]
   then
     # can we prevent rosdep from sending sigstop?

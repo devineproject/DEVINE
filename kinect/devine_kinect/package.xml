@@ -19,6 +19,7 @@
   <exec_depend>openni_launch</exec_depend>
   <exec_depend>rospy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
+  <exec_depend>devine_config</exec_depend>
   <export>
   </export>
 </package>

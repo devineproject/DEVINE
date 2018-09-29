@@ -6,6 +6,7 @@ import argparse
 import rospy
 
 from std_msgs.msg import Float32MultiArray
+from devine_config import topicname
 
 def main(args):
     ''' Publish on the 3D position from /base_link to point '''
@@ -20,7 +21,7 @@ def main(args):
 
     rate = rospy.Rate(1)
     while not rospy.is_shutdown():
-        pub = rospy.Publisher('/object_location', Float32MultiArray, queue_size=10)
+        pub = rospy.Publisher(topicname('guess_location_world'), Float32MultiArray, queue_size=10)
         ros_packet = Float32MultiArray()
         ros_packet.data = point
         pub.publish(ros_packet)

@@ -8,7 +8,7 @@ const cons = new LogConsole("GuessWhat", "#00bc8c");
 const subscriber = $("#guesswhat_checkbox");
 
 const topics = {
-  state:    new RosTopic(devineTopics.guesswhat_state),
+  state:    new RosTopic(devineTopics.guesswhat_status),
   question: new RosTopic(devineTopics.question),
 };
 

@@ -50,7 +50,7 @@ export default function createScoreboard() {
 
   //TODO: republish to scoreboardTopic, sync up with potential other instances open
   let [nameTopic, gameSuccessTopic, scoreboardTopic] = 
-    [rosTopics.player_name, rosTopics.game_success, rosTopics.scoreboard]
+    [rosTopics.player_name, rosTopics.object_guess_success, rosTopics.scoreboard]
       .map(top => new ROSLIB.Topic({ros, name: top.name, messageType: top.type}));
 
   nameTopic.subscribe(newPlayerName => {

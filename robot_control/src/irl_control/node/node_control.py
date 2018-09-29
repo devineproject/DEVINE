@@ -5,19 +5,20 @@
 import rospy
 import tf
 from std_msgs.msg import Float32MultiArray
+from irl_control import irl_constant
 from irl_control.movement import Movement
 from irl_control.controllers import TrajectoryClient
 from irl_control.gripper import Gripper
 import irl_control.ik as ik
+from devine_config import topicname
 
-ROBOT = 'jn0'
-TOPIC_OBJECT_LOCATION = '/object_location'
+ROBOT_NAME = irl_constant.ROBOT_NAME
+TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
 TOPIC_OBJECT_FRAME = '/object_frame'
-TOPIC_ROBOT_BASE = '/base_link'
-TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME = '/R_shoulder_fixed_link'
-TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME = '/L_shoulder_fixed_link'
-TOPIC_ROBOT_NECK_PAN_FRAME = '/neck_pan_link'
-TOPIC_GUESSWHAT_SUCCEED = '/is_guesswhat_succeed'
+TOPIC_ROBOT_BASE_FRAME = irl_constant.ROBOT_LINK['base']
+TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME = irl_constant.ROBOT_LINK['r_shoulder_fixed']
+TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME = irl_constant.ROBOT_LINK['l_shoulder_fixed']
+TOPIC_ROBOT_NECK_PAN_FRAME = irl_constant.ROBOT_LINK['neck_pan']
 
 class Controller(object):
     ''' Arms, head and gripper controller '''
@@ -31,23 +32,23 @@ class Controller(object):
         self.head_joints_position = [0, 0, 0, 0]
 
         self.tf_listener = tf.TransformListener()
-        self.gripper = Gripper(ROBOT, 'right')
+        self.gripper = Gripper(ROBOT_NAME, 'right')
 
         try:
             rospy.loginfo('Waiting for Arm and Head controllers')
-            self.arm_right = TrajectoryClient(ROBOT, 'right_arm_controller')
-            self.arm_left = TrajectoryClient(ROBOT, 'left_arm_controller')
-            self.head = TrajectoryClient(ROBOT, 'neck_controller')
+            self.arm_right = TrajectoryClient(ROBOT_NAME, 'right_arm_controller')
+            self.arm_left = TrajectoryClient(ROBOT_NAME, 'left_arm_controller')
+            self.head = TrajectoryClient(ROBOT_NAME, 'neck_controller')
         except RuntimeError as err:
             rospy.logerr(err)
             rospy.signal_shutdown(err)
 
         try:
             self.init_tf(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME, TOPIC_OBJECT_FRAME)
-            self.init_tf(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE)
+            self.init_tf(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE_FRAME)
 
             self.init_tf(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME, TOPIC_OBJECT_FRAME)
-            self.init_tf(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE)
+            self.init_tf(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE_FRAME)
 
         except tf.Exception as err:
             rospy.logerr(err)

@@ -18,12 +18,12 @@ const image = canvas ? canvas.getContext("2d") : undefined;
 const delay = $('#kinect_image_delay');
 
 const topics = {
-  image:              new RosTopic(devineTopics.image),
+  image:              new RosTopic(devineTopics.raw_image),
   segmentation_image: new RosTopic(devineTopics.segmentation_image),
-  segmentation:       new RosTopic(devineTopics.segmentation),
-  object_position_2d: new RosTopic(devineTopics.object_found),
-  object_position_3d: new RosTopic(devineTopics.object_location),
-  body_position:      new RosTopic(devineTopics.body_position)
+  segmentation:       new RosTopic(devineTopics.objects),
+  object_position_2d: new RosTopic(devineTopics.guess_location_image),
+  object_position_3d: new RosTopic(devineTopics.guess_location_world),
+  body_position:      new RosTopic(devineTopics.body_tracking)
 };
 
 const history = {

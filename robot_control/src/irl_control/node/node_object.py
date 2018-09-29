@@ -3,11 +3,13 @@
 ''' Node to visualize object in RViz and broadcast object_frame '''
 
 import rospy
+from irl_control import irl_constant
 from irl_control.objects import ObjectMaker, ObjectTf
+from devine_config import topicname
 
-TOPIC_OBJECT_LOCATION = '/object_location'
+TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
 TOPIC_OBJECT_FRAME = '/object_frame'
-TOPIC_ROBOT_BASE_FRAME = 'base_link'
+TOPIC_ROBOT_BASE_FRAME = irl_constant.ROBOT_LINK['base']
 
 
 def main():

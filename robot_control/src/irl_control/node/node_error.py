@@ -6,7 +6,9 @@ import math
 import rospy
 import tf
 
-TOPIC_ROBOT_POINT_RIGHT_FRAME = '/R_frame_tool_link'
+from irl_control import irl_constant
+
+TOPIC_ROBOT_POINT_RIGHT_FRAME = irl_constant.ROBOT_LINK['r_frame_tool']
 TOPIC_OBJECT_FRAME = '/object_frame'
 
 def main():

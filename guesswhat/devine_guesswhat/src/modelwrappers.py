@@ -6,11 +6,11 @@ import rospy
 from std_msgs.msg import String, Float64MultiArray
 
 from guesswhat.models.guesser.guesser_wrapper import GuesserWrapper
+from devine_config import topicname
 
-ANSWER_TOPIC = '/answer'
-QUESTION_TOPIC = '/question'
-CONFIDENCE_TOPIC = '/confidence'
-SELECTION_TOPIC = '/object_found'
+ANSWER_TOPIC = topicname('answer')
+QUESTION_TOPIC = topicname('question')
+CONFIDENCE_TOPIC = topicname('objects_confidence')
 
 class GuesserROSWrapper(GuesserWrapper):
     '''Wraps the guesser model and publishes confidence levels'''

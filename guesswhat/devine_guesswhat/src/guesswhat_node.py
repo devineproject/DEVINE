@@ -22,7 +22,9 @@ from guesswhat.data_provider.looper_batchifier import LooperBatchifier
 
 from modelwrappers import GuesserROSWrapper, OracleROSWrapper
 
-ROOT_DIR = sys.path[0]
+from devine_config import topicname
+
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 EVAL_CONF_PATH = os.path.join(ROOT_DIR, '../config/eval.json')
 GUESS_CONF_PATH = os.path.join(ROOT_DIR, '../config/guesser.json')
 QGEN_CONF_PATH = os.path.join(ROOT_DIR, '../config/qgen.json')
@@ -30,11 +32,13 @@ GUESS_NTW_PATH = os.path.join(ROOT_DIR, '../data/guesser.ckpt')
 QGEN_NTW_PATH = os.path.join(ROOT_DIR, '../data/qgen.ckpt')
 TOKENS_PATH = os.path.join(ROOT_DIR, '../data/tokens.json')
 
-SEGMENTATION_TOPIC = '/rcnn_segmentation'
-FEATURES_TOPIC = '/vgg16_features'
-OBJECT_TOPIC = '/object_found'
-CATEGORY_TOPIC = '/found_category'
-STATE_TOPIC = '/guesswhat_state'
+#topics
+SEGMENTATION_TOPIC = topicname('objects')
+FEATURES_TOPIC = topicname('image_features')
+STATUS_TOPIC = topicname('guesswhat_status')
+# TODO merge these topics to one
+OBJECT_TOPIC = topicname('guess_location_image')
+CATEGORY_TOPIC = topicname('guess_category')
 
 segmentations = Queue(1)
 features = Queue(1)
@@ -97,7 +101,7 @@ if __name__ == '__main__':
     rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, features_callback)
     object_found = rospy.Publisher(OBJECT_TOPIC, Int32MultiArray, queue_size=1)
     category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
-    state = rospy.Publisher(STATE_TOPIC, String, queue_size=1, latch=True)
+    status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
 
     eval_config = open_config(EVAL_CONF_PATH)
     guesser_config = open_config(GUESS_CONF_PATH)
@@ -129,7 +133,7 @@ if __name__ == '__main__':
 
         batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
 
-        state.publish('Waiting for image processing')
+        status.publish('Waiting for image processing')
         while not rospy.is_shutdown():
             try:
                 seg = segmentations.get(timeout=1)
@@ -167,4 +171,4 @@ if __name__ == '__main__':
             rospy.loginfo('Game over')
             category.publish(seg['objects'][choice_index]['category'])
 
-            state.publish('Waiting for image processing')
+            status.publish('Waiting for image processing')

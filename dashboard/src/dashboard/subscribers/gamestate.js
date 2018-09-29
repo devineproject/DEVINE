@@ -8,7 +8,7 @@ const cons = new LogConsole("Game State", "#E74C3C");
 const subscriber = $("#gamestate_checkbox");
 
 const topics = {
-  category: new RosTopic(devineTopics.found_category),
+  category: new RosTopic(devineTopics.guess_category),
 };
 
 subscriber.on("change", function () {

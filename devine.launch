@@ -15,11 +15,12 @@
   </group>
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
+    <!-- TODO have one node distribute frames to each module -->
     <node name="img_throttle_zone" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/zone_detection" />
     <node name="img_throttle_seg" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/segmentation" />
     <node name="img_throttle_features" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/features_extraction" />
     <node name="img_throttle_blur" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/blur_detection" />
-    <node name="img_throttle_bodytracking" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/body_tracking" />  
+    <node name="img_throttle_bodytracking" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/body_tracking" />
   </group>
   <group if="$(arg snips)">
     <node name="snips" pkg="snips" type="snips.py" respawn="true" />

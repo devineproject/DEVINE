@@ -1,6 +1,16 @@
 ''' IRL-1 Constants: Contains the controller names, joint names and joint limits '''
 
 ROBOT_NAME = 'jn0'
+
+ROBOT_LINK = {
+    'base': '/base_link',
+    'neck_pan': '/neck_pan_link',
+    'l_shoulder_fixed': '/L_shoulder_fixed_link',
+    'r_shoulder_fixed': '/R_shoulder_fixed_link',
+    'r_frame_tool': '/R_frame_tool_link',
+    'l_frame_tool': '/L_frame_tool_link'
+}
+
 ROBOT_CONTROLLER = {
     'neck_controller':  {
         'joints_name': ['neck_pan_joint', 'neck_tilt_joint'],

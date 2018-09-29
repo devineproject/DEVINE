@@ -14,12 +14,13 @@ import numpy as np
 import rospy
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import CompressedImage
+from devine_config import topicname
 
-ROOT_DIR = sys.path[0]
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 VGG16_NTW_PATH = os.path.join(ROOT_DIR, '../../vgg_16.ckpt')
 
-FEATURES_TOPIC = '/vgg16_features'
-IMAGE_TOPIC = '/devine/image/features_extraction'
+FEATURES_TOPIC = topicname('image_features')
+IMAGE_TOPIC = topicname('features_extraction_image')
 
 IMAGE_SIZE = 224
 CHANNEL_MEAN = np.array([123.68, 116.779, 103.939])

@@ -9,17 +9,16 @@ from io import BytesIO
 import rospy
 from std_msgs.msg import Bool 
 from sensor_msgs.msg import CompressedImage
+from devine_config import topicname
 
-IMAGE_TOPIC = '/devine/image/blur_detection'
-BLUR_DETECTION_TOPIC = '/blur_detection'
-DETECTION_THRESHOLD = 200 #Can be changed if need be
+BLUR_DETECTION_TOPIC = topicname('blur_detection')
+IMAGE_TOPIC = topicname('blur_detection_image')
+DETECTION_THRESHOLD = 200
 
-    
 def detect_image_blur(gray,threshold):
     """ compute the variance of the Laplacian to measure focus"""
     focus_measure = cv2.Laplacian(gray, cv2.CV_64F).var() 
     return focus_measure < threshold
-
 
 if __name__ == '__main__':
     rospy.init_node('blur_detection')

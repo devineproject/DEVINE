@@ -14,12 +14,14 @@ import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 import math
 import tf
+from devine_config import topicname
 
+#Topics
+IMAGE_DEPTH_TOPIC = topicname('image_depth')
+OBJECT_IMAGE_LOCATION_TOPIC = topicname('guess_location_image')
+OBJECT_WORLD_LOCATION_TOPIC = topicname('guess_location_world')
 
-IMAGE_DEPTH_TOPIC = "/camera/depth/points"
-OBJECT_POSITION_TOPIC = "/object_found"
-
-ROS_PUBLISHER = rospy.Publisher('/object_location', Float32MultiArray, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(OBJECT_IMAGE_LOCATION_TOPIC, Float32MultiArray, queue_size=10)
 
 (trans, rot) = (0, 0)
 
@@ -129,7 +131,7 @@ class PosLib(object):
 
 if __name__ == '__main__':
     rospy.init_node('devine_kinect')
-    PosLib(IMAGE_DEPTH_TOPIC, OBJECT_POSITION_TOPIC) 
+    PosLib(IMAGE_DEPTH_TOPIC, OBJECT_WORLD_LOCATION_TOPIC)
     rospy.loginfo("Node initialized")
 
     tf_listener = tf.TransformListener()
