@@ -1,6 +1,6 @@
 [submodule "guesswhat/guesswhat"]
-	path = guesswhat/guesswhat
+	path = src/guesswhat/guesswhat
 	url = git@github.com:FelixMartel/DEVINE-guesswhat.git
 [submodule "image_processing/Mask_RCNN"]
-	path = image_processing/Mask_RCNN
+	path = src/image_processing/Mask_RCNN
 	url = git@github.com:matterport/Mask_RCNN.git

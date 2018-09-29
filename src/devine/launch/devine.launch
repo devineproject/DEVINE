@@ -1,0 +1,44 @@
+<launch>
+  <arg name="launch_all" default="true" />
+  <arg name="robot_control" default="$(arg launch_all)"/>
+  <arg name="kinect" default="$(arg launch_all)"/>
+  <arg name="dialog" default="$(arg launch_all)"/>
+  <arg name="dashboard" default="$(arg launch_all)" />
+  <arg name="guesswhat" default="$(arg launch_all)" />
+  <arg name="image_processing" default="$(arg launch_all)" />
+  <arg name="jn0" default="true" />
+
+  <group if="$(arg robot_control)">
+    <include file="$(find irl_control)/launch/irl_control.launch">
+      <arg name="jn0" value="$(arg jn0)"/>
+    </include>
+    <!-- <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" /> -->
+  </group>
+  <group if="$(arg kinect)">
+    <include file="$(find openni_launch)/launch/openni.launch" />
+    <!-- TODO have one node distribute frames to each module -->
+    <node name="img_throttle_zone" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/zone_detection" />
+    <node name="img_throttle_seg" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/segmentation" />
+    <node name="img_throttle_features" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/features_extraction" />
+    <node name="img_throttle_blur" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/blur_detection" />
+    <node name="img_throttle_bodytracking" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/body_tracking" />
+  </group>
+  <group if="$(arg dialog)">
+    <node name="snips" pkg="dialog" type="snips.py" respawn="true" />
+    <node name="dialog_control" pkg="dialog" type="dialog_control.py" respawn="true" />
+  </group>
+  <group if="$(arg image_processing)">
+    <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
+    <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
+    <node name="zone_detection" pkg="devine_image_processing" type="zone_detection.py" respawn="true" />
+    <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
+    <node name="blur_detection" pkg="devine_image_processing" type="blur_detection.py" respawn="true" />
+  </group>
+  <group if="$(arg dashboard)">
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
+  </group>
+  <group if="$(arg guesswhat)">
+    <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
+  </group>
+</launch>

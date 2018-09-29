@@ -1,6 +1,7 @@
-*.pyc
-/dashboard/node_modules/*
-/dashboard/dist/*
 .idea/
+.vscode/
+*.pyc
+/src/dashboard/node_modules/*
+/src/dashboard/dist/*
 /docs/build/
 /docs/source/.doctrees/

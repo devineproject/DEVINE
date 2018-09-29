@@ -30,7 +30,7 @@ install_devine() {
   fi
 
   # TODO move pip installs to respective catkin package dep?
-  cd DEVINE/guesswhat
+  cd DEVINE/src/guesswhat
   unzip "$datapath/weights.zip" -d devine_guesswhat/data
   cd ../image_processing
   python3 -m pip install --user Cython
@@ -53,11 +53,11 @@ install_devine() {
   mkdir ~/.rviz
   cp launch/irl_point.rviz ~/.rviz/default.rviz
 
-  cd ../../..
+  cd ../../../..
   bash -ci catkin_make
 
-  cd src/DEVINE/dashboard
-  bash -ci 'rosrun devine_config devinetopics.py > src/vars/devine_topics.json'
+  cd src/DEVINE/src/dashboard
+  bash -ci 'rosrun devine_config devinetopics.py > src/devine_dashboard/js/vars/devine_topics.json'
   python3 -m pip install --user -r requirements.txt
   bash -ci 'npm install && npm run build'
 
