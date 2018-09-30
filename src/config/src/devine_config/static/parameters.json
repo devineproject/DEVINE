@@ -54,7 +54,7 @@
     },
     "guess_location_world": {
       "name": "/devine/guess_location/world",
-      "type": "std_msgs/Int32MultiArray"
+      "type": "std_msgs/Float32MultiArray"
     },
     "guess_category": {
       "name": "/devine/guess_category",
