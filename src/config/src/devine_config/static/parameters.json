@@ -1,0 +1,98 @@
+{
+  "topics": {
+    "raw_image": {
+      "name": "/camera/rgb/image_color/compressed",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "image_depth": {
+      "name": "/camera/depth/points",
+      "type": "sensor_msgs/PointCloud2"
+    },
+    "segmentation_image": {
+      "name": "/devine/image/segmentation",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "zone_detection_image": {
+      "name": "/devine/image/zone_detection",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "features_extraction_image": {
+      "name": "/devine/image/features_extraction",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "blur_detection_image": {
+      "name": "/devine/image/blur_detection",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "body_tracking_image": {
+      "name": "/devine/image/body_tracking",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "objects": {
+      "name": "/devine/objects",
+      "type": "std_msgs/String"
+    },
+    "zone_detection": {
+      "name": "/devine/zone_detection",
+      "type": "std_msgs/String"
+    },
+    "image_features": {
+      "name": "/devine/image_features",
+      "type": "std_msgs/Float64MultiArray"
+    },
+    "blur_detection": {
+      "name": "/devine/blur_detection",
+      "type": "std_msgs/Bool"
+    },
+    "body_tracking": {
+      "name": "/devine/body_tracking",
+      "type": "std_msgs/String"
+    },
+    "guess_location_image": {
+      "name": "/devine/guess_location/image",
+      "type": "std_msgs/Int32MultiArray"
+    },
+    "guess_location_world": {
+      "name": "/devine/guess_location/world",
+      "type": "std_msgs/Float32MultiArray"
+    },
+    "guess_category": {
+      "name": "/devine/guess_category",
+      "type": "std_msgs/String"
+    },
+    "guesswhat_status": {
+      "name": "/devine/guesswhat_status",
+      "type": "std_msgs/String"
+    },
+    "question": {
+      "name": "/devine/question",
+      "type": "std_msgs/String"
+    },
+    "answer": {
+      "name": "/devine/answer",
+      "type": "std_msgs/String"
+    },
+    "objects_confidence": {
+      "name": "/devine/objects_confidence",
+      "type": "std_msgs/Float64MultiArray"
+    },
+    "game_system_state": {
+      "name": "/devine/game_system_state",
+      "type": "std_msgs/String"
+    },
+    "scoreboard": {
+      "name": "/devine/scoreboard",
+      "type": "std_msgs/String"
+    },
+    "object_guess_success": {
+      "name": "/devine/object_guess_success",
+      "type": "std_msgs/Bool"
+    },
+    "player_name": {
+      "name": "/devine/player_name",
+      "type": "std_msgs/String"
+    }
+  },
+  "constants": {
+  }
+}
