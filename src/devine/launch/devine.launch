@@ -37,6 +37,7 @@
   <group if="$(arg dashboard)">
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
     <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
+    <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
   </group>
   <group if="$(arg guesswhat)">
     <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
