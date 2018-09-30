@@ -18,13 +18,15 @@ ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image')
 FEATURES_EXTRACTION_IMAGE_TOPIC = topicname('features_extraction_image')
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
 
-TIMER_DELAY = 0.008
+TIMER_DELAY = 125
 
 def dispatch():
-    Timer(TIMER_DELAY, dispatch).start()
+    '''Dipsatch frame to nodes'''
+    global timer
+    timer = Timer(TIMER_DELAY, dispatch)
+    timer.start()
     try:
         image = raw_image_queue.get(timeout=TIMER_DELAY)
-        blur_detection_pub.publish(image)
         if not is_blurry:
             segmentation_pub.publish(image)
             zone_detection_pub.publish(image)
@@ -34,14 +36,20 @@ def dispatch():
         pass
 
 def validate_image_callback(data):
+    '''Callback for blur'''
+    global is_blurry
     is_blurry = data.data
 
 def raw_image_callback(data):
-        '''Callback for image topic'''
-        if raw_image_queue.full():
-            raw_image_queue.get()
-        raw_image_queue.put(data.data)
+    '''Callback for image topic'''
+    if raw_image_queue.full():
+        raw_image_queue.get()
+    raw_image_queue.put(data)
+    blur_detection_pub.publish(image)
 
+def cancel_timer():
+    '''Cancel pending timer'''
+    timer.cancel()
 
 if __name__ == '__main__':
     rospy.init_node('image_dispatcher')
@@ -57,5 +65,8 @@ if __name__ == '__main__':
     rospy.Subscriber(IMAGE_TOPIC, CompressedImage, raw_image_callback)
     rospy.Subscriber(BLUR_DETECTION_TOPIC, Bool, validate_image_callback)
 
-    Timer(TIMER_DELAY, dispatch).start()
+    timer = Timer(0, dispatch)
+    rospy.on_shutdown(cancel_timer)
+    timer.start()
+
     rospy.spin()
