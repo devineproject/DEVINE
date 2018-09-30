@@ -8,7 +8,7 @@ import time
 import random
 import uuid
 from enum import Enum
-from dialog.msg import TtsQuery
+from devine_dialog.msg import TtsQuery
 from std_msgs.msg import Bool, String
 
 TTS_ANSWER_TOPIC = '/devine/tts/answer'

@@ -24,8 +24,8 @@
     <node name="img_throttle_bodytracking" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 0.008 /devine/image/body_tracking" />
   </group>
   <group if="$(arg dialog)">
-    <node name="snips" pkg="dialog" type="snips.py" respawn="true" />
-    <node name="dialog_control" pkg="dialog" type="dialog_control.py" respawn="true" />
+    <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
+    <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" respawn="true" />
   </group>
   <group if="$(arg image_processing)">
     <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />

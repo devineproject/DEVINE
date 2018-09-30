@@ -1,5 +1,9 @@
 '''Generic ROS Wrapper around image processing classes'''
-from queue import Queue, Empty
+try:
+    from queue import Queue, Empty
+except:
+    from Queue import Queue, Empty
+
 import time
 import numpy as np
 from PIL import Image

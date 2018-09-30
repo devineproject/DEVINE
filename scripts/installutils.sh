@@ -35,6 +35,7 @@ install_devine() {
   cd ../image_processing
   python3 -m pip install --user Cython
   python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
+  python2 -m pip install --user imutils shapely
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   git clone https://github.com/ildoonet/tf-pose-estimation.git
