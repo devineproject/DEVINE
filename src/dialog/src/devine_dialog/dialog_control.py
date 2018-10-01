@@ -9,10 +9,12 @@ import random
 import uuid
 from enum import Enum
 from devine_dialog.msg import TtsQuery
-from std_msgs.msg import Bool, String
+from std_msgs.msg import String
 
-TTS_ANSWER_TOPIC = '/devine/tts/answer'
-HUMAN_READY_DETECTED_TOPIC = '/devine/zone_detection/human_detected'
+from devine_config import topicname;
+
+TTS_ANSWER_TOPIC = topicname('tts_answer')
+HUMAN_READY_DETECTED_TOPIC = topicname('body_tracking')
 
 SCRIPT_DIR = os.path.dirname(os.path.realpath(__file__))
 CONST_FILE = os.path.join(SCRIPT_DIR, 'dialogs.json')
@@ -23,8 +25,8 @@ class TTSAnswerType(Enum):
     PLAYER_NAME = 2
 
 class DialogControl():
-    TTS_PUBLISHER = rospy.Publisher('/devine/tts/query', TtsQuery, queue_size=10)
-    READY_TO_PLAY_PUBLISHER = rospy.Publisher('/devine/game_control/start', String, queue_size=10)
+    TTS_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=10)
+    READY_TO_PLAY_PUBLISHER = rospy.Publisher(topicname('player_name'), String, queue_size=10)
     
     def __init__(self):
         dialogs = open(CONST_FILE)
@@ -66,8 +68,11 @@ class DialogControl():
         return answer == 'yes'
 
 
-    def on_human_detected(self, _):
+    def on_human_detected(self, human_object):
         '''When a human is detected, begin the robot/human dialog'''
+        humans = json.loads(human_object.data)
+        if len(humans) == 0: # No humans detected
+            return
 
         self.send_speech('welcome', TTSAnswerType.NO_ANSWER)
         answer = self.send_speech('ask_to_play', TTSAnswerType.YES_NO)
@@ -92,7 +97,7 @@ class DialogControl():
 
 def hook_listeners():
     dialog_control = DialogControl()
-    rospy.Subscriber(HUMAN_READY_DETECTED_TOPIC, Bool, dialog_control.on_human_detected)
+    rospy.Subscriber(HUMAN_READY_DETECTED_TOPIC, String, dialog_control.on_human_detected)
 
 if __name__ == '__main__':
     rospy.init_node('dialog_control')

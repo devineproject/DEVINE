@@ -1,7 +1,7 @@
 import publisher from './publisher';
 import gamestate from './subscribers/gamestate';
 import kinect from './subscribers/kinect';
-import snips from './subscribers/snips';
+import dialog from './subscribers/dialog';
 import guesswhat from './subscribers/guesswhat';
 
 export default function CreateDashboard() {
@@ -11,5 +11,6 @@ export default function CreateDashboard() {
   });
 
   kinect();
+  dialog();
   // TODO: IMPLEMENT OTHER MODULE CONSTRUCTORS
 }
