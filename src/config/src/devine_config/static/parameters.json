@@ -20,10 +20,6 @@
       "name": "/devine/image/features_extraction",
       "type": "sensor_msgs/CompressedImage"
     },
-    "blur_detection_image": {
-      "name": "/devine/image/blur_detection",
-      "type": "sensor_msgs/CompressedImage"
-    },
     "body_tracking_image": {
       "name": "/devine/image/body_tracking",
       "type": "sensor_msgs/CompressedImage"
