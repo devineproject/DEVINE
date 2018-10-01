@@ -6,7 +6,7 @@ import rospy
 from std_msgs.msg import Bool
 from sensor_msgs.msg import CompressedImage
 from devine_config import topicname
-from blur_detection import detect_image_blur
+from blur_detection import is_image_blurry
 from threading import Timer
 
 #topics
@@ -16,6 +16,7 @@ SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
 ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image')
 FEATURES_EXTRACTION_IMAGE_TOPIC = topicname('features_extraction_image')
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
+BLUR_DETECTION_TOPIC = topicname('blur_detection')
 
 TIMER_DELAY = 125
 
@@ -26,7 +27,9 @@ def dispatch():
     timer.start()
     try:
         image = raw_image_queue.get(timeout=TIMER_DELAY)
-        if not detect_image_blur(image.data):
+        is_blurry = is_image_blurry(image.data)
+        blur_detection_pub.publish(is_blurry)
+        if not is_blurry:
             segmentation_pub.publish(image)
             zone_detection_pub.publish(image)
             features_extraction_pub.publish(image)
@@ -53,6 +56,7 @@ if __name__ == '__main__':
     zone_detection_pub = rospy.Publisher(ZONE_DETECTION_IMAGE_TOPIC, CompressedImage, queue_size=1)
     features_extraction_pub = rospy.Publisher(FEATURES_EXTRACTION_IMAGE_TOPIC, CompressedImage, queue_size=1)
     body_tracking_pub = rospy.Publisher(BODY_TRACKING_IMAGE_TOPIC, CompressedImage, queue_size=1)
+    blur_detection_pub = rospy.Publisher(BLUR_DETECTION_TOPIC, Bool, queue_size=1)
 
     rospy.Subscriber(IMAGE_TOPIC, CompressedImage, raw_image_callback)
 

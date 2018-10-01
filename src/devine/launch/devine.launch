@@ -27,7 +27,6 @@
     <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
     <node name="zone_detection" pkg="devine_image_processing" type="zone_detection.py" respawn="true" />
     <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
-    <node name="blur_detection" pkg="devine_image_processing" type="blur_detection.py" respawn="true" />
   </group>
   <group if="$(arg dashboard)">
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
