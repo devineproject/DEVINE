@@ -11,7 +11,7 @@ from enum import Enum
 from devine_dialog.msg import TtsQuery
 from std_msgs.msg import String
 
-from devine_config import topicname;
+from devine_config import topicname
 
 TTS_ANSWER_TOPIC = topicname('tts_answer')
 HUMAN_READY_DETECTED_TOPIC = topicname('body_tracking')
@@ -30,8 +30,6 @@ class DialogControl():
     
     def __init__(self):
         dialogs = open(CONST_FILE)
-        if not dialogs:
-            raise 'Unable to read dialogs.json'
 
         self.dialogs = json.loads(dialogs.read())
 
@@ -78,7 +76,7 @@ class DialogControl():
         answer = self.send_speech('ask_to_play', TTSAnswerType.YES_NO)
 
         if not answer == 'yes':
-            self.send_speech('bye_bye')
+            self.send_speech('bye_bye', TTSAnswerType.NO_ANSWER)
             return
 
         player_name = self.send_speech('asking_the_name', TTSAnswerType.PLAYER_NAME)
@@ -87,7 +85,7 @@ class DialogControl():
             self.send_speech('bye_bye', TTSAnswerType.NO_ANSWER)
             return
 
-        self.send_speech('instructions')
+        self.send_speech('instructions', TTSAnswerType.NO_ANSWER)
         if not self.wait_for_player('ready', first_name=player_name):
             self.send_speech('bye_bye', TTSAnswerType.NO_ANSWER)
             return

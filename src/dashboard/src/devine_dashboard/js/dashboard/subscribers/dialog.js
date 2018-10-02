@@ -13,6 +13,12 @@ export default function()
     ttsAnswer: new RosTopic(devineTopics.tts_answer)
   };
 
+  const answer_types = {    
+    NO_ANSWER: 0,
+    YES_NO: 1,
+    PLAYER_NAME: 2
+  }
+
   let queries = [];
 
   subscriber.on("change", function () {
@@ -22,7 +28,7 @@ export default function()
       cons.log("Subscribed");
       
       topics.ttsQuery.subscribe(message => {
-        if (message.answer_type !== 0) {
+        if (message.answer_type !== answer_types.NO_ANSWER) {
           queries.push(message);
         }
         cons.log(`Querying TTS (${message.uid}): ${message.text}`);
