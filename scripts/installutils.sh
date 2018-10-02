@@ -38,15 +38,7 @@ install_devine() {
   python2 -m pip install --user shapely
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
-  git clone https://github.com/ildoonet/tf-pose-estimation.git
-  cd tf-pose-estimation
-  # hack remove this once body tracking is updated to a python3 node
-  sed -i 's/matplotlib >= 2.2.2/matplotlib == 2.2.2/' setup.py
-  python2 setup.py install
-  python2 -m pip install --user tensorflow --ignore-installed enum34
-  cd ..
-  rm -rf tf-pose-estimation
-  ln -sf "$(find /usr/local/lib/python2.7/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
+  ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
   cd ../game_system
   python2 -m pip install --user transitions
   python2 -m pip install --user paho-mqtt
@@ -92,6 +84,7 @@ install_base() {
   ensure_data https://storage.googleapis.com/download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/weights.zip
   as_su rm -f /opt/ros/kinetic/lib/python2.7/dist-packages/cv2.so
+  python3 -m pip install 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
   bash -ci 'nvm install --lts'
 

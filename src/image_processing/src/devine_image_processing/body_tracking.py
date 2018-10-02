@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 '''ROS module for body tracking'''
 
 import sys
@@ -52,7 +52,7 @@ class BodyTracking(ImageProcessor):
             result_human = {
                 "body_parts": []
             }
-            for (_, bp) in hum.body_parts.iteritems():
+            for (_, bp) in hum.body_parts.items():
                 result_human["body_parts"].append({
                     "name": self.body_parts_names[bp.part_idx],
                     "index": bp.part_idx,
