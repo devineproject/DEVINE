@@ -62,12 +62,22 @@
     },
     "question": {
       "name": "/devine/question",
-      "type": "std_msgs/String"
+      "type": "std_msgs/String",
+      "TODO": "REMOVE"
     },
     "answer": {
       "name": "/devine/answer",
-      "type": "std_msgs/String"
+      "type": "std_msgs/String",
+      "TODO": "REMOVE"
     },
+    "tts_query": {
+      "name": "/devine/tts/query",
+      "type": "devine_dialog/TtsQuery"
+    },
+    "tts_answer": {
+      "name": "/devine/tts/answer",
+      "type": "devine_dialog/TtsQuery"
+    },    
     "objects_confidence": {
       "name": "/devine/objects_confidence",
       "type": "std_msgs/Float64MultiArray"

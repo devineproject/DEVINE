@@ -22,6 +22,7 @@ body > div {
     background-color: transparent;
     border: none;
     color: white;
+    white-space: normal;
 }
 
 .card {
