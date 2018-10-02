@@ -3,35 +3,52 @@
 Snips ROS integration
 
 ROS Topics
-question -> question as string input
-answer -> answer as string output
+tts_query -> query as TtsQuery input
+tts_answer -> answer as TtsQuery output
 '''
 import json
 import paho.mqtt.client as mqtt
 import rospy
-from std_msgs.msg import String
 from devine_config import topicname
+from devine_dialog.msg import TtsQuery
+from enum import Enum
 
 # Snips settings
 SNIPS_HOST = "localhost"
 SNIPS_PORT = 1883
-SNIPS_TOPICS = ['hermes/intent/Picnic8:yes', 'hermes/intent/Picnic8:no', 'hermes/intent/Picnic8:na']
+SNIPS_TOPICS = {
+    'yes': 'Picnic8:yes',
+    'no': 'Picnic8:no',
+    'na': 'Picnic8:na'
+}
 MQTT_CLIENT = mqtt.Client()
 
 #Topics
-SNIPS_ANSWER = topicname('answer')
-SNIPS_QUESTION = topicname('question')
+TTS_QUERY = topicname('tts_query')
+TTS_ANSWER = topicname('tts_answer')
 
 # ROS
-ROS_PUBLISHER = rospy.Publisher(SNIPS_ANSWER, String, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsQuery, queue_size=10)
+
+class TTSAnswerType(Enum):
+    NO_ANSWER = 0
+    YES_NO = 1
+    PLAYER_NAME = 2
 
 def snips_ask_callback(data):
     '''
     Callback executed when a question is received from ROS
     '''
-    question = data.data
-    rospy.loginfo("%s received: %s", rospy.get_name(), question)
-    args = {'init': {'type': 'action', 'text': question, 'canBeEnqueued': True}} # TODO: Add an intentFilter
+    rospy.loginfo("%s received: %s", rospy.get_name(), data.text)
+    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': str(data.uid)}
+    if data.answer_type == TTSAnswerType.NO_ANSWER.value:
+        args['init']['type'] = 'notification'
+    elif data.answer_type == TTSAnswerType.YES_NO.value:
+        args['init']['type'] = 'action'
+        args['init']['intentFilter'] = [SNIPS_TOPICS['yes'], SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
+    elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
+        raise NotImplementedError()
+    
     MQTT_CLIENT.publish('hermes/dialogueManager/startSession', json.dumps(args))
 
 
@@ -41,9 +58,9 @@ def on_snips_connect(*_):
     Callback executed when snips is connected
     '''
     rospy.loginfo("Connected to snips at %s:%i", SNIPS_HOST, SNIPS_PORT)
-    for topic in SNIPS_TOPICS:
+    for topic in SNIPS_TOPICS.values():
         rospy.loginfo("Subscribe to topic: %s", topic)
-        MQTT_CLIENT.subscribe(topic)
+        MQTT_CLIENT.subscribe('hermes/intent/' + topic)
 
 
 # Args: client, userdata, msg
@@ -52,9 +69,9 @@ def on_snips_message(_client, _userdata, msg):
     Callback executed when snips receive an answer
     '''
     # Parse the json response
-    intent_json = json.loads(msg.payload)
-    intent_name = intent_json['intent']['intentName']
-    intent_probability = intent_json['intent']['probability']
+    mqtt_topic = json.loads(msg.payload)
+    intent_name = mqtt_topic['intent']['intentName']
+    intent_probability = mqtt_topic['intent']['probability']
 
     rospy.loginfo("Detected intent %s with a probability of %f", intent_name, intent_probability)
 
@@ -62,14 +79,18 @@ def on_snips_message(_client, _userdata, msg):
         rospy.logwarn("Dropped intent, probability was too low")
         return
 
-    ROS_PUBLISHER.publish(intent_name.split(":")[-1].lower())
+    tts_answer = TtsQuery()
+    tts_answer.uid = int(mqtt_topic['customData'])
+    tts_answer.text = intent_name.split(":")[-1].lower()
+
+    ROS_PUBLISHER.publish(tts_answer)
 
 
 def create_ros_listener():
     '''
     Create the ROS listeners
     '''
-    rospy.Subscriber(SNIPS_QUESTION, String, snips_ask_callback)
+    rospy.Subscriber(TTS_QUERY, TtsQuery, snips_ask_callback)
 
 
 def on_snips_disconnect():

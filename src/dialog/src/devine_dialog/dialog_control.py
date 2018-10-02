@@ -79,7 +79,8 @@ class DialogControl():
             self.send_speech('bye_bye', TTSAnswerType.NO_ANSWER)
             return
 
-        player_name = self.send_speech('asking_the_name', TTSAnswerType.PLAYER_NAME)
+        #player_name = self.send_speech('asking_the_name', TTSAnswerType.PLAYER_NAME) TODO: Implement in the assistant and snips.py
+        player_name = "you"
     
         if not self.wait_for_player('ready', first_name=player_name):
             self.send_speech('bye_bye', TTSAnswerType.NO_ANSWER)
