@@ -15,7 +15,7 @@ from devine_config import topicname
 # Snips settings
 SNIPS_HOST = "localhost"
 SNIPS_PORT = 1883
-SNIPS_TOPICS = ['hermes/intent/#'] # Wild card for every intents
+SNIPS_TOPICS = ['hermes/intent/Picnic8:yes', 'hermes/intent/Picnic8:no', 'hermes/intent/Picnic8:na']
 MQTT_CLIENT = mqtt.Client()
 
 #Topics
@@ -32,8 +32,7 @@ def snips_ask_callback(data):
     question = data.data
     rospy.loginfo("%s received: %s", rospy.get_name(), question)
     args = {'init': {'type': 'action', 'text': question, 'canBeEnqueued': True}} # TODO: Add an intentFilter
-    MQTT_CLIENT.publish(
-        'hermes/dialogueManager/startSession', json.dumps(args))
+    MQTT_CLIENT.publish('hermes/dialogueManager/startSession', json.dumps(args))
 
 
 # Args: client, userdata, flags, connection_result
@@ -43,6 +42,7 @@ def on_snips_connect(*_):
     '''
     rospy.loginfo("Connected to snips at %s:%i", SNIPS_HOST, SNIPS_PORT)
     for topic in SNIPS_TOPICS:
+        rospy.loginfo("Subscribe to topic: %s", topic)
         MQTT_CLIENT.subscribe(topic)
 
 
@@ -51,12 +51,17 @@ def on_snips_message(_client, _userdata, msg):
     '''
     Callback executed when snips receive an answer
     '''
-    rospy.loginfo("Received intent from snips: %s", msg.payload)
-    data = json.loads(msg.payload)
-    if data['slots']:
-        rospy.loginfo("Received message %s, detected: %s", data['input'],
-                      data['slots'][0]['value']['value'].lower())
-        ROS_PUBLISHER.publish(data['slots'][0]['value']['value'].lower())
+    # Parse the json response
+    intent_json = json.loads(msg.payload)
+    intent_name = intent_json['intent']['intentName']
+    intent_probability = intent_json['intent']['probability']
+
+    rospy.loginfo("Detected intent %s with a probability of %f", intent_name, intent_probability)
+
+    if intent_probability < 0.5:
+        return
+
+    ROS_PUBLISHER.publish(intent_name.split(":")[-1].lower())
 
 
 def create_ros_listener():
@@ -71,6 +76,7 @@ def on_snips_disconnect():
     Callback executed when snips is disconnected
     '''
     rospy.loginfo("Disconnected from snips")
+    MQTT_CLIENT.loop_start()
 
 
 def setup_snips():
