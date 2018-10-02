@@ -4,12 +4,14 @@ from queue import Queue, Empty
 
 import rospy
 from std_msgs.msg import String, Float64MultiArray
+from devine_dialog.msg import TtsQuery
+from devine_dialog import TTSAnswerType, send_speech
 
 from guesswhat.models.guesser.guesser_wrapper import GuesserWrapper
 from devine_config import topicname
 
-ANSWER_TOPIC = topicname('answer')
-QUESTION_TOPIC = topicname('question')
+TTS_ANSWER_TOPIC = topicname('tts_answer')
+TTS_QUERY_TOPIC = topicname('tts_query')
 CONFIDENCE_TOPIC = topicname('objects_confidence')
 
 class GuesserROSWrapper(GuesserWrapper):
@@ -31,9 +33,7 @@ class OracleROSWrapper(object):
     '''Wraps the oracle model, publishes questions and waits for their answers'''
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
-        self.answers = Queue(1)
-        self.questions = rospy.Publisher(QUESTION_TOPIC, String, queue_size=1, latch=True)
-        rospy.Subscriber(ANSWER_TOPIC, String, self.answer_callback)
+        self.questions = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1, latch=True)
 
     def initialize(self, sess):
         '''initialize interface'''
@@ -46,30 +46,16 @@ class OracleROSWrapper(object):
 
         text_question = self.tokenizer.decode(question[0]).replace('<padding>', '').strip()
 
-        self.questions.publish(text_question)
+        answer = send_speech(self.questions, text_question, TTSAnswerType.YES_NO)
 
-        while not rospy.is_shutdown():
-            try:
-                answer = self.answers.get(timeout=1)
-
-                if answer == 'yes':
-                    token = self.tokenizer.yes_token
-                    break
-                elif answer == 'no':
-                    token = self.tokenizer.no_token
-                    break
-                elif answer == 'na':
-                    token = self.tokenizer.non_applicable_token
-                    break
-                else:
-                    rospy.logerr('Garbage on {}, expects yes|no|na'.format(ANSWER_TOPIC))
-            except Empty:
-                pass
+        if answer == 'yes':
+            token = self.tokenizer.yes_token
+        elif answer == 'no':
+            token = self.tokenizer.no_token
+        elif answer == 'na':
+            token = self.tokenizer.non_applicable_token
         else:
-            exit()
+            rospy.logerr('Garbage on {}, expects yes|no|na'.format(TTS_ANSWER_TOPIC))
+            exit(1)
 
         return [token]
-
-    def answer_callback(self, data):
-        '''Callback for the answer topic'''
-        self.answers.put(data.data)
