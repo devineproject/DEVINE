@@ -11,7 +11,7 @@ import paho.mqtt.client as mqtt
 import rospy
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery
-from enum import Enum
+from devine_dialog import TTSAnswerType
 
 # Snips settings
 SNIPS_HOST = "localhost"
@@ -29,11 +29,6 @@ TTS_ANSWER = topicname('tts_answer')
 
 # ROS
 ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsQuery, queue_size=10)
-
-class TTSAnswerType(Enum):
-    NO_ANSWER = 0
-    YES_NO = 1
-    PLAYER_NAME = 2
 
 def snips_ask_callback(data):
     '''
