@@ -60,16 +60,6 @@
       "name": "/devine/guesswhat_status",
       "type": "std_msgs/String"
     },
-    "question": {
-      "name": "/devine/question",
-      "type": "std_msgs/String",
-      "TODO": "REMOVE"
-    },
-    "answer": {
-      "name": "/devine/answer",
-      "type": "std_msgs/String",
-      "TODO": "REMOVE"
-    },
     "tts_query": {
       "name": "/devine/tts/query",
       "type": "devine_dialog/TtsQuery"
