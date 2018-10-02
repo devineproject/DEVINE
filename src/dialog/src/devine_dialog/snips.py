@@ -59,6 +59,7 @@ def on_snips_message(_client, _userdata, msg):
     rospy.loginfo("Detected intent %s with a probability of %f", intent_name, intent_probability)
 
     if intent_probability < 0.5:
+        rospy.logwarn("Dropped intent, probability was too low")
         return
 
     ROS_PUBLISHER.publish(intent_name.split(":")[-1].lower())
