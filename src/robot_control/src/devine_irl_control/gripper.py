@@ -1,8 +1,8 @@
 ''' IRL-1 Gripper use /command topic for 2 fingers on right & left hand '''
 
-from irl_control.irl_constant import ROBOT_CONTROLLER
+from devine_irl_control.irl_constant import ROBOT_CONTROLLER
 
-from irl_control.controllers import CommandPublisher
+from devine_irl_control.controllers import CommandPublisher
 
 class Gripper(object):
     ''' Gripper Controller '''

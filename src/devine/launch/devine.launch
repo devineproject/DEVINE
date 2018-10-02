@@ -9,7 +9,7 @@
   <arg name="jn0" default="true" />
 
   <group if="$(arg robot_control)">
-    <include file="$(find irl_control)/launch/irl_control.launch">
+    <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
       <arg name="jn0" value="$(arg jn0)"/>
     </include>
     <!-- <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" /> -->

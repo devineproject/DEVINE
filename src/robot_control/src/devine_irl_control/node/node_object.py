@@ -3,8 +3,8 @@
 ''' Node to visualize object in RViz and broadcast object_frame '''
 
 import rospy
-from irl_control import irl_constant
-from irl_control.objects import ObjectMaker, ObjectTf
+from devine_irl_control import irl_constant
+from devine_irl_control.objects import ObjectMaker, ObjectTf
 from devine_config import topicname
 
 TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
@@ -15,7 +15,7 @@ TOPIC_ROBOT_BASE_FRAME = irl_constant.ROBOT_LINK['base']
 def main():
     ''' Init ROS Node to create marker and broadcast TF at postion /object_location '''
 
-    node_name = 'object'
+    node_name = 'devine_irl_control_object'
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\'')
 

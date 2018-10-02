@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.4.6)
-project(irl_control)
+project(devine_irl_control)
 
 find_package(catkin REQUIRED COMPONENTS 
    rospy 

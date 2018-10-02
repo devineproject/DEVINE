@@ -14,7 +14,7 @@
   <exec_depend>devine_dialog</exec_depend>
   <exec_depend>devine_guesswhat</exec_depend>
   <exec_depend>devine_image_processing</exec_depend>
-  <exec_depend>irl_control</exec_depend>
+  <exec_depend>devine_irl_control</exec_depend>
   <export>
   </export>
 </package>

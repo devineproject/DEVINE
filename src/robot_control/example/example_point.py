@@ -15,7 +15,7 @@ def main(args):
     point = [float(i) for i in args.point.split(',')]
 
     # Start ROS node
-    node_name = 'irl_control_example'
+    node_name = 'devine_irl_control_example_point'
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\' with object location at ' + str(point))
 

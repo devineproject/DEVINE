@@ -5,11 +5,11 @@
 import rospy
 import tf
 from std_msgs.msg import Float32MultiArray
-from irl_control import irl_constant
-from irl_control.movement import Movement
-from irl_control.controllers import TrajectoryClient
-from irl_control.gripper import Gripper
-import irl_control.ik as ik
+from devine_irl_control import irl_constant
+from devine_irl_control.movement import Movement
+from devine_irl_control.controllers import TrajectoryClient
+from devine_irl_control.gripper import Gripper
+import devine_irl_control.ik as ik
 from devine_config import topicname
 
 ROBOT_NAME = irl_constant.ROBOT_NAME
@@ -196,7 +196,7 @@ def get_joints_time(controller_joints, time):
 def main():
     ''' Node initialize controllers '''
 
-    node_name = 'irl_control_control'
+    node_name = 'devine_irl_control'
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\'')
 

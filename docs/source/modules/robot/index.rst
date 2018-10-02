@@ -63,11 +63,11 @@ Running Examples
 
 Before running any examples, you need to:
 
-1. Launch jn0 with RViz UI and irl_control nodes
+1. Launch jn0 with RViz UI and devine_irl_control nodes
 
 .. code-block:: bash
 
-    roslaunch irl_control irl_control.launch
+    roslaunch devine_irl_control devine_irl_control.launch
 
 2. Load RVIZ configuration
 
@@ -81,13 +81,13 @@ You can now execute any of the examples:
 
 .. code-block:: bash
 
-    rosrun irl_control example_point.py -p 0.6,0.3,0.5
+    rosrun devine_irl_control example_point.py -p 0.6,0.3,0.5
     # Position is referenced from base_link
 
 * Do complex move (SIMULATION ONLY!!!)
 
 .. code-block:: bash
 
-    rosrun irl_control example_emotion.py -c 0 -s 0
+    rosrun devine_irl_control example_emotion.py -c 0 -s 0
 
 .. _IntroLab: https://introlab.3it.usherbrooke.ca/mediawiki-introlab/index.php/Autonomous_Robot

@@ -9,7 +9,7 @@ from sensor_msgs.msg import JointState
 from control_msgs.msg import (FollowJointTrajectoryAction, FollowJointTrajectoryGoal)
 from trajectory_msgs.msg import (JointTrajectoryPoint)
 
-from irl_control.irl_constant import ROBOT_CONTROLLER
+from devine_irl_control.irl_constant import ROBOT_CONTROLLER
 
 class CommandPublisher(object):
     '''

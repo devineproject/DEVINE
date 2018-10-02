@@ -6,7 +6,7 @@ import math
 import rospy
 import tf
 
-from irl_control import irl_constant
+from devine_irl_control import irl_constant
 
 TOPIC_ROBOT_POINT_RIGHT_FRAME = irl_constant.ROBOT_LINK['r_frame_tool']
 TOPIC_OBJECT_FRAME = '/object_frame'
@@ -14,7 +14,7 @@ TOPIC_OBJECT_FRAME = '/object_frame'
 def main():
     ''' Compute error when pointing with arms '''
 
-    node_name = 'irl_control_error'
+    node_name = 'devine_irl_control_error'
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\'')
 

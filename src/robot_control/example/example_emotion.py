@@ -21,7 +21,7 @@ def main(arguments):
     is_guesswhat_succeed = bool(int(arguments.succeed))
 
     # Start ROS node
-    node_name = 'irl_control_emotion_example'
+    node_name = 'devine_irl_control_example_emotion'
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\'with\n\tconfidence: ' +
                   str(confidence_array) + '\n\tsucceed: ' + str(is_guesswhat_succeed))
