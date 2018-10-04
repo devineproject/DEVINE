@@ -16,7 +16,7 @@
   </group>
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
-    <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" />
+    <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
   </group>
   <group if="$(arg dialog)">
     <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
