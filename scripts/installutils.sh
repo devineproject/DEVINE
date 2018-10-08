@@ -5,9 +5,11 @@ datapath=~/.devine/data
 install() {
   local catkinsrc=$1
   local devineroot=$2
+  local tensorflow_package=$3
+
   confirm "This script was made for a fresh 16.04 Ubuntu desktop image and may harm your system, continue" || exit 1
 
-  install_base "$catkinsrc"
+  install_base "$catkinsrc" "$tensorflow_package"
   install_devine "$catkinsrc" "$devineroot"
 
   echo reload bash for $(whoami) to finish installation
@@ -16,18 +18,10 @@ install() {
 install_devine() {
   local catkinsrc=$1
   local devineroot=$2
-  local user=$(whoami)
 
   ln -sf "$(readlink -f $devineroot)" "$(readlink -f $catkinsrc)"
   
   pushd "$catkinsrc"
-
-  if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
-  then
-    python3 -m pip install --user nltk tqdm image
-    git clone --recursive https://github.com/devineproject/guesswhat.git || exit 1
-    ensure_line "export \"PYTHONPATH=$(pwd)/guesswhat/src:\$PYTHONPATH\"" ~/.bashrc
-  fi
 
   # TODO move pip installs to respective catkin package dep?
   cd DEVINE/src/guesswhat
@@ -39,8 +33,6 @@ install_devine() {
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
-  cd ../game_system
-  python2 -m pip install --user transitions
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
   mkdir ~/.rviz
@@ -59,7 +51,8 @@ install_devine() {
 
 install_base() {
   local catkinsrc=$1
-  local user=$(whoami)
+  local tensorflow_package=$2
+
   pushd "$catkinsrc"
 
   as_su apt-get update
@@ -76,7 +69,7 @@ install_base() {
   as_su apt-get install -y snips-platform-voice
   python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
   python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
-  python3 -m pip install --user tensorflow
+  python3 -m pip install --user $tensorflow_package
   python2 -m pip install --user opencv-contrib-python
   python3 -m pip install --user opencv-contrib-python
   mkdir -p "$datapath"
@@ -87,6 +80,13 @@ install_base() {
   python3 -m pip install 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
   bash -ci 'nvm install --lts'
+
+  if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
+  then
+    python3 -m pip install --user nltk tqdm image
+    git clone --recursive https://github.com/devineproject/guesswhat.git || exit 1
+    ensure_line "export \"PYTHONPATH=$(pwd)/guesswhat/src:\$PYTHONPATH\"" ~/.bashrc
+  fi
 
   if [ ! -f IRL-1 ]
   then
