@@ -58,9 +58,9 @@ install_base() {
   as_su apt-get update
   as_su apt-get install -y apt-transport-https git libffi-dev
   as_su sh -c 'echo "deb https://ftp.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-  as_su apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+  as_su apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116 || exit 1
   as_su sh -c 'echo "deb https://debian.snips.ai/jessie stable main" > /etc/apt/sources.list.d/snips.list'
-  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455
+  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455 || exit 1
   as_su apt-get update
   as_su apt-get install -y python3 python3-tk python3-pip python python-pip
   as_su apt-get install -y ros-kinetic-desktop-full ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control
