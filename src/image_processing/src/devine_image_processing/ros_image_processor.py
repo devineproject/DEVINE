@@ -58,7 +58,7 @@ class ROSImageProcessingWrapper(object):
             except Empty:
                 time.sleep(0.5)
             finally:
-                if killable_loop.kill_now:
+                if rospy.is_shutdown() or killable_loop.kill_now:
                     break
 
 # Thanks Mayank Jaiswal, https://stackoverflow.com/a/31464349
