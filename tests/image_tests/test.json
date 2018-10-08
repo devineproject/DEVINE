@@ -1,0 +1,15 @@
+{"tests" : [{"imageName":"frame0001.png", "refData": {
+		"timestamp": "Ignore",
+		"image": {
+			"height": 640,
+			"width": 480
+		},
+		"objects": ["carrot","carrot","carrot","knife","laptop","glasses","remote","keyboard","fork"] 
+}},{"imageName":"frame0002.png", "refData": {
+		"timestamp": "Ignore",
+		"image": {
+			"height": 640,
+			"width": 480
+		},
+		"objects": ["carrot","carrot","carrot","knife","laptop","glasses","remote","keyboard","fork"] 
+}}]}
