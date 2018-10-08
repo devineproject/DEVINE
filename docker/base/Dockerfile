@@ -1,7 +1,8 @@
 ARG guesswhat_docker=latest
-ARG tensorflow_package=tensorflow
 
 FROM devineproject/guesswhat:$guesswhat_docker
+
+ARG tensorflow_package=tensorflow
 
 ENTRYPOINT []
 
