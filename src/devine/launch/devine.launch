@@ -12,28 +12,37 @@
     <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
       <arg name="jn0" value="$(arg jn0)"/>
     </include>
-    <!-- <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" /> -->
   </group>
+
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
     <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" />
   </group>
+
+  <group if="$(eval arg('robot_control') and arg('kinect'))">
+    <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" />
+  </group>
+
   <group if="$(arg dialog)">
     <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
     <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" respawn="true" />
   </group>
+
   <group if="$(arg image_processing)">
     <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
     <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
     <node name="zone_detection" pkg="devine_image_processing" type="zone_detection.py" respawn="true" />
     <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
   </group>
+
   <group if="$(arg dashboard)">
     <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
     <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
     <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
   </group>
+
   <group if="$(arg guesswhat)">
     <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
   </group>
+
 </launch>
