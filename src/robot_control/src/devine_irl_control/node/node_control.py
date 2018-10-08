@@ -5,6 +5,7 @@
 import rospy
 import tf
 from std_msgs.msg import Float32MultiArray
+from trajectory_msgs.msg import JointTrajectoryPoint
 from devine_irl_control import irl_constant
 from devine_irl_control.movement import Movement
 from devine_irl_control.controllers import TrajectoryClient
@@ -14,6 +15,7 @@ from devine_config import topicname
 
 ROBOT_NAME = irl_constant.ROBOT_NAME
 TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
+TOPIC_HEAD_JOINT_STATE = topicname('robot_head_joint_traj_point')
 TOPIC_OBJECT_FRAME = '/object_frame'
 TOPIC_ROBOT_BASE_FRAME = irl_constant.ROBOT_LINK['base']
 TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME = irl_constant.ROBOT_LINK['r_shoulder_fixed']
@@ -55,12 +57,22 @@ class Controller(object):
             rospy.signal_shutdown(err)
 
         rospy.Subscriber(TOPIC_OBJECT_LOCATION, Float32MultiArray, self.object_location_callback)
+        rospy.Subscriber(TOPIC_HEAD_JOINT_STATE,
+                         JointTrajectoryPoint,
+                         self.head_joint_traj_point_callback)
 
     def init_tf(self, target_frame, source_frame):
         ''' Safely Initialize TF '''
 
         time = self.tf_listener.getLatestCommonTime(target_frame, source_frame)
         self.tf_listener.lookupTransform(target_frame, source_frame, time)
+
+    def head_joint_traj_point_callback(self, msg):
+        ''' On topic /head_joint_traj_point, move head '''
+        rospy.loginfo(msg.positions)
+        pos = msg.positions
+        time = msg.time_from_start
+        self.move({'head': pos}, time.to_sec())
 
     def object_location_callback(self, msg):
         ''' On topic /object_location, compute and move joints '''

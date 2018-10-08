@@ -87,6 +87,10 @@
     "player_name": {
       "name": "/devine/player_name",
       "type": "std_msgs/String"
+    },
+    "robot_head_joint_traj_point": {
+      "name": "/devine/robot/head_joint_traj_point",
+      "type": "trajectory_msgs/JointTrajectoryPoint"
     }
   },
   "constants": {

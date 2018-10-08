@@ -5,6 +5,7 @@ try:
     from queue import Queue, Empty
 except:
     from Queue import Queue, Empty
+
 import rospy
 from std_msgs.msg import Bool
 from sensor_msgs.msg import CompressedImage
