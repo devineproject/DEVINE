@@ -1,9 +1,8 @@
 import { RosTopic } from '../ros';
-import devineTopics from '../../vars/devine_topics.json';
 import LogConsole from '../console';
 import $ from 'jquery';
 
-export default function()
+export default function initDialogModule(devineTopics)
 {
   const cons = new LogConsole("Dialog", "#F39C12");
   const subscriber = $("#dialog_checkbox");

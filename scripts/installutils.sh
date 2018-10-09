@@ -42,7 +42,6 @@ install_devine() {
   bash -ci catkin_make
 
   cd src/DEVINE/src/dashboard
-  bash -ci 'rosrun devine_config devinetopics.py > src/devine_dashboard/js/vars/devine_topics.json'
   python3 -m pip install --user -r requirements.txt
   bash -ci 'npm install && npm run build'
 

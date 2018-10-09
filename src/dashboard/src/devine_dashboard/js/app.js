@@ -10,12 +10,14 @@ try {
   require('bootstrap');
 } catch (e) { console.error(e); }
 
-switch (window.route) {
-case "scoreboard":
-  scoreboard();
-  break;
-case "index": //Passthrough as default
-default:
-  dashboard();
-  break;
-}
+$.getJSON("/topics", function(topics) {
+  switch (window.route) {
+  case "scoreboard":
+    scoreboard(topics);
+    break;
+  case "index": //Passthrough as default
+  default:
+    dashboard(topics);
+    break;
+  }
+});
