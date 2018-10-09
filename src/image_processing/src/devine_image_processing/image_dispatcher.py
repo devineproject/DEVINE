@@ -47,9 +47,9 @@ class TopicState(IntEnum):
 class SubscriberReady(object):
     '''Wrapper that checks if a topic was published with valid data'''
 
-    def __init__(self, topic, type, validator=lambda x: bool(x.data)):
+    def __init__(self, topic, topic_type, validator=lambda x: bool(x.data)):
         self.__lock = RLock()
-        self.__sub = rospy.Subscriber(topic, type, self.__topic_callback)
+        self.__sub = rospy.Subscriber(topic, topic_type, self.__topic_callback)
         self.validator = validator
         self.topic_state = TopicState.NOTHING_RECEIVED
 
@@ -80,12 +80,12 @@ class SmartImagePublisher(object):
         self.state_validator = state_validator
         self.publish_state = publish_state
 
-    def process(self, img):
+    def process(self, payload):
         '''Process func for a specific publisher'''
         state = self.state_validator()
         if self.publish_state in state:
             if self.publisher:
-                self.publisher.publish(img)
+                self.publisher.publish(payload)
         return TopicState.RECEIVED_YES in state
 
 
@@ -110,13 +110,13 @@ class ImageDispatcher(ImageProcessor):
 
         self.pub_index = 0
 
-    def process(self, img):
+    def process(self, img, img_payload):
         '''Remove blurry images and submit the images to the current module'''
         if is_image_blurry(img):
             return
         while not rospy.is_shutdown():
             image_publisher = self.smart_publishers[self.pub_index]
-            if image_publisher.process(self.payload):
+            if image_publisher.process(img_payload):
                 self.pub_index += 1
                 self.pub_index %= len(self.smart_publishers)
             else:

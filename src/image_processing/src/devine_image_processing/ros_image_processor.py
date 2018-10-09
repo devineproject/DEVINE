@@ -13,11 +13,6 @@ import inspect
 
 class ImageProcessor(object):
     ''' Base interface for an image processor'''
-    payload = None
-    def update_payload(self, payload):
-        '''Private func to update the payload'''
-        self.payload = payload
-
     def processor_name(self):
         '''Return the processor's name'''
         return self.__class__.__name__
@@ -55,9 +50,9 @@ class ROSImageProcessingWrapper(object):
         killable_loop = GracefulKiller()
         while True:
             try:
-                img = self.image_queue.get(False)
-                self.image_processor.update_payload(img)
-                output = self.image_processor.process(np.asarray(bytearray(img.data),dtype=np.uint8))
+                img_payload = self.image_queue.get(False)
+                img = np.asarray(bytearray(img_payload.data),dtype=np.uint8)
+                output = self.image_processor.process(img, img_payload)
                 if process_callback:
                     process_callback(output)
             except Empty:
