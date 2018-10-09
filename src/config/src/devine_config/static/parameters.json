@@ -32,6 +32,10 @@
       "name": "/devine/zone_detection",
       "type": "std_msgs/String"
     },
+    "scene_found": {
+      "name": "/devine/scene_found",
+      "type": "std_msgs/Bool"
+    },
     "image_features": {
       "name": "/devine/image_features",
       "type": "std_msgs/Float64MultiArray"

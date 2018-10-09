@@ -1,4 +1,6 @@
-FROM devineproject/devine-base
+ARG base_docker=latest
+
+FROM devineproject/devine-base:$base_docker
 
 COPY . /usr/src/DEVINE
 
