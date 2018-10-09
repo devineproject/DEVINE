@@ -96,7 +96,7 @@
       "name": "/devine/robot/head_joint_traj_point",
       "type": "trajectory_msgs/JointTrajectoryPoint"
     },
-    "is_pointing": {
+    "is_pointing_object": {
       "name" : "/devine/robot/is_pointing",
       "type" : "std_msgs/Bool"
     },
