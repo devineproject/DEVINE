@@ -10,6 +10,8 @@ import rospy
 from sensor_msgs.msg import CompressedImage
 import signal
 import inspect
+from PIL import Image	
+from io import BytesIO
 
 class ImageProcessor(object):
     ''' Base interface for an image processor'''
@@ -51,7 +53,7 @@ class ROSImageProcessingWrapper(object):
         while True:
             try:
                 img_payload = self.image_queue.get(False)
-                img = np.asarray(bytearray(img_payload.data),dtype=np.uint8)
+                img = np.array(Image.open(BytesIO(img_payload.data))).astype(np.uint8)
                 output = self.image_processor.process(img, img_payload)
                 if process_callback:
                     process_callback(output)
