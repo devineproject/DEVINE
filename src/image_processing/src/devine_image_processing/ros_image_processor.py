@@ -6,8 +6,6 @@ except:
 
 import time
 import numpy as np
-from PIL import Image
-from io import BytesIO
 import rospy
 from sensor_msgs.msg import CompressedImage
 import signal
@@ -15,6 +13,10 @@ import inspect
 
 class ImageProcessor(object):
     ''' Base interface for an image processor'''
+    payload = None
+    def update_payload(self, payload):
+        '''Private func to update the payload'''
+        self.payload = payload
 
     def processor_name(self):
         '''Return the processor's name'''
@@ -46,7 +48,7 @@ class ROSImageProcessingWrapper(object):
         if self.image_queue.full():
             rospy.logwarn(rospy.get_name() + " : image receiving rate is too high.")
             self.image_queue.get()
-        self.image_queue.put(np.array(Image.open(BytesIO(data.data))))
+        self.image_queue.put(data)
 
     def loop(self, process_callback=None):
         '''Looping method to process every image'''
@@ -54,7 +56,8 @@ class ROSImageProcessingWrapper(object):
         while True:
             try:
                 img = self.image_queue.get(False)
-                output = self.image_processor.process(img)
+                self.image_processor.update_payload(img)
+                output = self.image_processor.process(np.asarray(bytearray(img.data),dtype=np.uint8))
                 if process_callback:
                     process_callback(output)
             except Empty:
