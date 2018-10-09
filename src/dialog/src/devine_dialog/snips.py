@@ -17,9 +17,9 @@ from devine_dialog import TTSAnswerType
 SNIPS_HOST = "localhost"
 SNIPS_PORT = 1883
 SNIPS_TOPICS = {
-    'yes': 'Picnic8:yes',
-    'no': 'Picnic8:no',
-    'na': 'Picnic8:na'
+    'yes': 'Devine-UdeS:Yes',
+    'no': 'Devine-UdeS:No',
+    'na': 'Devine-UdeS:NA'
 }
 MQTT_CLIENT = mqtt.Client()
 
@@ -43,7 +43,7 @@ def snips_ask_callback(data):
         args['init']['intentFilter'] = [SNIPS_TOPICS['yes'], SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
     elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
         raise NotImplementedError()
-    
+
     MQTT_CLIENT.publish('hermes/dialogueManager/startSession', json.dumps(args))
 
 
