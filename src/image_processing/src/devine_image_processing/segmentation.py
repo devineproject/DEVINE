@@ -4,7 +4,6 @@
 import sys
 import os
 import datetime
-#import pickle
 
 import rospy
 from std_msgs.msg import String
@@ -26,6 +25,8 @@ MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 #topics
 IMAGE_TOPIC = topicname('segmentation_image')
 SEGMENTATION_TOPIC = topicname('objects')
+
+SEGMENTATION_THRESHOLD = 0.8
 
 class RCNNSegmentation(ImageProcessor):
     '''RCNN segmentation wrapper of Mask_RCNN for use in guesswhat'''
@@ -77,27 +78,16 @@ class RCNNSegmentation(ImageProcessor):
         }
         object_array = []
 
-        # Debug file dump
-        # with open('id.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result['class_ids'], pickle_file)
-        # with open('scores.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result['scores'], pickle_file)
-        # with open('masks.pkl', 'wb') as pickle_file:
-        #     pickle.dump(result['masks'], pickle_file)
-        # with open('rois.pkl','wb') as pickle_file:
-        #     result['rois'].dump(pickle_file)
-
-        for current_id, (class_id, bounding_box) in enumerate(zip(result['class_ids'], result['rois'])):
-            object_area = 0 # figure out if we ever use the area
-            # According the MsCoco api this seems to be the mask area
-            # (check if maskrcnn can produce this)
+        for current_id, (class_id, bounding_box, score, mask) in enumerate(zip(result['class_ids'], result['rois'], result['scores'], result['masks'])):
+            if score < SEGMENTATION_THRESHOLD:
+                continue
             current_object = {
                 "category_id": int(class_id),
                 "bbox": bounding_box.tolist(),
                 "category": self.class_names[class_id],
                 "segment": [],
                 "id" : current_id,
-                "area": object_area
+                "area": mask
             }
             object_array.append(current_object)
 
