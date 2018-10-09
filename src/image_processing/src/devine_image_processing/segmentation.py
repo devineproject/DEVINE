@@ -87,7 +87,7 @@ class RCNNSegmentation(ImageProcessor):
                 "category": self.class_names[class_id],
                 "segment": [],
                 "id" : current_id,
-                "area": mask
+                "area": mask.tolist()
             }
             object_array.append(current_object)
 
