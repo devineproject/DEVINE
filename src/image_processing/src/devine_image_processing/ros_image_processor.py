@@ -11,6 +11,7 @@ from io import BytesIO
 import rospy
 from sensor_msgs.msg import CompressedImage
 import signal
+import inspect
 
 class ImageProcessor(object):
     ''' Base interface for an image processor'''
@@ -29,7 +30,7 @@ class ROSImageProcessingWrapper(object):
     image_processor = None
 
     def __init__(self, image_processor, receiving_topic):
-        if issubclass(image_processor, ImageProcessor):
+        if inspect.isclass(image_processor) and issubclass(image_processor, ImageProcessor):
             image_processor = image_processor()
         if not isinstance(image_processor, ImageProcessor):
             raise Exception("The image processor is not an instance of ImageProcessor")
@@ -47,14 +48,15 @@ class ROSImageProcessingWrapper(object):
             self.image_queue.get()
         self.image_queue.put(np.array(Image.open(BytesIO(data.data))))
 
-    def loop(self, process_callback):
+    def loop(self, process_callback=None):
         '''Looping method to process every image'''
         killable_loop = GracefulKiller()
         while True:
             try:
                 img = self.image_queue.get(False)
                 output = self.image_processor.process(img)
-                process_callback(output)
+                if process_callback:
+                    process_callback(output)
             except Empty:
                 time.sleep(0.5)
             finally:
