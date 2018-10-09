@@ -87,7 +87,7 @@ class ZoneDetection(ImageProcessor):
         filtered_contours = filter(filter_contour, contours)
         return map(cv2.boundingRect, filtered_contours)
     
-    def process(self, image):
+    def process(self, image, _):
         '''Process a new image by detecting possible zones'''
         bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) if COLOR_DEBUG_MODE or COLOR_PICKER_MODE else None
         hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)

@@ -34,7 +34,7 @@ class BodyTracking(ImageProcessor):
     def __init__(self):
         self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368)) #downscale image 
 
-    def process(self, img):
+    def process(self, img, _):
         '''Actual body tracking of the image'''
         rospy.logdebug("Starting body tracking")
         image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)

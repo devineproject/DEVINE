@@ -57,7 +57,7 @@ class RCNNSegmentation(ImageProcessor):
         self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=self.config)
         self.model.load_weights(COCO_MODEL_PATH, by_name=True) #blocking I/O in constructor!
 
-    def process(self, image):
+    def process(self, image, _):
         '''Actual segmentation of the image'''
         rospy.logdebug("Starting segmentation")
         height, width, _ = image.shape
