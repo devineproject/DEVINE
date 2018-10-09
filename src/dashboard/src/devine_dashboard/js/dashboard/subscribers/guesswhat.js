@@ -9,14 +9,12 @@ const subscriber = $("#guesswhat_checkbox");
 
 const topics = {
   state:    new RosTopic(devineTopics.guesswhat_status),
-  question: new RosTopic(devineTopics.question),
 };
 
 subscriber.on("change", function () {
   $('#guesswhat_ask_btn').prop('disabled', !this.checked);
   if (this.checked) {
     topics.state.subscribe(message => cons.log(`State: ${message.data}`));
-    topics.question.subscribe(message => cons.log(`Question: ${message.data}`));
 
     cons.log("Subscribed");
   } else {
