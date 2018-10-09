@@ -95,6 +95,14 @@
     "robot_head_joint_traj_point": {
       "name": "/devine/robot/head_joint_traj_point",
       "type": "trajectory_msgs/JointTrajectoryPoint"
+    },
+    "is_pointing": {
+      "name" : "/devine/robot/is_pointing",
+      "type" : "std_msgs/Bool"
+    },
+    "end_of_game": {
+      "name" : "/devine/game_system_state/",
+      "type" : "std_msgs/Bool"
     }
   },
   "constants": {
