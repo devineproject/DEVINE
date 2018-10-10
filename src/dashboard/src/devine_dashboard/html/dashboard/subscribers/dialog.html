@@ -4,6 +4,17 @@
     </h3>
     <ul class="list-group list-group-flush mt-0">
         <li class="list-group-item">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">Answer</div>
+                </div>
+                <input id="dialog_answer" placeholder="yes|no|na" type="text" class="form-control" style="border: none;">
+                <div class="input-group-append">
+                    <button id="dialog_publish" type="button" class="btn btn-primary">Publish</button>
+                </div>
+            </div>
+        </li>
+        <li class="list-group-item">
             <div class="custom-control custom-checkbox">
                 <input class="custom-control-input" id="dialog_checkbox" checked="" type="checkbox">
                 <label class="custom-control-label" for="dialog_checkbox">Subscribe</label>
