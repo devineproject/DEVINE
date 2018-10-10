@@ -1,7 +1,7 @@
 {
   "topics": {
     "raw_image": {
-      "name": "/camera/rgb/image_color/compressed",
+      "name": "/devine/image/raw_image",
       "type": "sensor_msgs/CompressedImage"
     },
     "image_depth": {

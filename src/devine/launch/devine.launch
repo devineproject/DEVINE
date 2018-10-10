@@ -16,6 +16,7 @@
 
   <group if="$(arg kinect)">
     <include file="$(find openni_launch)/launch/openni.launch" />
+    <node name="img_throttle_zone" pkg="topic_tools" type="throttle" args="messages /camera/rgb/image_color/compressed 5 /devine/image/raw_image" />
     <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
   </group>
 
