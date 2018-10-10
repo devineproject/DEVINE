@@ -4,6 +4,6 @@ GuessWhat
 Description
 ===========
 
-GuessWhat has been developed by `IGLU`_.
+GuessWhat has been developed by IGLU.
 
 TODO: More in depth information.

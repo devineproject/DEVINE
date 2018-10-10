@@ -32,13 +32,13 @@
       "name": "/devine/zone_detection",
       "type": "std_msgs/String"
     },
+    "scene_found": {
+      "name": "/devine/scene_found",
+      "type": "std_msgs/Bool"
+    },
     "image_features": {
       "name": "/devine/image_features",
       "type": "std_msgs/Float64MultiArray"
-    },
-    "blur_detection": {
-      "name": "/devine/blur_detection",
-      "type": "std_msgs/Bool"
     },
     "body_tracking": {
       "name": "/devine/body_tracking",
@@ -91,6 +91,10 @@
     "robot_head_joint_traj_point": {
       "name": "/devine/robot/head_joint_traj_point",
       "type": "trajectory_msgs/JointTrajectoryPoint"
+    },
+    "robot_facial_expression": {
+      "name": "/devine/robot/facial_expression",
+      "type": "jn0_face_msgs/EmoIntensity"
     }
   },
   "constants": {

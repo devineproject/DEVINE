@@ -5,9 +5,11 @@ datapath=~/.devine/data
 install() {
   local catkinsrc=$1
   local devineroot=$2
+  local tensorflow_package=$3
+
   confirm "This script was made for a fresh 16.04 Ubuntu desktop image and may harm your system, continue" || exit 1
 
-  install_base "$catkinsrc"
+  install_base "$catkinsrc" "$tensorflow_package"
   install_devine "$catkinsrc" "$devineroot"
 
   echo reload bash for $(whoami) to finish installation
@@ -16,18 +18,10 @@ install() {
 install_devine() {
   local catkinsrc=$1
   local devineroot=$2
-  local user=$(whoami)
 
   ln -sf "$(readlink -f $devineroot)" "$(readlink -f $catkinsrc)"
   
   pushd "$catkinsrc"
-
-  if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
-  then
-    python3 -m pip install --user nltk tqdm image
-    git clone --recursive https://github.com/devineproject/guesswhat.git || exit 1
-    ensure_line "export \"PYTHONPATH=$(pwd)/guesswhat/src:\$PYTHONPATH\"" ~/.bashrc
-  fi
 
   # TODO move pip installs to respective catkin package dep?
   cd DEVINE/src/guesswhat
@@ -39,8 +33,6 @@ install_devine() {
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
-  cd ../game_system
-  python2 -m pip install --user transitions
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
   mkdir ~/.rviz
@@ -50,7 +42,6 @@ install_devine() {
   bash -ci catkin_make
 
   cd src/DEVINE/src/dashboard
-  bash -ci 'rosrun devine_config devinetopics.py > src/devine_dashboard/js/vars/devine_topics.json'
   python3 -m pip install --user -r requirements.txt
   bash -ci 'npm install && npm run build'
 
@@ -59,15 +50,16 @@ install_devine() {
 
 install_base() {
   local catkinsrc=$1
-  local user=$(whoami)
+  local tensorflow_package=$2
+
   pushd "$catkinsrc"
 
   as_su apt-get update
   as_su apt-get install -y apt-transport-https git libffi-dev
   as_su sh -c 'echo "deb https://ftp.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-  as_su apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116
+  as_su apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116 || exit 1
   as_su sh -c 'echo "deb https://debian.snips.ai/jessie stable main" > /etc/apt/sources.list.d/snips.list'
-  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455
+  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455 || exit 1
   as_su apt-get update
   as_su apt-get install -y python3 python3-tk python3-pip python python-pip
   as_su apt-get install -y ros-kinetic-desktop-full ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control
@@ -76,7 +68,7 @@ install_base() {
   as_su apt-get install -y snips-platform-voice
   python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
   python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
-  python3 -m pip install --user tensorflow
+  python3 -m pip install --user $tensorflow_package
   python2 -m pip install --user opencv-contrib-python
   python3 -m pip install --user opencv-contrib-python
   mkdir -p "$datapath"
@@ -87,6 +79,13 @@ install_base() {
   python3 -m pip install 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
   bash -ci 'nvm install --lts'
+
+  if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
+  then
+    python3 -m pip install --user nltk tqdm image
+    git clone --recursive https://github.com/devineproject/guesswhat.git || exit 1
+    ensure_line "export \"PYTHONPATH=$(pwd)/guesswhat/src:\$PYTHONPATH\"" ~/.bashrc
+  fi
 
   if [ ! -f IRL-1 ]
   then
