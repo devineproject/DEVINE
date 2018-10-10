@@ -3,5 +3,8 @@
 *.pyc
 /src/dashboard/node_modules/*
 /src/dashboard/dist/*
+/src/config/build/*
+/src/dialog/build/*
 /docs/build/
 /docs/source/.doctrees/
+package-lock.json
