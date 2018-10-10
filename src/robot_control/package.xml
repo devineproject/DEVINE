@@ -13,4 +13,5 @@
     <depend>sensor_msgs</depend>
     <depend>control_msgs</depend>
     <depend>trajectory_msgs</depend>
+    <depend>jn0_face_msgs</depend>
 </package>
