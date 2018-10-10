@@ -8,4 +8,4 @@ TODO: https://trello.com/c/Ce0l6ehz
     :glob:
     :maxdepth: 1
    
-    *
+    docker/index 
