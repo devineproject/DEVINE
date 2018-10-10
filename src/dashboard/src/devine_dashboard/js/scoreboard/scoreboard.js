@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import ROSLIB from 'roslib';
-import rosTopics from "../vars/devine_topics.json";
 
 class Player {
   constructor(playerNameOrCopiedObj, inGamePlayed = 0, inGameWon = 0) {
@@ -39,7 +38,7 @@ class BrowserStorage {
   }
 }
 
-export default function createScoreboard() {
+export default function createScoreboard(rosTopics) {
   let browserStorage = new BrowserStorage();
   let leaderboard = browserStorage.leaderboard;
   let playerName = "Anonymous"; //Unregistered user

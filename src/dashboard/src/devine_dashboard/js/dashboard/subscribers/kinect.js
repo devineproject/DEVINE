@@ -1,6 +1,5 @@
 import { RosTopic } from '../ros';
 import { distinctColors } from '../../vars/colors';
-import devineTopics from '../../vars/devine_topics.json';
 import throttle from '../../throttle';
 import LogConsole from '../console';
 import $ from 'jquery';
@@ -13,17 +12,6 @@ const canvas = $("#kinect_image")[0];
 const image = canvas ? canvas.getContext("2d") : undefined; 
 const delay = $('#kinect_image_delay');
 const image_selection = $("input[name=image_selection]");
-
-const topics = {
-  image:                new RosTopic(devineTopics.raw_image),
-  segmentation_image:   new RosTopic(devineTopics.segmentation_image),
-  body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
-  segmentation:         new RosTopic(devineTopics.objects),
-  object_position_2d:   new RosTopic(devineTopics.guess_location_image),
-  object_position_3d:   new RosTopic(devineTopics.guess_location_world),
-  body_position:        new RosTopic(devineTopics.body_tracking),
-  current_img_topic:    null
-};
 
 let history = createHistory();
 function createHistory()
@@ -38,8 +26,18 @@ function createHistory()
   };
 }
 
+export default function InitKinectModule(devineTopics) {
+  const topics = {
+    image:                new RosTopic(devineTopics.raw_image),
+    segmentation_image:   new RosTopic(devineTopics.segmentation_image),
+    body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
+    segmentation:         new RosTopic(devineTopics.objects),
+    object_position_2d:   new RosTopic(devineTopics.guess_location_image),
+    object_position_3d:   new RosTopic(devineTopics.guess_location_world),
+    body_position:        new RosTopic(devineTopics.body_tracking),
+    current_img_topic:    null
+  };
 
-export default function InitKinectModule() {
   //We want to limit drawing for performance, yet we might want to keep all data
   function imageSourceChanged()
   {

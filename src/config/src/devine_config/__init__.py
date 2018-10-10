@@ -17,3 +17,7 @@ def constant(name):
 def printtopics():
     '''write json topics to stdout'''
     print(json.dumps(config["topics"]))
+
+def gettopics():
+    '''Return the entire topics object'''
+    return config["topics"]
