@@ -2,6 +2,7 @@
   <arg name="jn0" default="true"/>
   <arg name="control" default="true"/>
   <arg name="point" default="true"/>
+  <arg name="scene_finder" default="true"/>
   <arg name="prod" default="true"/>
 
   <group if="$(arg jn0)">
@@ -15,6 +16,10 @@
   <group if="$(arg point)">
       <node name="devine_irl_control_object" pkg="devine_irl_control" type="node_object.py" respawn="$(arg prod)" />
       <node name="devine_irl_control_error" pkg="devine_irl_control" type="node_error.py" respawn="$(arg prod)" />
+  </group>
+
+  <group if="$(arg scene_finder)">
+      <node name="devine_common_find_scene" pkg="devine_common" type="node_find_scene.py" respawn="$(arg prod)" />
   </group>
   
 </launch>
