@@ -18,11 +18,11 @@ Installation with SAM
 5. If you get an error at this stage, add this line ``your_username ALL=(ALL) NOPASSWD: ALL`` at the end of your sudoers file with the command : ``sudo visudo``, then try again.
 6. Test the speaker with ``sam test speaker``
 7. Test the microphone with ``sam test microphone``
-8. If tests are not conclusive or quality is poor, try selecting a diferent speaker and microphone with : ``sam setup audio``
+8. If tests are not conclusive or quality is poor, try selecting a different speaker and microphone with : ``sam setup audio``
 9. Connect to DEVINE's snips account : ``sam login``, email: devine.gegi@listes.usherbrooke.ca , password is in Devine private repo
 10. Download the assistant : ``sam install assistant``
 11. Install the requirements : ``sudo -H pip install -r requirements.txt``
-12. Run the setup script ``sudo python setup.py``
+12. Run the setup script ``sudo python setup.py install``
 
 
 Usage
@@ -44,7 +44,8 @@ To send custom data to the topic used by snips, do :
 - Select topic : /devine/tts/answer
 - Select type : devine_dialog/TtsQuery
 - Select a frequency
-- Fill out the 'text', 'uid' and 'answer_type' fields.
+- Fill out the 'text' (ex: "Is the object blue ?"), 'uid' (ex: 1) and 'answer_type' (ex: 1) fields.
+
 
 
 
