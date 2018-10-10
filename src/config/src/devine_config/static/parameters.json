@@ -101,7 +101,7 @@
       "type" : "std_msgs/Bool"
     },
     "end_of_game": {
-      "name" : "/devine/game_system_state/",
+      "name" : "/devine/end_of_game/",
       "type" : "std_msgs/Bool"
     }
   },

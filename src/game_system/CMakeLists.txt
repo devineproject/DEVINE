@@ -8,8 +8,6 @@ project(devine_game_system)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  openni_camera
-  openni_launch
   rospy
   std_msgs
 )

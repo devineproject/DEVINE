@@ -10,11 +10,11 @@ from devine_config import topicname
 
 NODE_NAME = 'announce_object'
 TOPIC_OBJECT_CATEGORY = topicname('guess_category')
-TOPIC_SNIPS = topicname('tts_answer')
+TOPIC_SNIPS = topicname('tts_query')
 TOPIC_IS_POINTING_OBJECT = topicname('is_pointing_object')
 TOPIC_IS_END_OF_GAME = topicname('end_of_game') 
 
-class announce_node:
+class announceNode:
 
 	def __init__(self):
 		self.current_category = ""
@@ -40,13 +40,12 @@ class announce_node:
 		while not rospy.is_shutdown():
 			if self.pointing_state == True:
 				snips.publish(self.current_category)
-				#rospy.sleep(1)
+				rospy.sleep(1)
 				end_of_game.publish(True)
 				self.pointing_state = False
 			rate.sleep()
 
 
 if __name__ == '__main__':
-	node_inst = announce_node()
+	node_inst = announceNode()
 	node_inst.run_node()
-	rospy.spin()
