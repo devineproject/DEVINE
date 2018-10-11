@@ -4,9 +4,8 @@
 import rospy
 from Queue import Queue, Empty
 from std_msgs.msg import Bool
-from std_msgs.msg import String
 from devine_config import topicname
-
+from devine_dialog.msg import TtsQuery
 
 NODE_NAME = 'announce_object'
 TOPIC_OBJECT_CATEGORY = topicname('guess_category')
@@ -31,7 +30,7 @@ class announceNode:
 	def run_node(self):
 		''' Checks if selected object has been pointed to and announces its category '''
 		rospy.init_node(NODE_NAME)
-		rospy.Subscriber(TOPIC_OBJECT_CATEGORY, String, self.category_callback)
+		rospy.Subscriber(TOPIC_OBJECT_CATEGORY, TtsQuery , self.category_callback)
 		rospy.Subscriber(TOPIC_IS_POINTING_OBJECT, Bool, self.is_pointing_callback)
 		end_of_game = rospy.Publisher(TOPIC_IS_END_OF_GAME, Bool, queue_size=1)
 		snips = rospy.Publisher(TOPIC_SNIPS, String, queue_size=1)
