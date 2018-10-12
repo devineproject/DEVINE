@@ -28,4 +28,4 @@ then
     exit 1
 fi
 
-install "$1" "$2"
+install "$1" "$2" "tensorflow"
