@@ -76,7 +76,7 @@ install_base() {
   ensure_data https://storage.googleapis.com/download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/weights.zip
   as_su rm -f /opt/ros/kinetic/lib/python2.7/dist-packages/cv2.so
-  python3 -m pip install 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
+  python3 -m pip install --user 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
   curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
   bash -ci 'nvm install --lts'
 
