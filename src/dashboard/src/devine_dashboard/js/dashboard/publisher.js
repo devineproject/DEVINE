@@ -50,6 +50,9 @@ function setTopicsList(rosTopics) {
 }
 
 export default function InitPublisherModule(devineTopics) {
-  insertTopics(Object.keys(devineTopics).map((key) => devineTopics[key].name), ".common-topics");
+  insertTopics(Object.keys(devineTopics)
+    .filter(key => devineTopics[key].type == "std_msgs/String")
+    .map((key) => devineTopics[key].name), 
+  ".common-topics");
   ros.getTopics(setTopicsList);
 }
