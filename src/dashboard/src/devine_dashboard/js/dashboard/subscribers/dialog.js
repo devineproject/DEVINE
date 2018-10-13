@@ -1,12 +1,13 @@
 import { RosTopic } from '../ros';
-import devineTopics from '../../vars/devine_topics.json';
+import ROSLIB from 'roslib';
 import LogConsole from '../console';
 import $ from 'jquery';
 
-export default function()
+export default function initDialogModule(devineTopics)
 {
   const cons = new LogConsole("Dialog", "#F39C12");
   const subscriber = $("#dialog_checkbox");
+  const answerField = $("#dialog_answer");
 
   const topics = {
     ttsQuery: new RosTopic(devineTopics.tts_query),
@@ -20,6 +21,25 @@ export default function()
   }
 
   let queries = [];
+
+  $("#dialog_publish").on("click", function() {
+    const answer = answerField.val();
+    if (answer !== "") {
+      const query = queries[queries.length-1];
+      if (query) {
+        new RosTopic(
+            devineTopics.tts_answer
+        ).publish(new ROSLIB.Message({
+          text: answer,
+          uid: query.uid,
+          answer_type: answer_types.YES_NO
+        }));
+        answerField.val("");
+      } else {
+        cons.log("No TTS query to answer");
+      }
+    }
+  });
 
   subscriber.on("change", function () {
     $('#dialog_ask_btn').prop('disabled', !this.checked);

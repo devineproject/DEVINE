@@ -87,7 +87,8 @@ class ZoneDetection(ImageProcessor):
         filtered_contours = filter(filter_contour, contours)
         return map(cv2.boundingRect, filtered_contours)
     
-    def process(self, image):
+    # TODO: robustness of the commented code and the fuschia polygon
+    def process(self, image, _):
         '''Process a new image by detecting possible zones'''
         bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR) if COLOR_DEBUG_MODE or COLOR_PICKER_MODE else None
         hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
@@ -108,40 +109,51 @@ class ZoneDetection(ImageProcessor):
 
             # Resulting positions of the colors
             color_positions = {}
+            tracked_color = TrackingColor.FUCHSIA
+            #for tracked_color in TrackingColor:
+            saturation_polygon = SATURATION_HUE_POLYGONS[tracked_color]
+            lightness_polygon = LIGHTNESS_HUE_POLYGONS[tracked_color]
+            for x in range(width):
+                for y in range(height):
+                    [h, l, s] = hls[x, y]
+                    if saturation_polygon.contains(Point(h, s)) and lightness_polygon.contains(Point(h, l)):
+                        masked_image[x, y] = 255 #(255, 255, 255)
 
-            for tracked_color in TrackingColor:
-                saturation_polygon = SATURATION_HUE_POLYGONS[tracked_color]
-                lightness_polygon = LIGHTNESS_HUE_POLYGONS[tracked_color]
-                for x in range(width):
-                    for y in range(height):
-                        [h, l, s] = hls[x, y]
-                        if saturation_polygon.contains(Point(h, s)) and lightness_polygon.contains(Point(h, l)):
-                            masked_image[x, y] = 255 #(255, 255, 255)
+            # Noise reduction equivalent to erosion + dilatation filters
+            masked_image = cv2.morphologyEx(masked_image, cv2.MORPH_OPEN, None, iterations=2)
 
-                # Noise reduction equivalent to erosion + dilatation filters
-                masked_image = cv2.morphologyEx(masked_image, cv2.MORPH_OPEN, None, iterations=2)
+            bounding_rects = self.filter_valid_shapes(masked_image)
 
-                bounding_rects = self.filter_valid_shapes(masked_image)
+            positions_detected = []
+            for (x, y, w, h) in bounding_rects:
+                if w > 10 and h > 10:
+                    positions_detected.append((x + w/2, y + h/2))
+                    if COLOR_DEBUG_MODE:
+                        cv2.rectangle(bgr, (x, y), (x+w, y+h), (255, 0, 0), 2)
+                    
+            color_positions[tracked_color] = positions_detected
+        
+            if COLOR_DEBUG_MODE:
+                cv2.imshow("Mask", masked_image)
+                cv2.imshow("Image", bgr)
+                cv2.waitKey(1)
+                #break #Only the first color in debug mode, so we can show the results properly
 
-                positions_detected = []
-                for (x, y, w, h) in bounding_rects:
-                    if w > 10 and h > 10:
-                        positions_detected.append((x + w/2, y + h/2))
-                        if COLOR_DEBUG_MODE:
-                            cv2.rectangle(bgr, (x, y), (x+w, y+h), (255, 0, 0), 2)
-                        
-                color_positions[tracked_color] = positions_detected
-            
-                if COLOR_DEBUG_MODE:
-                    cv2.imshow("Mask", masked_image)
-                    cv2.imshow("Image", bgr)
-                    cv2.waitKey(1)
-                    break #Only the first color in debug mode, so we can show the results properly
-
-            result = {
-                "top_left_corner": self.detect_corner(TOP_LEFT_CORNER, color_positions, width, height),
-                "bottom_right_corner": self.detect_corner(BOTTOM_RIGHT_CORNER, color_positions, width, height)
-            }
+            colors = color_positions.get(tracked_color)
+            if len(colors) > 1:
+                x_max = max(colors, key=lambda (x, _): x)[0]
+                y_max = max(colors, key=lambda (_, y): y)[1]
+                x_min = min(colors, key=lambda (x, _): x)[0]
+                y_min = min(colors, key=lambda (_, y): y)[1]
+                result = {
+                    "top_left_corner": [y_max, x_min],
+                    "bottom_right_corner": [y_min, x_max],
+                }
+            else:
+                result = {
+                    "top_left_corner": [-1, -1], #self.detect_corner(TOP_LEFT_CORNER, color_positions, width, height),
+                    "bottom_right_corner": [-1, -1] #self.detect_corner(BOTTOM_RIGHT_CORNER, color_positions, width, height)
+                }
 
         return json_util.dumps(result)
 

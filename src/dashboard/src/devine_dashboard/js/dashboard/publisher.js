@@ -1,7 +1,5 @@
-import ROSLIB from 'roslib';
 import { RosTopic, ros } from './ros';
-import devineTopics from "../vars/devine_topics.json";
-import LogConsole from './console'
+import LogConsole from './console';
 import $ from 'jquery';
 
 const cons = new LogConsole("ROS", "grey");
@@ -51,6 +49,10 @@ function setTopicsList(rosTopics) {
   }
 }
 
-insertTopics(Object.keys(devineTopics).map((key) => devineTopics[key].name), ".common-topics");
-ros.getTopics(setTopicsList);
-
+export default function InitPublisherModule(devineTopics) {
+  insertTopics(Object.keys(devineTopics)
+    .filter(key => devineTopics[key].type == "std_msgs/String")
+    .map((key) => devineTopics[key].name), 
+  ".common-topics");
+  ros.getTopics(setTopicsList);
+}

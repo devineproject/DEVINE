@@ -40,10 +40,6 @@
       "name": "/devine/image_features",
       "type": "std_msgs/Float64MultiArray"
     },
-    "blur_detection": {
-      "name": "/devine/blur_detection",
-      "type": "std_msgs/Bool"
-    },
     "body_tracking": {
       "name": "/devine/body_tracking",
       "type": "std_msgs/String"
@@ -103,6 +99,10 @@
     "end_of_game": {
       "name" : "/devine/end_of_game/",
       "type" : "std_msgs/Bool"
+    },
+    "robot_facial_expression": {
+      "name": "/devine/robot/facial_expression",
+      "type": "jn0_face_msgs/EmoIntensity"
     }
   },
   "constants": {

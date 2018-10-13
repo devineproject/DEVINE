@@ -26,7 +26,7 @@ class DialogControl():
 
 
     def send_sentence(self, sentence, answer_type, **format_args):
-        send_speech(self.TTS_PUBLISHER, random.choice(self.dialogs[sentence]).format(**format_args), answer_type)
+        return send_speech(self.TTS_PUBLISHER, random.choice(self.dialogs[sentence]).format(**format_args), answer_type)
 
     def wait_for_player(self, message_name, **format_args):
         '''Ask 5 time the human a question. Return true if he did answer 'yes' one time.'''
@@ -54,10 +54,6 @@ class DialogControl():
 
         #player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME) TODO: Implement in the assistant and snips.py
         player_name = "you"
-    
-        if not self.wait_for_player('ready', first_name=player_name):
-            self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
-            return
 
         self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
         if not self.wait_for_player('ready', first_name=player_name):

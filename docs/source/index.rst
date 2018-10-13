@@ -35,17 +35,20 @@ Global installation process for the project can be found here
    
     installation/index
 
-ROS Modules
-===========
 
-Specific ROS module informations can be found here:
+ROS
+===
+
+In this section you will find:
+
+* Tips'n tricks for ROS
+* Specific informations on our ROS modules
 
 .. toctree::
     :glob:
     :maxdepth: 2
    
-    modules/index
-
+    ros/index
 
 .. _DEVINE GitHub: https://github.com/FelixMartel/DEVINE
 .. _DEVINE website: https://devine.gel.usherbrooke.ca/

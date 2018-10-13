@@ -141,7 +141,7 @@ if __name__ == '__main__':
             except Empty:
                 continue
 
-            rospy.loginfo('Starting new game')
+            status.publish('Starting new game')
             img = {'id': 0, 'width': 640, 'height': 480, 'coco_url': ''}
             game = Game(id=0,
                         object_id=0,
@@ -164,11 +164,12 @@ if __name__ == '__main__':
             looper.process(sess, iterator, mode='greedy', store_games=True)
 
             storage = looper.storage[0]
-            choice_index = storage['guess_object_index']
-            choice_bbox = game.objects[choice_index].bbox
+            choice_index = storage['guess_object_id']
+            choice = next(obj for obj in storage['game'].objects if obj.id == choice_index)
+            choice_bbox = choice.bbox
             object_found.publish(Int32MultiArray(data=[int(choice_bbox.x_center),
                                                        int(choice_bbox.y_center)]))
-            rospy.loginfo('Game over')
-            category.publish(seg['objects'][choice_index]['category'])
+            status.publish('Object guessed')
+            category.publish(choice.category)
 
             status.publish('Waiting for image processing')

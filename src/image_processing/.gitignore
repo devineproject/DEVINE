@@ -1,2 +1,3 @@
 mask_rcnn_coco.h5
 vgg_16.ckpt
+mobilenet_thin.pb

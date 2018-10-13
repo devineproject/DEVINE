@@ -24,7 +24,6 @@ Installation
 
 .. code-block:: bash
 
-    rosrun devine_config devinetopics.py > src/vars/devine_topics.json
     npm run build
 
 Usage

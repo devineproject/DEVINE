@@ -1,9 +1,7 @@
 {
     "welcome": [
         "Welcome to the DEVINE GuessWhat game.",
-        "Greetings! My name is IRL-1.",
-        "Hey you!",
-        "Oh hello there!"
+        "Greetings! My name is Johnny Zero"
     ],
     "ask_to_play": [
         "Would you like to play a simple game with me?",
@@ -17,10 +15,10 @@
         "Before we begin, I just need to know your name!"
     ],
     "ready": [
-        "Great, {first_name}! Are you ready to start?"
+        "Great! Are you ready to start?"
     ],
     "instructions": [
-        "Good! So now think about one of the objects on the table, and I will ask you some question in order to find it."
+        "Good! So now think about one of the objects on the table, and I will ask you some questions in order to find it."
     ],
     "bye_bye": [
         "All right, good bye."
