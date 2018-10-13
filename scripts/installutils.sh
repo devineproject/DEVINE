@@ -31,15 +31,15 @@ install_devine() {
   python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
   python2 -m pip install --user shapely
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
-  tar --overwrite xzf "$datapath/vgg_16_2016_08_28.tar.gz"
+  tar --overwrite -xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
-  mkdir ~/.rviz
-  cp launch/irl_point.rviz ~/.rviz/default.rviz
+  mkdir -p ~/.rviz
+  cp -f launch/irl_point.rviz ~/.rviz/default.rviz
 
   cd ../../../..
-  bash -ci catkin_make
+  bash -ci "catkin_make"
 
   cd src/DEVINE/src/dashboard
   python3 -m pip install --user -r requirements.txt
@@ -97,11 +97,9 @@ install_base() {
   ensure_line "export \"PYTHONPATH=$(pwd)/devel/lib/python2.7/dist-packages:\$PYTHONPATH\"" ~/.bashrc
   if [ ! -d /etc/ros/rosdep ]
   then
-    # can we prevent rosdep from sending sigstop?
-    trap 'echo send the "fg" command to resume this script' TSTP
-    as_su bash -ci "rosdep init" 2>&1 > /dev/null
+    as_su bash -ci "rosdep -q init"
   fi
-  bash -ci "rosdep update"
+  bash -ci "rosdep -q update"
   bash -ci "catkin_make"
 
   popd
