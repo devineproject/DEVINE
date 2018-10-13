@@ -23,6 +23,7 @@ Installation
 2. Build
 
 .. code-block:: bash
+
     npm run build
 
 Usage
