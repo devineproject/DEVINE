@@ -16,12 +16,18 @@ TOPIC_IS_POINTING_OBJECT = topicname('is_pointing_object')
 TOPIC_IS_END_OF_GAME = topicname('end_of_game') 
 TRANSITION_DELAY = 1 #Amount of time waited before asking for new game
  
-class announceNode:
+class AnnouceNode:
 
     def __init__(self):
         self.current_category = ""
         self.pointing_state = False
-
+        rospy.init_node(NODE_NAME)
+        rospy.Subscriber(TOPIC_OBJECT_CATEGORY,String,self.category_callback)
+        rospy.Subscriber(TOPIC_IS_POINTING_OBJECT,Bool,self.is_pointing_callback)
+        end_of_game = rospy.Publisher(TOPIC_IS_END_OF_GAME,Bool,queue_size=1)
+        snips = rospy.Publisher(TOPIC_SNIPS,TtsQuery,queue_size=1)
+        rospy.sleep(1)
+        
     def category_callback(self,data):
         '''Callback for the category topic'''
         self.current_category = data.data
@@ -32,16 +38,10 @@ class announceNode:
 
     def run_node(self):
         ''' Checks if selected object has been pointed to and announces its category '''
-        rospy.init_node(NODE_NAME)
-        rospy.Subscriber(TOPIC_OBJECT_CATEGORY,String , self.category_callback)
-        rospy.Subscriber(TOPIC_IS_POINTING_OBJECT, Bool, self.is_pointing_callback)
-        end_of_game = rospy.Publisher(TOPIC_IS_END_OF_GAME, Bool, queue_size=1)
-        snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1)
-        rospy.sleep(1)
         rate = rospy.Rate(1) # TBD
         while not rospy.is_shutdown():
             if self.pointing_state == True:
-                send_speech(snips, self.current_category,TTSAnswerType.NO_ANSWER)
+                send_speech(snips,self.current_category,TTSAnswerType.NO_ANSWER)
                 rospy.sleep(TRANSITION_DELAY)
                 end_of_game.publish(True)
                 self.pointing_state = False
