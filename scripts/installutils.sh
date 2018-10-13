@@ -7,12 +7,12 @@ install() {
   local devineroot=$2
   local tensorflow_package=$3
 
-  confirm "This script was made for a fresh 16.04 Ubuntu desktop image and may harm your system, continue" || exit 1
+  confirm "This script was made for a fresh \033[0;31m16.04 Ubuntu\033[0m desktop image and may \033[0;31mharm\033[0m your system. Installation will be effective for user \033[0;31m$(whoami)\033[0m, continue" || exit 1
 
   install_base "$catkinsrc" "$tensorflow_package"
   install_devine "$catkinsrc" "$devineroot"
 
-  echo reload bash for $(whoami) to finish installation
+  echo -e "\033[0;31mReload bash for $(whoami) to finish installation\033[0m"
 }
 
 install_devine() {
@@ -25,13 +25,13 @@ install_devine() {
 
   # TODO move pip installs to respective catkin package dep?
   cd DEVINE/src/guesswhat
-  unzip "$datapath/weights.zip" -d devine_guesswhat/data
+  unzip -o "$datapath/weights.zip" -d devine_guesswhat/data
   cd ../image_processing
   python3 -m pip install --user Cython
   python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
   python2 -m pip install --user shapely
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
-  tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
+  tar --overwrite xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
@@ -66,8 +66,8 @@ install_base() {
   as_su apt-get install -y ros-kinetic-openni-launch ros-kinetic-openni-camera ros-kinetic-openni-description ros-kinetic-compressed-image-transport
   as_su apt-get install -y ros-kinetic-rosbridge-server
   as_su apt-get install -y snips-platform-voice
-  python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
-  python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
+  as_su python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
+  as_su python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
   python3 -m pip install --user $tensorflow_package
   python2 -m pip install --user opencv-contrib-python
   python3 -m pip install --user opencv-contrib-python
@@ -138,7 +138,7 @@ ensure_line() {
 
 get_keypress() {
   local REPLY IFS=
-  >/dev/tty printf '%s' "$*"
+  >/dev/tty printf "$*"
   [[ $ZSH_VERSION ]] && read -rk1
   [[ $BASH_VERSION ]] && </dev/tty read -rn1
   printf '%s' "$REPLY"
