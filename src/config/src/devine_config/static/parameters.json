@@ -92,6 +92,14 @@
       "name": "/devine/robot/head_joint_traj_point",
       "type": "trajectory_msgs/JointTrajectoryPoint"
     },
+    "is_pointing_object": {
+      "name" : "/devine/robot/is_pointing",
+      "type" : "std_msgs/Bool"
+    },
+    "end_of_game": {
+      "name" : "/devine/end_of_game/",
+      "type" : "std_msgs/Bool"
+    },
     "robot_facial_expression": {
       "name": "/devine/robot/facial_expression",
       "type": "jn0_face_msgs/EmoIntensity"
