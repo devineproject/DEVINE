@@ -32,18 +32,18 @@ install_devine() {
   python2 -m pip install --user shapely
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar --overwrite -xzf "$datapath/vgg_16_2016_08_28.tar.gz"
-  ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
+  ln -sf "$(find "$(dirname "$(python3 -c 'import tf_pose;print(tf_pose.__file__)')")"/.. -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
   mkdir -p ~/.rviz
   cp -f launch/irl_point.rviz ~/.rviz/default.rviz
 
   cd ../../../..
-  bash -ci "catkin_make"
+  catkin_make
 
   cd src/DEVINE/src/dashboard
   python3 -m pip install --user -r requirements.txt
-  bash -ci 'npm install && npm run build'
+  npm install && npm run build
 
   popd
 }
@@ -77,8 +77,9 @@ install_base() {
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/weights.zip
   as_su rm -f /opt/ros/kinetic/lib/python2.7/dist-packages/cv2.so
   python3 -m pip install --user 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
-  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-  bash -ci 'nvm install --lts'
+  IFS= x=$(curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash | tail -n 3)
+  eval $x
+  nvm install --lts
 
   if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
   then
@@ -97,10 +98,10 @@ install_base() {
   ensure_line "export \"PYTHONPATH=$(pwd)/devel/lib/python2.7/dist-packages:\$PYTHONPATH\"" ~/.bashrc
   if [ ! -d /etc/ros/rosdep ]
   then
-    as_su bash -ci "rosdep -q init"
+    as_su rosdep -q init
   fi
-  bash -ci "rosdep -q update"
-  bash -ci "catkin_make"
+  rosdep -q update
+  catkin_make
 
   popd
 }
@@ -128,6 +129,7 @@ ensure_line() {
   local line=$1
   local file=$2
 
+  eval $line
   if ! grep -q -F "$line" "$file"
   then
     echo "$line" >> "$file"
