@@ -16,6 +16,7 @@ NODE_NAME = 'game_starter'
 TOPIC_SNIPS = topicname('tts_query')
 TOPIC_IS_END_OF_GAME = topicname('end_of_game') 
 OPEN_POSE_TOPIC = topicname('body_tracking')
+TOPIC_NEW_GAME = topicname('new_game')
 BYE_BYE_DELAY = 5
 
 class NewGameStarter:
@@ -24,7 +25,8 @@ class NewGameStarter:
         self.player_has_left = False
         
         rospy.init_node(NODE_NAME)
-        self.snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1) #fix type
+        self.snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1) 
+	self.new_game = rospy.Publisher(TOPIC_NEW_GAME,Bool,queue_size=1)
         rospy.Subscriber(TOPIC_IS_END_OF_GAME, Bool, self.is_end_of_game_callback)
         rospy.Subscriber(OPEN_POSE_TOPIC, String, self.__is_player_gone__)
         self.rate = rospy.Rate(1)
@@ -35,7 +37,7 @@ class NewGameStarter:
         self.player_has_left = (len(humans) != 0)
     
     def __start_new_game__(self):
-        pass
+        self.new_game.pub(True)
         
     def __restart_game__(self):
         pass

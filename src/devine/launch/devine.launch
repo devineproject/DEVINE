@@ -8,6 +8,7 @@
   <arg name="image_processing" default="$(arg launch_all)" />
   <arg name="scene_finder" default="$(arg launch_all)" />
   <arg name="jn0" default="true" />
+  <arg name="game_restarter" default="true"/>
 
   <group if="$(arg robot_control)">
     <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
@@ -42,7 +43,7 @@
       <arg name="image_topic" value="image_rect_mono" />
       <arg name="camera_frame" value="openni_rgb_optical_frame" />
     </include>
-    <node name="scene_finder" pkg="devine_scene_finder" type="scene_finder.py" respawn="true" />
+    <node name="scene_finder" pkg="devine_game_system" type="scene_finder.py" respawn="true" />
   </group>
 
   <group if="$(arg dashboard)">
@@ -55,4 +56,8 @@
     <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
   </group>
 
+  <group if="$(arg game_restarter)">
+    <node name="restarter" pkg="devine_game_system" type="start_new_game.py" respawn="true" />
+    <node name="announcer" pkg="devine_game_system" type="announce_object.py" respawn="true" />
+  </group>
 </launch>
