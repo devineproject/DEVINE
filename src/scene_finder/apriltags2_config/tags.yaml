@@ -1,0 +1,8 @@
+standalone_tags:
+  [
+    {id: 0, size: 0.11, name: 'top_left'},
+    {id: 1, size: 0.11, name: 'bottom_right'}
+  ]
+tag_bundles:
+  [
+  ]

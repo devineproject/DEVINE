@@ -6,4 +6,5 @@
 /src/config/build/*
 /src/dialog/build/*
 /docs/build/
+/docs/source/_build/
 /docs/source/.doctrees/

@@ -35,7 +35,6 @@ Global installation process for the project can be found here
    
     installation/index
 
-
 ROS
 ===
 

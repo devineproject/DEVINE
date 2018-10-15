@@ -43,7 +43,7 @@ class ROSImageProcessingWrapper(object):
     def image_received_callback(self, data):
         '''Callback when a new image is received from the topic'''
         if self.image_queue.full():
-            rospy.logwarn(rospy.get_name() + " : image receiving rate is too high.")
+            rospy.logwarn_throttle(30, rospy.get_name() + " : image receiving rate is too high.")
             self.image_queue.get()
         self.image_queue.put(data)
 
