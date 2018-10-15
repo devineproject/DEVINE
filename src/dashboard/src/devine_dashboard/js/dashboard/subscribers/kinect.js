@@ -21,7 +21,6 @@ function createHistory()
     image: [],
     segmentation: [],
     body_tracking: [],
-    zone_detection: [],
     object_position_2d: [],
     object_position_3d: []
   };
@@ -37,7 +36,6 @@ export default function InitKinectModule(devineTopics) {
     object_position_2d:   new RosTopic(devineTopics.guess_location_image),
     object_position_3d:   new RosTopic(devineTopics.guess_location_world),
     body_position:        new RosTopic(devineTopics.body_tracking),
-    zone_detection:       new RosTopic(devineTopics.zone_detection),
     current_img_topic:    null
   };
 
@@ -70,7 +68,6 @@ export default function InitKinectModule(devineTopics) {
         break;
       case "zone_detection":
         topics.current_img_topic = topics.zone_detection_image;
-        topics.zone_detection.subscribe(handleTopicData.bind(this, history.zone_detection));
       }
       cons.log(`Subscribed to ${currentImgType}`);
       topics.current_img_topic.subscribe(handleTopicData.bind(this, history.image));
@@ -84,7 +81,6 @@ export default function InitKinectModule(devineTopics) {
     let obj_pos_3d = getCurrentElement(history.object_position_3d);
     let body_tracking = getCurrentElement(history.body_tracking);
     let seg = getCurrentElement(history.segmentation);
-    let zone = getCurrentElement(history.zone_detection);
     let img = getCurrentElement(history.image);
     let image_length = history.image.length;
 
@@ -107,10 +103,6 @@ export default function InitKinectModule(devineTopics) {
 
         if (body_tracking != undefined) {
           drawBodyTracking(JSON.parse(body_tracking));
-        }
-
-        if (zone != undefined) {
-          drawZoneDetection(JSON.parse(zone));
         }
       };
       imageObject.src = "data:image/jpg;base64, " + img;
@@ -238,21 +230,4 @@ function drawBodyTracking(humans) {
       image.stroke();
     }
   }
-}
-
-function drawZoneDetection(zone) {
-  let [top, left] = zone['top_left_corner'];
-  let [bottom, right] = zone['bottom_right_corner'];
-  if (top == -1 || left == -1 || bottom == -1 || right == -1) {
-    setColor("red");
-    image.font = "bold 20pt Arial";
-    image.fillText("< No Zone Detected />", 190, (imageSize.y / 2));
-    return;
-  }
-  image.beginPath();
-  let width = right - left;
-  let height = bottom - top;
-  image.rect(left, top, width, height);
-  image.stroke();
-  image.closePath();
 }
