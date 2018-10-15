@@ -13,7 +13,7 @@
       "type": "sensor_msgs/CompressedImage"
     },
     "zone_detection_image": {
-      "name": "/devine/image/zone_detection",
+      "name": "/tag_detections_image/compressed",
       "type": "sensor_msgs/CompressedImage"
     },
     "features_extraction_image": {
