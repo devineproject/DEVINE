@@ -22,9 +22,10 @@ dir_exists() {
 dir_exists "$1"
 dir_exists "$2"
 
-if [ "${1##*/}" != "src" ]
+dir="${1%/}"
+if [ "${dir##*/}" != "src" ]
 then
-    echo "catkin_src_dir must be named src. Is named ${1##*/}"
+    echo "catkin_src_dir must be named src. Is named ${dir##*/}"
     exit 1
 fi
 

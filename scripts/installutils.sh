@@ -7,12 +7,12 @@ install() {
   local devineroot=$2
   local tensorflow_package=$3
 
-  confirm "This script was made for a fresh 16.04 Ubuntu desktop image and may harm your system, continue" || exit 1
+  confirm "This script was made for a fresh \033[0;31m16.04 Ubuntu\033[0m desktop image and may \033[0;31mharm\033[0m your system. Installation will be effective for user \033[0;31m$(whoami)\033[0m, continue" || exit 1
 
   install_base "$catkinsrc" "$tensorflow_package"
   install_devine "$catkinsrc" "$devineroot"
 
-  echo reload bash for $(whoami) to finish installation
+  echo -e "\033[0;31mReload bash for $(whoami) to finish installation\033[0m"
 }
 
 install_devine() {
@@ -25,26 +25,26 @@ install_devine() {
 
   # TODO move pip installs to respective catkin package dep?
   cd DEVINE/src/guesswhat
-  unzip "$datapath/weights.zip" -d devine_guesswhat/data
+  unzip -o "$datapath/weights.zip" -d devine_guesswhat/data
   cd ../image_processing
   python3 -m pip install --user Cython
   python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
-  tar xzf "$datapath/vgg_16_2016_08_28.tar.gz"
-  ln -sf "$(find /usr/local/lib/python3.?/dist-packages/ -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
+  tar --overwrite -xzf "$datapath/vgg_16_2016_08_28.tar.gz"
+  ln -sf "$(find "$(dirname "$(python3 -c 'import tf_pose;print(tf_pose.__file__)')")"/.. -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
   python2 -m pip install --user paho-mqtt
   cd ../robot_control
-  mkdir ~/.rviz
-  cp launch/irl_point.rviz ~/.rviz/default.rviz
+  mkdir -p ~/.rviz
+  cp -f launch/irl_point.rviz ~/.rviz/default.rviz
   cd ../scene_finder
   cp -f apriltags2_config/* ../../../apriltags2_ros/apriltags2_ros/config
 
   cd ../../../..
-  bash -ci catkin_make
+  catkin_make
 
   cd src/DEVINE/src/dashboard
   python3 -m pip install --user -r requirements.txt
-  bash -ci 'npm install && npm run build'
+  npm install && npm run build
 
   popd
 }
@@ -67,8 +67,8 @@ install_base() {
   as_su apt-get install -y ros-kinetic-openni-launch ros-kinetic-openni-camera ros-kinetic-openni-description ros-kinetic-compressed-image-transport
   as_su apt-get install -y ros-kinetic-rosbridge-server
   as_su apt-get install -y snips-platform-voice
-  python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
-  python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
+  as_su python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
+  as_su python3 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography
   python3 -m pip install --user $tensorflow_package
   python2 -m pip install --user opencv-contrib-python
   python3 -m pip install --user opencv-contrib-python
@@ -78,8 +78,9 @@ install_base() {
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/weights.zip
   as_su rm -f /opt/ros/kinetic/lib/python2.7/dist-packages/cv2.so
   python3 -m pip install --user 'git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose'
-  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
-  bash -ci 'nvm install --lts'
+  IFS= x=$(curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash | tail -n 3)
+  eval $x
+  nvm install --lts
 
   if python3 -c "import guesswhat" 2>&1 | grep '^' > /dev/null
   then
@@ -104,12 +105,10 @@ install_base() {
   ensure_line "export \"PYTHONPATH=$(pwd)/devel/lib/python2.7/dist-packages:\$PYTHONPATH\"" ~/.bashrc
   if [ ! -d /etc/ros/rosdep ]
   then
-    # can we prevent rosdep from sending sigstop?
-    trap 'echo send the "fg" command to resume this script' TSTP
-    as_su bash -ci "rosdep init" 2>&1 > /dev/null
+    as_su rosdep -q init
   fi
-  bash -ci "rosdep update"
-  bash -ci "catkin_make"
+  rosdep -q update
+  catkin_make
 
   popd
 }
@@ -137,6 +136,7 @@ ensure_line() {
   local line=$1
   local file=$2
 
+  eval $line
   if ! grep -q -F "$line" "$file"
   then
     echo "$line" >> "$file"
@@ -145,7 +145,7 @@ ensure_line() {
 
 get_keypress() {
   local REPLY IFS=
-  >/dev/tty printf '%s' "$*"
+  >/dev/tty printf "$*"
   [[ $ZSH_VERSION ]] && read -rk1
   [[ $BASH_VERSION ]] && </dev/tty read -rn1
   printf '%s' "$REPLY"
