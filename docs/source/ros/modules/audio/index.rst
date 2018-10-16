@@ -21,8 +21,7 @@ Installation with SAM
 8. If tests are not conclusive or quality is poor, try selecting a different speaker and microphone with : ``sam setup audio``
 9. Connect to DEVINE's snips account : ``sam login``, email: devine.gegi@listes.usherbrooke.ca , password is in Devine private repo
 10. Download the assistant : ``sam install assistant``
-11. Install the requirements : ``sudo -H pip install -r requirements.txt``
-12. Run the setup script ``sudo python setup.py install``
+
 
 
 Usage
@@ -41,12 +40,13 @@ To send custom data to the topic used by snips, do :
 
 ``rosrun rqt_gui rqt_gui``
 
-- Select topic : /devine/tts/answer
+- Select topic : /devine/tts/query
 - Select type : devine_dialog/TtsQuery
 - Select a frequency
 - Fill out the 'text' (ex: "Is the object blue ?"), 'uid' (ex: 1) and 'answer_type' (ex: 1) fields.
 
-
+Or, run this command :
+``rostopic pub /devine/tts/query devine_dialog/TtsQuery '{text: "Is the object blue?", uid: 1, answer_type: 1}'``
 
 
 .. _SNIPS: https://snips.ai/
