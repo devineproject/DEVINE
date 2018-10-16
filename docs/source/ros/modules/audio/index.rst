@@ -21,7 +21,7 @@ Installation with SAM
 8. If tests are not conclusive or quality is poor, try selecting a different speaker and microphone with : ``sam setup audio``
 9. Connect to DEVINE's snips account : ``sam login``, email: devine.gegi@listes.usherbrooke.ca , password is in Devine private repo
 10. Download the assistant : ``sam install assistant``
-11. Run the setup script ``sudo python setup.py install``
+
 
 
 Usage
