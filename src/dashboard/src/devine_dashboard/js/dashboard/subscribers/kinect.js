@@ -9,12 +9,13 @@ const imageSize = { x: 640, y: 480 };
 const objectPos2d = $("#kinect_pos_found")[0];
 const objectPos3d = $("#kinect_pos_calc")[0];
 const canvas = $("#kinect_image")[0];
-const image = canvas ? canvas.getContext("2d") : undefined;
+const image = canvas ? canvas.getContext("2d") : undefined; 
 const delay = $('#kinect_image_delay');
 const image_selection = $("input[name=image_selection]");
 
 let history = createHistory();
-function createHistory(){
+function createHistory()
+{
   return {
     position: 1,
     image: [],
@@ -22,8 +23,7 @@ function createHistory(){
     body_tracking: [],
     zone_detection: [],
     object_position_2d: [],
-    object_position_3d: [],
-    confidence: []
+    object_position_3d: []
   };
 }
 
@@ -38,12 +38,12 @@ export default function InitKinectModule(devineTopics) {
     object_position_3d:   new RosTopic(devineTopics.guess_location_world),
     body_position:        new RosTopic(devineTopics.body_tracking),
     zone_detection:       new RosTopic(devineTopics.zone_detection),
-    objects_confidence:   new RosTopic(devineTopics.objects_confidence),
-    current_img_topic:    null,
+    current_img_topic:    null
   };
 
   //We want to limit drawing for performance, yet we might want to keep all data
-  function imageSourceChanged(){
+  function imageSourceChanged()
+  {
     if ($(this).is(':checked'))
     {
       history = createHistory();
@@ -76,7 +76,6 @@ export default function InitKinectModule(devineTopics) {
       topics.current_img_topic.subscribe(handleTopicData.bind(this, history.image));
     }
   }
-
   image_selection.change(imageSourceChanged);
   image_selection.each(imageSourceChanged); //Initialisation
 
@@ -128,7 +127,7 @@ export default function InitKinectModule(devineTopics) {
   }
 
   $('#kinect_image_type').on("change", function () {
-    topics.image.name = this.value;
+    topics.image.name = this.value; 
   });
 
   delay.on("change", function () {
@@ -214,7 +213,7 @@ function drawBodyTracking(humans) {
         y: bp.y * imageSize.y + 0.5
       };
     }
-
+    
     //For each body parts that should be linked, draw a line between these two
     for (let j in BodyPartsAggr) {
       let pair = BodyPartsAggr[j];
