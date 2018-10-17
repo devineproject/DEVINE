@@ -25,7 +25,7 @@ class FacialExpression():
 
     def __init__(self):
         self.robot_expression_publisher = rospy.Publisher(ROBOT_EXPRESSION_TOPIC,
-                                                          EmoIntensity, queue_size=10)
+                                                          EmoIntensity, queue_size=1)
 
         rospy.Subscriber(OBJECT_CONFIDENCE_TOPIC, Float64MultiArray,
                          self.on_new_object_confidence)
