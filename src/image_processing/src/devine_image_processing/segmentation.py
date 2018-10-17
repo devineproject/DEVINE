@@ -13,6 +13,8 @@ from bson import json_util
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../Mask_RCNN'))
 import coco
 import model as modellib
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
 from devine_config import topicname
 
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
@@ -53,9 +55,11 @@ class RCNNSegmentation(ImageProcessor):
 
     def __init__(self):
         self.config = self.InferenceConfig()
-        #config.display()
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        set_session(tf.Session(config=config))
         self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=self.config)
-        self.model.load_weights(COCO_MODEL_PATH, by_name=True) #blocking I/O in constructor!
+        self.model.load_weights(COCO_MODEL_PATH, by_name=True)
 
     def process(self, image, _):
         '''Actual segmentation of the image'''

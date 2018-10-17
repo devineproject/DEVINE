@@ -109,7 +109,9 @@ if __name__ == '__main__':
 
     tokenizer = GWTokenizer(TOKENS_PATH)
 
-    with tf.Session() as sess:
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    with tf.Session(config=tf_config) as sess:
         guesser_network = GuesserNetwork(guesser_config['model'], num_words=tokenizer.no_words)
         guesser_var = [v for v in tf.global_variables() if 'guesser' in v.name]
         guesser_saver = tf.train.Saver(var_list=guesser_var)
