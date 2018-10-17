@@ -4,6 +4,7 @@ import gamestate from './subscribers/gamestate';
 import kinect from './subscribers/kinect';
 import dialog from './subscribers/dialog';
 import guesswhat from './subscribers/guesswhat';
+import imgdispatcher from './subscribers/image_dispatcher';
 
 export default function CreateDashboard(topics) {
   $(document).ready(function () {
@@ -15,5 +16,6 @@ export default function CreateDashboard(topics) {
     dialog(topics);
     gamestate(topics);
     guesswhat(topics);
+    imgdispatcher(topics);
   });
 }
