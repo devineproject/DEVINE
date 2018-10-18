@@ -161,7 +161,7 @@ if __name__ == '__main__':
                                  batch_size=1)
 
             iterator = SingleGameIterator(tokenizer, game)
-            looper.process(sess, iterator, mode='greedy', store_games=True)
+            looper.process(sess, iterator, mode='beam_search', store_games=True)
 
             storage = looper.storage[0]
             choice_index = storage['guess_object_id']
