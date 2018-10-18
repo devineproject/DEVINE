@@ -62,6 +62,8 @@ class DialogControl():
         
         self.READY_TO_PLAY_PUBLISHER.publish(player_name)
 
+        rospy.sleep(3.)
+
 
 def hook_listeners():
     dialog_control = DialogControl()
