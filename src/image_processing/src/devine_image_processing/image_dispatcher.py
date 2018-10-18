@@ -98,7 +98,7 @@ class ImageDispatcher(ImageProcessor):
         zone_detection_validator.topic_state = TopicState.RECEIVED_NO
         seg_validator = SubscriberReady(SEGMENTATION_IMAGE_TOPIC, CompressedImage)
         features_validator = SubscriberReady(FEATURES_EXTRACTION_IMAGE_TOPIC, CompressedImage)
-        restart_validator = SubscriberReady(topicname('guess_category'), String)
+        restart_validator = SubscriberReady(topicname('new_game'), Bool)
 
         self.smart_publishers = [
             SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=3),
