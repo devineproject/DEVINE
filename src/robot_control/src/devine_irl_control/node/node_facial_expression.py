@@ -51,7 +51,7 @@ class FacialExpression():
         if 0 <= confidence < .6:
             expression = RobotExpression.ANGER
         elif .6 <= confidence < .8:
-            expression = RobotExpression.SUPRISE
+            expression = RobotExpression.SURPRISE
         elif confidence >= .8:
             expression = RobotExpression.JOY
 
