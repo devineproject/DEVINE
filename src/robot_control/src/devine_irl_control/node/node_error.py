@@ -54,7 +54,7 @@ class ErrorPoint(object):
                 rospy.logerr(err)
 
     def pose_stamp_callback(self, msg):
-        ''' Callback PoseStamp '''
+        ''' Callback PoseStamped '''
 
         self.pose_stamp = msg
 

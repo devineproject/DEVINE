@@ -35,6 +35,7 @@ class Controller(object):
         self.head_data = None
         self.time = 3
         self.tf_listener = tf.TransformListener()
+        self.is_arms_activated = is_arms_activated
 
         rospy.loginfo('Waiting for controllers')
 
@@ -55,10 +56,9 @@ class Controller(object):
             rospy.logerr(err)
             rospy.signal_shutdown(err)
 
-        if is_arms_activated:
-            rospy.Subscriber(TOPIC_OBJECT_LOCATION, PoseStamped, self.arm_pose_callback)
-            self.pub_is_pointing = rospy.Publisher(TOPIC_IS_POINTING,
-                                                   Bool, queue_size=1)
+        rospy.Subscriber(TOPIC_OBJECT_LOCATION, PoseStamped, self.arm_pose_callback)
+        self.pub_is_pointing = rospy.Publisher(TOPIC_IS_POINTING,
+                                               Bool, queue_size=1)
         if is_head_activated:
             rospy.Subscriber(TOPIC_HEAD_LOOK_AT, PoseStamped, self.head_pose_callback)
             rospy.Subscriber(TOPIC_HEAD_JOINT_STATE,
@@ -78,14 +78,15 @@ class Controller(object):
         ''' On topic /object_location, compute and move joints '''
         if self.arm_data != msg:
             self.arm_data = msg
-            if msg.pose.position != (0, 0, 0):
-                # TODO add decision left/right arms in ik.py
-                arm_decision = 'right'
-                joints_position = self.calcul_arm(arm_decision)
-                self.move({'arm_' + arm_decision: joints_position},
-                          self.time)
-            else:
-                self.move_init(10)
+            if self.is_arms_activated:
+                if msg.pose.position != (0, 0, 0):
+                    # TODO add decision left/right arms in ik.py
+                    arm_decision = 'right'
+                    joints_position = self.calcul_arm(arm_decision)
+                    self.move({'arm_' + arm_decision: joints_position},
+                            self.time)
+                else:
+                    self.move_init(10)
 
             self.pub_is_pointing.publish(True)
 

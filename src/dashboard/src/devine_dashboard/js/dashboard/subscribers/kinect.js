@@ -31,7 +31,7 @@ export default function InitKinectModule(devineTopics) {
     image:                new RosTopic(devineTopics.raw_image),
     segmentation_image:   new RosTopic(devineTopics.segmentation_image),
     body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
-    zone_detection_image: new RosTopic(devineTopics.zone_detection_image),
+    zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),
     segmentation:         new RosTopic(devineTopics.objects),
     object_position_2d:   new RosTopic(devineTopics.guess_location_image),
     object_position_3d:   new RosTopic(devineTopics.guess_location_world),
