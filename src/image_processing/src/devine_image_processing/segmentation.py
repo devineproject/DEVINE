@@ -97,7 +97,7 @@ class RCNNSegmentation(ImageProcessor):
 def main():
     '''Entry point of this file'''
     processor = ROSImageProcessingWrapper(RCNNSegmentation, IMAGE_TOPIC)
-    publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10, latch=True)
+    publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10, latch=False)
     processor.loop(lambda processor_output : publisher.publish(processor_output))
 
 if __name__ == '__main__':

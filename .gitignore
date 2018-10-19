@@ -1,6 +1,7 @@
 .idea/
 .vscode/
 *.pyc
+.env
 /src/dashboard/node_modules/*
 /src/dashboard/dist/*
 /src/config/build/*

@@ -96,7 +96,6 @@ def main():
     while not rospy.is_shutdown() and pos < len(test_images):
         rospy.loginfo("### Test image %d ###", pos + 1)
         test_segmentation_should_find_most_of_the_objects(test_images[pos])
-        rospy.sleep(0.5)
         pos += 1
 
 
