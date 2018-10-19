@@ -2,7 +2,7 @@
 import cv2
 import numpy as np
 
-DETECTION_THRESHOLD = 50
+DETECTION_THRESHOLD = 20
 
 def is_image_blurry(img):
     """ compute the variance of the Laplacian to measure focus"""
