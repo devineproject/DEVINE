@@ -1,11 +1,9 @@
-#! /usr/bin/env python2
-""" Test to validate segmentation rates """
 import json
-import rospy
-import utils
 from collections import Counter
 from sensor_msgs.msg import CompressedImage
 from devine_config import topicname
+import rospy
+from devine_tests import utils
 
 IMAGE_TOPIC = topicname("segmentation_image")
 SEGMENTATION_IMAGE_TOPIC = topicname("objects")
@@ -15,7 +13,7 @@ IMAGE_PUB = rospy.Publisher(IMAGE_TOPIC, CompressedImage, queue_size=1)
 IMAGE_MSG = "image_msg"
 EXPECTED_OBJECTS = "expected_objects"
 
-def load_test_images(test_filepath):
+def load_test_images(file, test_filepath):
     """ Loads test data and images"""
     test_images = []
     with open(test_filepath) as json_data:
@@ -23,7 +21,7 @@ def load_test_images(test_filepath):
 
     for test in file_data["tests"]:
         test_images.append({
-            IMAGE_MSG: utils.image_file_to_ros_msg(test["imageName"]),
+            IMAGE_MSG: utils.image_file_to_ros_msg(utils.get_fullpath(file, test["imageName"])),
             EXPECTED_OBJECTS: test["refData"]["objects"]
         })
 
