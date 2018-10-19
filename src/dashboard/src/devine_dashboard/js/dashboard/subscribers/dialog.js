@@ -21,7 +21,7 @@ export default function initDialogModule(devineTopics)
 
   let queries = [];
 
-  $("#dialog_publish").on("click", function() {
+  function publish() {
     const answer = answerField.val();
     if (answer !== "") {
       const query = queries[queries.length-1];
@@ -38,9 +38,15 @@ export default function initDialogModule(devineTopics)
         cons.log("No TTS query to answer");
       }
     }
+  }
+
+  $("#dialog_publish").on("click", publish);
+  $("#dialog_answer").on("keypress", function(e) {
+    if (e.which == 13) {
+      publish();
+    }
   });
 
-  
   cons.log("Subscribed");
   
   topics.ttsQuery.subscribe(message => {

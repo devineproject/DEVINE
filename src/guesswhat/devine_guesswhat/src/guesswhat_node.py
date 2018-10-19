@@ -145,6 +145,14 @@ if __name__ == '__main__':
 
             status.publish('Starting new game')
             img = {'id': 0, 'width': 640, 'height': 480, 'coco_url': ''}
+
+            objects = []
+            for obj in seg['objects']:
+                bbox = obj['bbox']
+                obj['bbox'] = [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]]
+                objects.append(obj)
+            seg['objects'] = objects
+
             game = Game(id=0,
                         object_id=0,
                         objects=seg['objects'],
