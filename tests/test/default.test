@@ -1,0 +1,4 @@
+<launch>
+    <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
+    <test test-name="unit" type="test_suite.py" pkg="devine_tests"/>
+</launch>
