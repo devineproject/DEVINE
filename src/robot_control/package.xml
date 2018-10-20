@@ -5,7 +5,6 @@
     <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
     <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
     <license>BSD</license>
-
     <buildtool_depend>catkin</buildtool_depend>
     <depend>rospy</depend>
     <depend>actionlib</depend>
