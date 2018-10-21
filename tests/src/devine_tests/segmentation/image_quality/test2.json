@@ -1,0 +1,39 @@
+{
+	"tests":[
+	   {
+		  "imageName":"images/test2/S8-640x480.jpg",
+		  "refData":{
+			 "image":{ "height":640, "width":480 },
+			 "objects":[
+				"person",
+				"chair",
+				"chair",
+				"chair",
+				"chair",
+				"dining table",
+				"dining table",
+				"cell phone",
+				"laptop",
+				"laptop",
+				"mouse",
+				"bottle",
+				"tv"
+			 ]
+		  }
+	   },
+	   {
+		  "imageName":"images/test2/S8-720x540.jpg",
+		  "refData":{
+			 "image":{ "height":720, "width":540 },
+			 "objects":[]
+		  }
+	   },
+	   {
+		  "imageName":"images/test2/S8-1920x1440.jpg",
+		  "refData":{
+			 "image":{ "height":1920, "width":1440 },
+			 "objects":[]
+		  }
+	   }
+	]
+ }

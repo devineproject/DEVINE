@@ -8,6 +8,7 @@
   <url>https://devine.gel.usherbrooke.ca</url>
   <license>BSD License 2.0</license>
   <buildtool_depend>catkin</buildtool_depend>
+  <test_depend>rosunit</test_depend>
   <exec_depend>devine_image_processing</exec_depend>
   <export>
   </export>
