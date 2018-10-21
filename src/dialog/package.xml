@@ -5,16 +5,12 @@
   <description>The DEVINE dialog package</description>
   <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
   <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
-  <license>BSD License 2.0</license>
+  <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>rospy</build_depend>
-  <build_depend>std_msgs</build_depend>
   <build_depend>message_generation</build_depend>
-  <build_export_depend>rospy</build_export_depend>
-  <build_export_depend>std_msgs</build_export_depend>
-  <exec_depend>rospy</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>devine_config</exec_depend>
+  <depend>rospy</depend>
+  <depend>std_msgs</depend>
+  <depend>devine_config</depend>
   <exec_depend>message_runtime</exec_depend>
   <export>
   </export>

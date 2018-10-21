@@ -43,7 +43,7 @@
       <arg name="image_topic" value="image_rect_mono" />
       <arg name="camera_frame" value="openni_rgb_optical_frame" />
     </include>
-    <node name="scene_finder" pkg="devine_game_system" type="scene_finder.py" respawn="true" />
+    <node name="scene_finder" pkg="devine_scene_finder" type="scene_finder.py" respawn="true" />
   </group>
 
   <group if="$(arg dashboard)">

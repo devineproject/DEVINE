@@ -1,4 +1,4 @@
-import $ from 'jquery'
+import $ from 'jquery';
 
 export default class LogConsole {
   constructor(source, color) {
@@ -14,7 +14,7 @@ export default class LogConsole {
     $("font", logMessage).text(this.source).prop("color", this.color);
     $("span", logMessage).text(` > ${message}`);
 
-    this.console.append(logMessage);
+    this.console.prepend(logMessage);
     this.console.scrollTop = this.console.scrollHeight;
   }
 

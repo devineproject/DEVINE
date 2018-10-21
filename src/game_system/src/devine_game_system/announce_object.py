@@ -1,7 +1,6 @@
 #! /usr/bin/env python2
 ''' Announce selected object once IRL-1 has pointed to it'''
 
-from Queue import Queue, Empty
 import rospy
 
 from std_msgs.msg import Bool
@@ -27,8 +26,8 @@ class AnnounceNode:
         rospy.init_node(NODE_NAME)
         rospy.Subscriber(TOPIC_OBJECT_CATEGORY, String, self.category_callback)
         rospy.Subscriber(TOPIC_IS_POINTING_OBJECT, Bool, self.is_pointing_callback)
-        end_of_game = rospy.Publisher(TOPIC_IS_END_OF_GAME, Bool, queue_size=1)
-        snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1)
+        self.end_of_game = rospy.Publisher(TOPIC_IS_END_OF_GAME, Bool, queue_size=1)
+        self.snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1)
         rospy.sleep(1)
 
     def category_callback(self, data):
@@ -41,16 +40,19 @@ class AnnounceNode:
 
     def run_node(self):
         ''' Checks if selected object has been pointed to and announces its category '''
-        rate = rospy.Rate(1)  # TBD
+        rate = rospy.Rate(1)  # TODO TBD
         while not rospy.is_shutdown():
             if self.pointing_state is True:
-                send_speech(snips, self.current_category, TTSAnswerType.NO_ANSWER)
+                send_speech(self.snips, self.current_category, TTSAnswerType.NO_ANSWER)
                 rospy.sleep(TRANSITION_DELAY)
-                end_of_game.publish(True)
+                self.end_of_game.publish(True)
                 self.pointing_state = False
             rate.sleep()
 
-
-if __name__ == '__main__':
+def main():
+    ''' Starting point for this node '''
     node_inst = AnnounceNode()
     node_inst.run_node()
+
+if __name__ == '__main__':
+    main()

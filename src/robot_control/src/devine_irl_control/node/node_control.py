@@ -4,170 +4,156 @@
 
 import rospy
 import tf
-from std_msgs.msg import Float32MultiArray
+
+from std_msgs.msg import Bool
+from geometry_msgs.msg import PoseStamped
 from trajectory_msgs.msg import JointTrajectoryPoint
+
+from devine_config import topicname
 from devine_irl_control import irl_constant
 from devine_irl_control.movement import Movement
 from devine_irl_control.controllers import TrajectoryClient
 from devine_irl_control.gripper import Gripper
 import devine_irl_control.ik as ik
-from devine_config import topicname
 
 ROBOT_NAME = irl_constant.ROBOT_NAME
+# IN
 TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
+TOPIC_HEAD_LOOK_AT = topicname('robot_look_at')
 TOPIC_HEAD_JOINT_STATE = topicname('robot_head_joint_traj_point')
-TOPIC_OBJECT_FRAME = '/object_frame'
-TOPIC_ROBOT_BASE_FRAME = irl_constant.ROBOT_LINK['base']
-TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME = irl_constant.ROBOT_LINK['r_shoulder_fixed']
-TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME = irl_constant.ROBOT_LINK['l_shoulder_fixed']
-TOPIC_ROBOT_NECK_PAN_FRAME = irl_constant.ROBOT_LINK['neck_pan']
+
+# OUT
+TOPIC_IS_POINTING = topicname('is_pointing_object')
+TOPIC_IS_LOOKING = topicname('is_looking')
+
 
 class Controller(object):
     ''' Arms, head and gripper controller '''
 
-    def __init__(self):
-        self.object_location = None
-        self.now = 0
+    def __init__(self, is_head_activated=True, is_arms_activated=True, is_gripper_activated=True):
+        self.arm_data = None
+        self.head_data = None
         self.time = 3
-        self.right_joints_position = [0, 0, 0, 0]
-        self.left_joints_position = [0, 0, 0, 0]
-        self.head_joints_position = [0, 0, 0, 0]
-
         self.tf_listener = tf.TransformListener()
-        self.gripper = Gripper(ROBOT_NAME, 'right')
+        self.is_arms_activated = is_arms_activated
+
+        rospy.loginfo('Waiting for controllers')
+
+        if is_gripper_activated:
+            self.gripper_right = Gripper(ROBOT_NAME, 'right')
+            self.gripper_left = Gripper(ROBOT_NAME, 'left')
+            rospy.loginfo('Gripper controllers are ready')
 
         try:
-            rospy.loginfo('Waiting for Arm and Head controllers')
-            self.arm_right = TrajectoryClient(ROBOT_NAME, 'right_arm_controller')
-            self.arm_left = TrajectoryClient(ROBOT_NAME, 'left_arm_controller')
-            self.head = TrajectoryClient(ROBOT_NAME, 'neck_controller')
+            if is_head_activated:
+                self.head = TrajectoryClient(ROBOT_NAME, 'neck_controller')
+                rospy.loginfo('Head controller are ready')
+            if is_arms_activated:
+                self.arm_right = TrajectoryClient(ROBOT_NAME, 'right_arm_controller')
+                self.arm_left = TrajectoryClient(ROBOT_NAME, 'left_arm_controller')
+                rospy.loginfo('Arms controllers are ready')
         except RuntimeError as err:
             rospy.logerr(err)
             rospy.signal_shutdown(err)
 
-        try:
-            self.init_tf(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME, TOPIC_OBJECT_FRAME)
-            self.init_tf(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE_FRAME)
-
-            self.init_tf(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME, TOPIC_OBJECT_FRAME)
-            self.init_tf(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME, TOPIC_ROBOT_BASE_FRAME)
-
-        except tf.Exception as err:
-            rospy.logerr(err)
-            rospy.signal_shutdown(err)
-
-        rospy.Subscriber(TOPIC_OBJECT_LOCATION, Float32MultiArray, self.object_location_callback)
-        rospy.Subscriber(TOPIC_HEAD_JOINT_STATE,
-                         JointTrajectoryPoint,
-                         self.head_joint_traj_point_callback)
-
-    def init_tf(self, target_frame, source_frame):
-        ''' Safely Initialize TF '''
-
-        time = self.tf_listener.getLatestCommonTime(target_frame, source_frame)
-        self.tf_listener.lookupTransform(target_frame, source_frame, time)
+        rospy.Subscriber(TOPIC_OBJECT_LOCATION, PoseStamped, self.arm_pose_callback)
+        self.pub_is_pointing = rospy.Publisher(TOPIC_IS_POINTING,
+                                               Bool, queue_size=1)
+        if is_head_activated:
+            rospy.Subscriber(TOPIC_HEAD_LOOK_AT, PoseStamped, self.head_pose_callback)
+            rospy.Subscriber(TOPIC_HEAD_JOINT_STATE,
+                             JointTrajectoryPoint,
+                             self.head_joint_traj_point_callback)
+            self.pub_is_looking = rospy.Publisher(TOPIC_IS_LOOKING,
+                                                  Bool, queue_size=1)
 
     def head_joint_traj_point_callback(self, msg):
         ''' On topic /head_joint_traj_point, move head '''
-        rospy.loginfo(msg.positions)
+
         pos = msg.positions
         time = msg.time_from_start
         self.move({'head': pos}, time.to_sec())
 
-    def object_location_callback(self, msg):
+    def arm_pose_callback(self, msg):
         ''' On topic /object_location, compute and move joints '''
+        if self.arm_data != msg:
+            self.arm_data = msg
+            if self.is_arms_activated:
+                if msg.pose.position != (0, 0, 0):
+                    # TODO add decision left/right arms in ik.py
+                    arm_decision = 'right'
+                    joints_position = self.calcul_arm(arm_decision)
+                    self.move({'arm_' + arm_decision: joints_position},
+                            self.time)
+                else:
+                    self.move_init(10)
 
-        if self.object_location != msg.data:
-            rospy.loginfo(msg.data)
-            self.object_location = msg.data
-            self.now = rospy.Time().now()
-            if msg.data != (0, 0, 0):
-                # TODO if send joints: do it.
-                self.calcul()
-                self.move({'head': self.head_joints_position,
-                           # 'arm_left': self.left_joints_position,
-                           # 'arm_right': self.right_joints_position
-                          },
+            self.pub_is_pointing.publish(True)
+
+    def head_pose_callback(self, msg):
+        ''' On topic /look_at, compute and move joints '''
+        if self.head_data != msg:
+            self.head_data = msg
+            if msg.pose.position != (0, 0, 0):
+                joints_position = self.calcul_head()
+                self.move({'head': joints_position},
                           self.time)
             else:
                 self.move_init(10)
 
-    def calcul(self):
-        ''' Get translation from TF and apply inverse kinematic '''
+            self.pub_is_looking.publish(True)
 
-        trans_r_arm = None
-        trans_l_arm = None
-        timeout = rospy.Duration(4)
+    def calcul_arm(self, controller):
+        ''' Get arm translation from TF and apply inverse kinematic '''
+
+        arm_joints_position = None
+
+        topic_robot_shoulder_frame = irl_constant.ROBOT_LINK['r_shoulder_fixed']
+        if controller is 'left':
+            topic_robot_shoulder_frame = irl_constant.ROBOT_LINK['l_shoulder_fixed']
+
         try:
-            self.tf_listener.waitForTransform(TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME,
-                                              TOPIC_OBJECT_FRAME,
-                                              self.now,
-                                              timeout)
-            (trans_r_arm, _) = self.tf_listener.lookupTransform(
-                TOPIC_ROBOT_R_SHOULDER_FIXED_FRAME,
-                TOPIC_OBJECT_FRAME,
-                self.now)
+            tf_pose_stamp = self.tf_listener.transformPose(topic_robot_shoulder_frame,
+                                                           self.arm_data)
+            tf_position = tf_pose_stamp.pose.position
 
-            self.tf_listener.waitForTransform(TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME,
-                                              TOPIC_OBJECT_FRAME,
-                                              self.now,
-                                              timeout)
-            (trans_l_arm, _) = self.tf_listener.lookupTransform(
-                TOPIC_ROBOT_L_SHOULDER_FIXED_FRAME,
-                TOPIC_OBJECT_FRAME,
-                self.now)
+            arm_joints_position = ik.arms_pan_tilt(controller,
+                                                   tf_position.x,
+                                                   tf_position.y,
+                                                   tf_position.z)
+
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as err:
             rospy.logerr(err)
-            rospy.signal_shutdown(err)
 
-        if not rospy.is_shutdown():
-            trans_head = None
-            try:
-                self.tf_listener.waitForTransform(TOPIC_ROBOT_NECK_PAN_FRAME,
-                                                  TOPIC_OBJECT_FRAME,
-                                                  self.now, rospy.Duration(4))
-                (trans_head, _) = self.tf_listener.lookupTransform(
-                    TOPIC_ROBOT_NECK_PAN_FRAME,
-                    TOPIC_OBJECT_FRAME,
-                    self.now)
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as err:
-                rospy.logerr(err)
-                rospy.signal_shutdown(err)
+        return arm_joints_position
 
-        if not rospy.is_shutdown():
-            rospy.loginfo('Translation from r_shoulder_fixed_link to obj: %s', trans_r_arm)
-            rospy.loginfo('Translation from l_shoulder_fixed_link to obj: %s', trans_l_arm)
-            rospy.loginfo('Translation from neck_pan_link to obj: %s', trans_head)
+    def calcul_head(self):
+        ''' Get head translation from TF and apply inverse kinematic '''
 
-            # Calculate inverse kinematic
-            self.right_joints_position = ik.arms_pan_tilt('right',
-                                                          trans_r_arm[0],
-                                                          trans_r_arm[1],
-                                                          trans_r_arm[2])
-            rospy.loginfo('Right Joint Position: %s', self.right_joints_position)
+        head_joints_position = None
 
-            self.left_joints_position = ik.arms_pan_tilt('left',
-                                                         trans_l_arm[0],
-                                                         trans_l_arm[1],
-                                                         trans_l_arm[2])
-            rospy.loginfo('Left Arm Joint Position: %s', self.left_joints_position)
+        try:
+            tf_pose_stamp = self.tf_listener.transformPose(irl_constant.ROBOT_LINK['neck_pan'],
+                                                           self.head_data)
+            tf_position = tf_pose_stamp.pose.position
 
-            self.head_joints_position = ik.head_pan_tilt(trans_head[0],
-                                                         trans_head[1],
-                                                         trans_head[2])
-            rospy.loginfo('Head Joint Position: %s', self.head_joints_position)
+            head_joints_position = ik.head_pan_tilt(tf_position.x,
+                                                    tf_position.y,
+                                                    tf_position.z)
+
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as err:
+            rospy.logerr(err)
+
+        return head_joints_position
 
     def move_init(self, time):
         ''' Move joints to initial position '''
 
-        rospy.loginfo('move_init')
         self.move({'head': [0, 0],
                    'arm_left':  [0, 0, 0, 0],
                    'arm_right':  [0, 0, 0, 0]
                   },
                   time)
-
-        rospy.loginfo('Completed')
 
     def move(self, controller_joints_positions, time):
         ''' Move joints '''
@@ -186,13 +172,11 @@ class Controller(object):
         if move_gripper:
             i = 0
             while i < 3:
-                self.gripper.open(0.3)
+                self.gripper_right.open(0.3)
                 rospy.sleep(0.5)
-                self.gripper.open(0.1)
+                self.gripper_right.open(0.1)
                 rospy.sleep(0.5)
                 i = i + 1
-        # TODO write topic: completedMotion: bool
-        rospy.loginfo('Completed')
 
 def get_joints_time(controller_joints, time):
     ''' Converte a single time to an array of time '''
@@ -212,8 +196,16 @@ def main():
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'' + node_name + '\'')
 
-    controller = Controller()
+    is_head_activated = rospy.get_param('/'.join(['', node_name, 'is_head_activated']))
+    is_arms_activated = rospy.get_param('/'.join(['', node_name, 'is_arms_activated']))
+    is_grippers_activated = rospy.get_param('/'.join(['', node_name, 'is_grippers_activated']))
+
+    # Wait for gazebo before initializing controllers
+    rospy.wait_for_service('gazebo/set_physics_properties')
+
+    controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
     Movement(controller)
+
     rospy.spin()
 
 if __name__ == '__main__':

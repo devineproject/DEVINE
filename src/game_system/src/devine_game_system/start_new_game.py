@@ -1,5 +1,5 @@
 #! /usr/bin/env python2
-''' Announce selected object once IRL-1 has pointed to it'''
+'''Restarts game once the object has been announced and the robot has emoted'''
 
 from Queue import Queue, Empty
 import json
@@ -28,26 +28,26 @@ class NewGameStarter:
         
         rospy.init_node(NODE_NAME)
         self.snips = rospy.Publisher(TOPIC_SNIPS, TtsQuery, queue_size=1) 
-        self.new_game = rospy.Publisher(TOPIC_NEW_GAME,Bool,queue_size=1)
+        self.new_game = rospy.Publisher(TOPIC_NEW_GAME, Bool, queue_size=1)
         rospy.Subscriber(TOPIC_IS_END_OF_GAME, Bool, self.is_end_of_game_callback)
-        rospy.Subscriber(OPEN_POSE_TOPIC, String, self.__is_player_gone__)
+        rospy.Subscriber(OPEN_POSE_TOPIC, String, self._is_player_gone)
         self.rate = rospy.Rate(1)
 
 
-    def __is_player_gone__(self,data):
+    def _is_player_gone(self, data):
         """ A naive way to check if the player has left """
         humans = json.loads(data.data)
         self.player_has_left = (len(humans) == 0)
     
-    def __start_new_game__(self):
-        """ Restarts game from the getgo"""
+    def _start_new_game(self):
+        """ Restarts game from the get-go"""
         self.new_game.pub(True)
         
-    def __restart_game__(self):
+    def _restart_game(self):
         """ Currently starts game from the beggining but could be changed"""
         self.new_game.pub(True)
  
-    def is_end_of_game_callback(self,data):
+    def is_end_of_game_callback(self, data):
         """ Call back that checks if object has been announced"""
         self.is_new_game = data.data
     
@@ -60,9 +60,9 @@ class NewGameStarter:
                     while not self.player_has_left:
                         send_speech(snips, "Bye bye!", TTSAnswerType.NO_ANSWER)
                         rospy.sleep(BYE_BYE_DELAY)
-                    self.__restart_game__()
+                    self._restart_game()
                 else:
-                    self.__start_new_game__()
+                    self._start_new_game()
                 self.is_new_game = False
             self.rate.sleep()
             

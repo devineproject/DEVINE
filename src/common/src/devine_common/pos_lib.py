@@ -9,10 +9,13 @@ from threading import Lock
 import rospy
 from sensor_msgs.msg import PointCloud2
 from sensor_msgs import point_cloud2
-from std_msgs.msg import Float32MultiArray, Int32MultiArray
+from std_msgs.msg import Int32MultiArray
+from geometry_msgs.msg import PoseStamped
+
 import tf
 from devine_config import topicname
 import devine_common.math_utils as math_utils
+import devine_common.ros_utils as ros_utils
 
 #Topics
 IMAGE_DEPTH_TOPIC = topicname('image_depth')
@@ -22,7 +25,7 @@ OBJECT_WORLD_LOCATION_TOPIC = topicname('guess_location_world')
 ROBOT_BASE_LINK_FRAME = "/base_link"
 CAMERA_BASE_LINK_FRAME = "/openni_base_link"
 
-ROS_PUBLISHER = rospy.Publisher(OBJECT_WORLD_LOCATION_TOPIC, Float32MultiArray, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(OBJECT_WORLD_LOCATION_TOPIC, PoseStamped, queue_size=10)
 
 
 class PosLib(object):
@@ -49,7 +52,7 @@ class PosLib(object):
         #points = math_utils.plot_3d_matrix(self.deserialize(data))
 
     def object_position_callback(self, data):
-        ''' Callback executed when an object is found by guesswhat and its position is broadcasted '''
+        ''' Callback executed when an object is found by guesswhat and brodcast its position '''
         rospy.loginfo("Received a new 2D point to transform")
         self.mutex.acquire()
         self.position_to_transform = data.data
@@ -71,8 +74,7 @@ class PosLib(object):
                                                               z,
                                                               pc.width, pc.height,
                                                               trans, rot)
-                ros_packet = Float32MultiArray()
-                ros_packet.data = position
+                ros_packet = ros_utils.pose_stamped(position[0], position[1], position[2])
                 ROS_PUBLISHER.publish(ros_packet)
                 self.current_point_cloud = None
                 self.position_to_transform = None

@@ -2,42 +2,10 @@
 
 import random
 import rospy
-import tf
 
-from std_msgs.msg import Float32MultiArray
+from geometry_msgs.msg import PoseStamped
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
-
-
-class ObjectTf(object):
-    ''' Object TF '''
-
-    def __init__(self, topic_object_pos, topic_object_frame, topic_from_ref):
-        self.object_location = [0, 0, 0]
-
-        self.topic_object_pos = topic_object_pos
-        self.topic_object_frame = topic_object_frame
-        self.topic_from_ref = topic_from_ref
-
-        self.tf_broadcaster = tf.TransformBroadcaster()
-        rospy.Subscriber(topic_object_pos, Float32MultiArray, self.object_location_callback)
-
-    def object_location_callback(self, msg):
-        ''' On /object_location changes, broadcast TF frame '''
-
-        if self.object_location != msg.data:
-            rospy.loginfo(msg.data)
-            self.object_location = msg.data
-            self.brodcast_tf()
-
-    def brodcast_tf(self):
-        ''' Broadcast transformation between /base_link and /object_frame '''
-
-        self.tf_broadcaster.sendTransform(self.object_location,
-                                          (0.0, 0.0, 0.0, 1.0),
-                                          rospy.Time.now(),
-                                          self.topic_object_frame,
-                                          self.topic_from_ref)
 
 class ObjectMaker(object):
     ''' On topic_name changes, marker array is updated '''
@@ -45,15 +13,16 @@ class ObjectMaker(object):
     def __init__(self, topic_name):
         self.object_location = None
         self.markers = Markers()
-        rospy.Subscriber(topic_name, Float32MultiArray, self.object_location_callback)
+        rospy.Subscriber(topic_name, PoseStamped, self.object_location_callback)
 
     def object_location_callback(self, msg):
         ''' Create marker array at /object_location position '''
 
-        if self.object_location != msg.data:
-            rospy.loginfo('New object location: %s', msg.data)
-            self.object_location = msg.data
-            self.markers.set_marker_array([msg.data])
+        if self.object_location != msg:
+            rospy.loginfo('New object location: %s', msg.pose.position)
+            self.object_location = msg
+            position = msg.pose.position
+            self.markers.set_marker_array([[position.x, position.y, position.z]])
             self.markers.publish()
 
 class Markers(object):

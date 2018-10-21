@@ -15,7 +15,7 @@ from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 IMAGE_TOPIC = topicname('raw_image')
 
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
-ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image')
+ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
 FEATURES_EXTRACTION_IMAGE_TOPIC = topicname('features_extraction_image')
 
@@ -113,6 +113,7 @@ class ImageDispatcher(ImageProcessor):
     def process(self, img, img_payload):
         '''Remove blurry images and submit the images to the current module'''
         if is_image_blurry(img):
+            rospy.logwarn("Discarding blurry image")
             return
         while not rospy.is_shutdown():
             image_publisher = self.smart_publishers[self.pub_index]

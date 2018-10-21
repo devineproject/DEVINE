@@ -31,7 +31,7 @@ export default function InitKinectModule(devineTopics) {
     image:                new RosTopic(devineTopics.raw_image),
     segmentation_image:   new RosTopic(devineTopics.segmentation_image),
     body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
-    zone_detection_image: new RosTopic(devineTopics.zone_detection_image),
+    zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),
     segmentation:         new RosTopic(devineTopics.objects),
     object_position_2d:   new RosTopic(devineTopics.guess_location_image),
     object_position_3d:   new RosTopic(devineTopics.guess_location_world),
@@ -55,8 +55,6 @@ export default function InitKinectModule(devineTopics) {
       switch (currentImgType) {
       case "raw_camera":
         topics.current_img_topic = topics.image;
-        topics.object_position_2d.subscribe(handleTopicData.bind(this, history.object_position_2d));
-        topics.object_position_3d.subscribe(handleTopicData.bind(this, history.object_position_3d));
         break;
       case "segmentation":
         topics.current_img_topic = topics.segmentation_image;
@@ -69,6 +67,8 @@ export default function InitKinectModule(devineTopics) {
       case "zone_detection":
         topics.current_img_topic = topics.zone_detection_image;
       }
+      topics.object_position_2d.subscribe(handleTopicData.bind(this, history.object_position_2d));
+      topics.object_position_3d.subscribe(handleTopicData.bind(this, history.object_position_3d));
       cons.log(`Subscribed to ${currentImgType}`);
       topics.current_img_topic.subscribe(handleTopicData.bind(this, history.image));
     }

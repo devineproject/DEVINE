@@ -13,7 +13,7 @@ from devine_config import topicname
 class RobotExpression(Enum):
     ''' Valid expressions '''
     
-    SUPRISE = "Suprise"
+    SURPRISE = "Surprise"
     ANGER = "Anger"
     JOY = "Joy"
 
@@ -25,7 +25,7 @@ class FacialExpression():
 
     def __init__(self):
         self.robot_expression_publisher = rospy.Publisher(ROBOT_EXPRESSION_TOPIC,
-                                                          EmoIntensity, queue_size=10)
+                                                          EmoIntensity, queue_size=1)
 
         rospy.Subscriber(OBJECT_CONFIDENCE_TOPIC, Float64MultiArray,
                          self.on_new_object_confidence)
@@ -51,7 +51,7 @@ class FacialExpression():
         if 0 <= confidence < .6:
             expression = RobotExpression.ANGER
         elif .6 <= confidence < .8:
-            expression = RobotExpression.SUPRISE
+            expression = RobotExpression.SURPRISE
         elif confidence >= .8:
             expression = RobotExpression.JOY
 

@@ -8,10 +8,9 @@ We use a `Sphinx Server`_ as the container.
 
 The documentation will automatically refresh if you change the docs!
 
-* navigate to ``/docs``
-* run ``./serve_doc.sh``
+* Run ``./serve_doc.sh``
 * In your browser, navigate to ``http://localhost:8000/``
-* profit!
+* Profit!
 
 
 Local Env

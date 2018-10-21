@@ -6,7 +6,6 @@ import $ from 'jquery';
 export default function initDialogModule(devineTopics)
 {
   const cons = new LogConsole("Dialog", "#F39C12");
-  const subscriber = $("#dialog_checkbox");
   const answerField = $("#dialog_answer");
 
   const topics = {
@@ -22,13 +21,13 @@ export default function initDialogModule(devineTopics)
 
   let queries = [];
 
-  $("#dialog_publish").on("click", function() {
+  function publish() {
     const answer = answerField.val();
     if (answer !== "") {
       const query = queries[queries.length-1];
       if (query) {
         new RosTopic(
-            devineTopics.tts_answer
+          devineTopics.tts_answer
         ).publish(new ROSLIB.Message({
           text: answer,
           uid: query.uid,
@@ -39,39 +38,35 @@ export default function initDialogModule(devineTopics)
         cons.log("No TTS query to answer");
       }
     }
+  }
+
+  $("#dialog_publish").on("click", publish);
+  $("#dialog_answer").on("keypress", function(e) {
+    if (e.which == 13) {
+      publish();
+    }
   });
 
-  subscriber.on("change", function () {
-    $('#dialog_ask_btn').prop('disabled', !this.checked);
+  cons.log("Subscribed");
   
-    if (this.checked) {
-      cons.log("Subscribed");
-      
-      topics.ttsQuery.subscribe(message => {
-        if (message.answer_type !== answer_types.NO_ANSWER) {
-          queries.push(message);
-        }
-        cons.log(`Querying TTS (${message.uid}): ${message.text}`);
-      });
-      topics.ttsAnswer.subscribe(message => {
-        let query_answered = false;
-        for (let i in queries) {
-          if (queries[i].uid == message.uid) {
-            queries = queries.splice(i, 1);
-            query_answered = true;
-            cons.log(`Answer STT (${message.uid}): ${message.text}`);
-            break;
-          }
-        }
-        if (!query_answered) {
-          cons.log(`ERROR: Answer without query for uid ${message.uid}: ${message.text}`);
-        }
-      });
-    } else {
-      for (let i in topics) {
-        topics[i].removeAllListeners();
+  topics.ttsQuery.subscribe(message => {
+    if (message.answer_type !== answer_types.NO_ANSWER) {
+      queries.push(message);
+    }
+    cons.log(`Querying TTS (${message.uid}): ${message.text}`);
+  });
+  topics.ttsAnswer.subscribe(message => {
+    let query_answered = false;
+    for (let i in queries) {
+      if (queries[i].uid == message.uid) {
+        queries = queries.splice(i, 1);
+        query_answered = true;
+        cons.log(`Answer STT (${message.uid}): ${message.text}`);
+        break;
       }
-      cons.log("Unsubscribed");
+    }
+    if (!query_answered) {
+      cons.log(`ERROR: Answer without query for uid ${message.uid}: ${message.text}`);
     }
   });
 }

@@ -109,7 +109,9 @@ if __name__ == '__main__':
 
     tokenizer = GWTokenizer(TOKENS_PATH)
 
-    with tf.Session() as sess:
+    tf_config = tf.ConfigProto()
+    tf_config.gpu_options.allow_growth = True
+    with tf.Session(config=tf_config) as sess:
         guesser_network = GuesserNetwork(guesser_config['model'], num_words=tokenizer.no_words)
         guesser_var = [v for v in tf.global_variables() if 'guesser' in v.name]
         guesser_saver = tf.train.Saver(var_list=guesser_var)
@@ -143,6 +145,14 @@ if __name__ == '__main__':
 
             status.publish('Starting new game')
             img = {'id': 0, 'width': 640, 'height': 480, 'coco_url': ''}
+
+            objects = []
+            for obj in seg['objects']:
+                bbox = obj['bbox']
+                obj['bbox'] = [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]]
+                objects.append(obj)
+            seg['objects'] = objects
+
             game = Game(id=0,
                         object_id=0,
                         objects=seg['objects'],
@@ -161,7 +171,7 @@ if __name__ == '__main__':
                                  batch_size=1)
 
             iterator = SingleGameIterator(tokenizer, game)
-            looper.process(sess, iterator, mode='greedy', store_games=True)
+            looper.process(sess, iterator, mode='beam_search', store_games=True)
 
             storage = looper.storage[0]
             choice_index = storage['guess_object_id']

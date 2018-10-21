@@ -11,6 +11,8 @@ from bson import json_util
 
 from tf_pose.estimator import TfPoseEstimator
 from tf_pose.networks import get_graph_path
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
 
 import cv2
 
@@ -32,6 +34,9 @@ class BodyTracking(ImageProcessor):
         "RAnkle", "LHip", "LKnee", "LAnkle", "REye", "LEye", "REar", "LEar", "Background"
     ]
     def __init__(self):
+        config = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        set_session(tf.Session(config=config))
         self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368)) #downscale image 
 
     def process(self, img, _):

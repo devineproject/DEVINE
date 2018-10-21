@@ -7,7 +7,10 @@ D_2_R = -0.09471141
 D_2_L = 0.09471141
 
 def arms_pan_tilt(controller, obj_x, obj_y, obj_z):
-    '''' Inverse Kinematic for arms pan and tils joints '''
+    ''''
+    Inverse Kinematic for arms pan and tils joints
+    Equations solved by Arnaud Aumont, IntRoLab, version 22/01/2012
+    '''
 
     obj_z = obj_z + 0.25 # by test & error
 
