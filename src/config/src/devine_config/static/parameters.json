@@ -12,8 +12,12 @@
       "name": "/devine/image/segmentation",
       "type": "sensor_msgs/CompressedImage"
     },
-    "zone_detection_image": {
+    "zone_detection_image_out": {
       "name": "/tag_detections_image/compressed",
+      "type": "sensor_msgs/CompressedImage"
+    },
+    "zone_detection_image_in": {
+      "name": "/devine/image/zone_detection",
       "type": "sensor_msgs/CompressedImage"
     },
     "features_extraction_image": {
@@ -50,11 +54,11 @@
     },
     "guess_location_world": {
       "name": "/devine/guess_location/world",
-      "type": "geometry_msgs/PoseStamp"
+      "type": "geometry_msgs/PoseStamped"
     },
     "robot_look_at": {
       "name": "/devine/robot/look_at",
-      "type": "geometry_msgs/PoseStamp"
+      "type": "geometry_msgs/PoseStamped"
     },
     "robot_err_pointing": {
       "name": "/devine/robot/err_pointing",

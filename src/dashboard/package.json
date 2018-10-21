@@ -9,7 +9,7 @@
     "start": "npm run serve | webpack --watch"
   },
   "author": "DEVINE",
-  "license": "UNLICENSED",
+  "license": "BSD",
   "private": true,
   "dependencies": {
     "bootstrap": "^4.1.0",
