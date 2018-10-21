@@ -62,8 +62,6 @@ All DEVINE modules:
 Tests
 =====
 
-Useful information about the tests:
-
 .. toctree::
     :glob:
     :maxdepth: 1
