@@ -6,4 +6,12 @@ find_package(catkin REQUIRED)
 catkin_python_setup()
 
 # workaround for devel space
-configure_file(src/devine_config/static/parameters.json ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/${PROJECT_NAME}/static/parameters.json COPYONLY)
+configure_file(src/devine_config/static/parameters.json
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/${PROJECT_NAME}/static/parameters.json
+  COPYONLY
+)
+
+###################################
+## catkin specific configuration ##
+###################################
+catkin_package()
