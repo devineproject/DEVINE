@@ -1,5 +1,5 @@
 <launch>
-  <arg name="dashboard" default="true" />
+  <arg name="dashboard" default="false" />
 
   <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
 

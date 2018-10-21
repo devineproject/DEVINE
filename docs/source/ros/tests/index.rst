@@ -3,8 +3,8 @@ About the tests
 
 The tests are made with `Python unittest <https://docs.python.org/3/library/unittest.html>`_.
 
-Running the unit tests suite
-############################
+Running the unit test suite
+###########################
 
 In order to launch the devine unit tests, you can use the following commands:
 
@@ -25,12 +25,12 @@ In order to launch the devine unit tests, you can use the following commands:
 
 The `--verbose` option will show all the logs from the tests using unittest directly.
 
-Launching only one test case
-===========================
+Launching a single test case
+============================
 
-Each `test_*.py` file correspond to a test case (a list of tests that are related).
+Each `test_*.py` file corresponds to a test case.
 
-Each one of theses files can be run individually like so:
+Each one of these files can run individually like so:
 
 .. code-block:: bash
 
@@ -54,4 +54,4 @@ the tests tend to fail using that method (*to be investigated*).
 Adding tests
 ############
 
-To add a serie of tests, simply copy the `testcase_template.py` into your test folder, then import your test case into `test_suite.py`.
+To add a test case, simply copy the `testcase_template.py` into your test folder, then import your test case into `test_suite.py`.
