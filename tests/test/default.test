@@ -1,4 +1,13 @@
 <launch>
-    <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
-    <test test-name="unit" type="test_suite.py" pkg="devine_tests"/>
+  <arg name="dashboard" default="false" />
+
+  <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
+
+  <group if="$(arg dashboard)">
+    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+    <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
+    <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
+  </group>
+
+  <test test-name="unit" type="test_suite.py" pkg="devine_tests"/>
 </launch>

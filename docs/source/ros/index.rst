@@ -57,3 +57,13 @@ All DEVINE modules:
     :maxdepth: 1
    
     modules/*/index
+
+
+Tests
+=====
+
+.. toctree::
+    :glob:
+    :maxdepth: 1
+   
+    tests/index
