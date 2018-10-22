@@ -4,7 +4,6 @@ import $ from 'jquery';
 
 export default function InitImgDispatcherModule(devineTopics) {
   const topics = {
-    image:                new RosTopic(devineTopics.raw_image),
     segmentation_image:   new RosTopic(devineTopics.segmentation_image),
     body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
     features_image:  new RosTopic(devineTopics.features_extraction_image),
@@ -12,9 +11,11 @@ export default function InitImgDispatcherModule(devineTopics) {
 
   let republish_from_img = function(topic) {
     return function() {
-      topics.image.subscribe(img => {
+      const image_topic = new RosTopic(devineTopics.raw_image);
+      image_topic.subscribe(img => {
         topic.publish(img);
-        topics.image.unsubscribe();
+        image_topic.unsubscribe();
+        image_topic.removeAllListeners();
       });
     };
   };
