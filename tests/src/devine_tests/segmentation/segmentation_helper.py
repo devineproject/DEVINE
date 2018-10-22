@@ -4,6 +4,7 @@ from sensor_msgs.msg import CompressedImage
 from devine_config import topicname
 import rospy
 from devine_tests import utils
+from std_msgs.msg import String
 
 IMAGE_TOPIC = topicname("segmentation_image")
 SEGMENTATION_IMAGE_TOPIC = topicname("objects")
@@ -11,7 +12,14 @@ SEGMENTATION_IMAGE_TOPIC = topicname("objects")
 IMAGE_PUB = rospy.Publisher(IMAGE_TOPIC, CompressedImage, queue_size=1)
 
 IMAGE_MSG = "image_msg"
+FILENAME = "filename"
 EXPECTED_OBJECTS = "expected_objects"
+
+def segment_image(image):
+    # send over node
+    IMAGE_PUB.publish(image[IMAGE_MSG])
+    # receive data
+    return rospy.wait_for_message(SEGMENTATION_IMAGE_TOPIC, String)
 
 def load_test_images(file, test_filepath):
     """ Loads test data and images"""
@@ -22,6 +30,7 @@ def load_test_images(file, test_filepath):
     for test in file_data["tests"]:
         test_images.append({
             IMAGE_MSG: utils.image_file_to_ros_msg(utils.get_fullpath(file, test["imageName"])),
+            FILENAME: test["imageName"],
             EXPECTED_OBJECTS: test["refData"]["objects"]
         })
 

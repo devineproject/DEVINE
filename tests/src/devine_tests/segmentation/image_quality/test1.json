@@ -1,0 +1,29 @@
+{
+	"tests":[
+	   {
+		  "imageName":"images/test1/kinect-640x480.jpg",
+		  "refData":{
+			 "image":{ "height":640, "width":480 },
+			 "objects":[
+				"person",
+				"chair",
+				"chair",
+				"chair",
+				"chair",
+				"chair",
+				"laptop",
+				"laptop",
+				"dining table",
+				"tv"
+			 ]
+		  }
+	   },
+	   {
+		  "imageName":"images/test1/S8-640x480.jpg",
+		  "refData":{
+			 "image":{ "height":640, "width":480 },
+			 "objects":[]
+		  }
+	   }
+	]
+ }

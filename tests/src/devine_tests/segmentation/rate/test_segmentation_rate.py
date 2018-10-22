@@ -1,33 +1,28 @@
+#! /usr/bin/env python2
 import json
 import unittest
 import rospy
 from devine_tests import utils
 import devine_tests.segmentation.segmentation_helper as helper
-from std_msgs.msg import String
 
 class TestSegmentationRate(unittest.TestCase):
     """ Test to validate segmentation rates """
 
     def test_segmentation_rate_on_two_frames(self):
         """ Loads images and posts the corresponding segmentation rates """
-        # Start ROS node
-        rospy.init_node("image_seg_test")
         test_images = helper.load_test_images(__file__, utils.get_fullpath(__file__, "test.json"))
 
-        pos = 0
-        while not rospy.is_shutdown() and pos < len(test_images):
-            rospy.loginfo("### Test image %d ###", pos + 1)
-            self.segmentation_should_find_most_of_the_objects(test_images[pos])
-            pos += 1
+        for image in test_images:
+            self.assertFalse(rospy.is_shutdown())
+
+            rospy.loginfo("### Test image %s ###", image[helper.FILENAME])
+            self.segmentation_should_find_most_of_the_objects(image)
 
     def segmentation_should_find_most_of_the_objects(self, test_image):
         """ Evaluates  segmentation rate for a single image """
         expected_objects = test_image[helper.EXPECTED_OBJECTS]
 
-        # send over node
-        helper.IMAGE_PUB.publish(test_image[helper.IMAGE_MSG])
-        # receive data
-        data = rospy.wait_for_message(helper.SEGMENTATION_IMAGE_TOPIC, String)
+        data = helper.segment_image(test_image)
         rospy.logwarn("Message timestamp: %s", json.loads(data.data)['timestamp'])
         objects_found = helper.get_segmented_objets(data)
 
@@ -42,3 +37,8 @@ class TestSegmentationRate(unittest.TestCase):
             rospy.logwarn("The ratio of objects missed if greater than 50%.")
 
         self.assertTrue(objects_missed_ratio < 0.7, "The object missed ratio is too high.")
+
+
+if __name__ == "__main__":
+    rospy.init_node("test")
+    unittest.main()
