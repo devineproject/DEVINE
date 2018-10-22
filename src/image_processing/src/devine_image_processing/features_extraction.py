@@ -56,7 +56,7 @@ if __name__ == '__main__':
                 img = image_queue.get(timeout=1)
 
                 rospy.loginfo('Processing frame')
-                img = Image.open(BytesIO(img))
+                img = Image.open(BytesIO(img)).convert('RGB')
                 img = img.resize((IMAGE_SIZE, IMAGE_SIZE), resample=Image.BILINEAR)
                 img = np.array(img, dtype=np.float32)
                 img -= CHANNEL_MEAN[None, None, :]
