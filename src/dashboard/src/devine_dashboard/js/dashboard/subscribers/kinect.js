@@ -19,6 +19,7 @@ function createHistory()
   return {
     position: 1,
     image: [],
+    confidence: [],
     segmentation: [],
     body_tracking: [],
     object_position_2d: [],
@@ -32,6 +33,7 @@ export default function InitKinectModule(devineTopics) {
     segmentation_image:   new RosTopic(devineTopics.segmentation_image),
     body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
     zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),
+    confidence:           new RosTopic(devineTopics.objects_confidence),
     segmentation:         new RosTopic(devineTopics.objects),
     object_position_2d:   new RosTopic(devineTopics.guess_location_image),
     object_position_3d:   new RosTopic(devineTopics.guess_location_world),
@@ -59,6 +61,10 @@ export default function InitKinectModule(devineTopics) {
       case "segmentation":
         topics.current_img_topic = topics.segmentation_image;
         topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
+        topics.segmentation.subscribe(function(confidence, _) {
+          confidence.length = 0;
+        }.bind(this, history.confidence));
+        topics.confidence.subscribe(handleTopicData.bind(this, history.confidence));
         break;
       case "body_tracking":
         topics.current_img_topic = topics.body_tracking_image;
@@ -80,6 +86,7 @@ export default function InitKinectModule(devineTopics) {
     let obj_pos_2d = getCurrentElement(history.object_position_2d);
     let obj_pos_3d = getCurrentElement(history.object_position_3d);
     let body_tracking = getCurrentElement(history.body_tracking);
+    let confidence = history.position == 1 ? getCurrentElement(history.confidence) : undefined;
     let seg = getCurrentElement(history.segmentation);
     let img = getCurrentElement(history.image);
     let image_length = history.image.length;
@@ -98,7 +105,7 @@ export default function InitKinectModule(devineTopics) {
         }
 
         if (seg != undefined) {
-          drawObjectsRectangles(JSON.parse(seg).objects);
+          drawObjectsRectangles(JSON.parse(seg).objects, confidence);
         }
 
         if (body_tracking != undefined) {
@@ -151,7 +158,7 @@ function drawPositionFound(x, y) {
   image.fillRect(x - 1, y - 20, 2, 40);
 }
 
-function drawObjectsRectangles(objects) {
+function drawObjectsRectangles(objects, confidence) {
   for (var i = 0; i < objects.length; i++) {
     setColor(distinctColors[i % 14]);
 
@@ -161,6 +168,8 @@ function drawObjectsRectangles(objects) {
     let height = bottom - top;
     image.rect(left, top, width, height);
     image.fillText(objects[i].category, left, top - 1);
+    if (confidence !== undefined && confidence.length === objects.length)
+      image.fillText(confidence[i].toFixed(2), left, bottom - 1);
     image.stroke();
     image.closePath();
   }
