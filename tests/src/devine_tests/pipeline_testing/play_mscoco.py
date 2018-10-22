@@ -5,19 +5,12 @@ import argparse
 import random
 import rospy
 from devine_config import topicname
-from Queue import Queue, Empty
-import json
 import cv2
 from sensor_msgs.msg import CompressedImage
-from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
-from std_msgs.msg import String
-from std_msgs.msg import Bool
-from devine_dialog.msg import TtsQuery
-from devine_dialog import TTSAnswerType, send_speech
 from time import sleep
 import os
-# How to load images from mscoco
+import utils
 
 FEATURE_IMAGE_TOPIC = topicname('features_extraction_image')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
@@ -37,28 +30,23 @@ class MSCOCOTest:
         self.image_seg_pub = rospy.Publisher(SEGMENTATION_IMAGE_TOPIC, CompressedImage, queue_size=1)
         sleep(1)
         
-    def _load_test_image(self, image_name):
+    def _load_test_image_path(self, image_name):
         """ Loads test data and images """
         if image_name is None:
             image_list = os.listdir(self.image_folder)
             random.shuffle(image_list)
             image_name = image_list[0]
-        image_path = os.path.join(self.image_folder,image_name)
-        self.image = cv2.imread(image_path,cv2.IMREAD_COLOR)
+        return os.path.join(self.image_folder,image_name)
 
-    def _send_compressed_image(self):
+    def _send_compressed_image(self, image_path):
         ''' Sends compressed image to feature and seg nodes '''
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "png"
-        msg.data = np.array(cv2.imencode('.png', self.image)[1]).tostring()
+        msg = utils.image_file_to_ros_msg(image_path)
         self.image_seg_pub.publish(msg) 
         self.image_feat_pub.publish(msg)
         
     def play_game(self,image_name = None):
         ''' Plays a game of GW?! '''
-        self._load_test_image(image_name)
-        self._send_compressed_image()
+        self._send_compressed_image(self._load_test_image_path(image_name))
         guess = rospy.wait_for_message(CATEGORY_TOPIC, String)
         return guess
         
