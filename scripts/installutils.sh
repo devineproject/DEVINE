@@ -25,7 +25,7 @@ install_devine() {
 
   cd DEVINE/src/guesswhat
   python3 -m pip install --user -r requirements.txt
-  unzip -o "$datapath/weights.zip" -d src/devine_guesswhat/data
+  unzip -o "$datapath/weights.zip" -d data
   cd ../image_processing
   python3 -m pip install --user -r requirements.txt
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
