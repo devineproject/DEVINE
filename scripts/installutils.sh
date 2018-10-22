@@ -24,7 +24,8 @@ install_devine() {
   pushd "$catkinsrc"
 
   cd DEVINE/src/guesswhat
-  unzip -o "$datapath/weights.zip" -d devine_guesswhat/data
+  python3 -m pip install --user -r requirements.txt
+  unzip -o "$datapath/weights.zip" -d src/devine_guesswhat/data
   cd ../image_processing
   python3 -m pip install --user -r requirements.txt
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
@@ -37,9 +38,7 @@ install_devine() {
   cp -f launch/irl_point.rviz ~/.rviz/default.rviz
   cd ../scene_finder
   cp -f apriltags2_config/* ../../../apriltags2_ros/apriltags2_ros/config
-  cd ../guesswhat/devine_guesswhat
-  python3 -m pip install --user -r requirements.txt
-  cd ../../common
+  cd ../common
   python2 -m pip install --user -r requirements.txt
 
   cd ../../../..
