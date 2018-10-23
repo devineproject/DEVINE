@@ -11,6 +11,7 @@ import numpy as np
 from time import sleep
 import os
 from std_msgs.msg import String
+from utils import image_to_ros_msg
 
 FEATURE_IMAGE_TOPIC = topicname('features_extraction_image')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
@@ -43,11 +44,8 @@ class MSCOCOTest:
 
     def _send_compressed_image(self, image):
         ''' Sends compressed image to feature and seg nodes '''
-        msg = CompressedImage()
-        msg.header.stamp = rospy.Time.now()
-        msg.format = "png"
-        msg.data = np.array(cv2.imencode('.png', image)[1]).tostring()
-	self.image_seg_pub.publish(msg) 
+	msg = image_to_ros_msg(image)
+        self.image_seg_pub.publish(msg) 
         self.image_feat_pub.publish(msg)
 
     def play_game(self, image = np.array([])):

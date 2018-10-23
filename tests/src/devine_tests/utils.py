@@ -9,14 +9,15 @@ from sensor_msgs.msg import CompressedImage
 def image_file_to_ros_msg(image_path):
     """ Convert an image file to a ros readable data message """
     img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    return image_to_ros_msg(img)
 
+def image_to_ros_msg(image):
+    """ Convert an image into a compressedImage message """
     msg = CompressedImage()
     msg.header.stamp = rospy.Time.now()
     msg.format = "png"
     msg.data = np.array(cv2.imencode(".png", img)[1]).tostring()
-
     return msg
-
 
 def get_fullpath(file, relative_file):
     """ Return the full path of a file in a directory relative to this one """
