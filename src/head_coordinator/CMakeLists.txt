@@ -4,6 +4,7 @@ project(devine_head_coordinator)
 find_package(catkin REQUIRED COMPONENTS
   rospy
   actionlib
+  actionlib_msgs
   tf
   std_msgs
   sensor_msgs
@@ -14,7 +15,18 @@ find_package(catkin REQUIRED COMPONENTS
   devine_irl_control
 )
 
+add_action_files(
+  DIRECTORY action
+  FILES LookAtHuman.action
+)
+
+generate_messages(
+  DEPENDENCIES actionlib_msgs std_msgs  # Or other packages containing msgs
+)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS actionlib_msgs
+)
