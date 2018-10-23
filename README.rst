@@ -22,11 +22,11 @@ The player validates IRL-1’s guess, IRL-1 reacts accordingly and then conclude
 Accessing the documentation
 ===========================
 
-If you already have ``Docker`` installed, simply navigate to ``/docs`` and run the following command:
+If you already have ``Docker`` installed, simply navigate to ``/docs`` and run the following command to start a sphinx server at port :8000.
 
 .. code-block:: bash
     
-    ./gen_doc.sh
+    ./serve_doc.sh
 
 For local environment installation, please refer to our `Documentation Readme`_ 
 
