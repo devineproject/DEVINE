@@ -51,7 +51,7 @@ audio_args=''
 fi
 
 CMD="sudo docker run -p 9090:9090 -p 8080:8080 -it --rm -e QT_X11_NO_MITSHM=1 \
-    $BASE_CMD $render_args $display_args $audio_args \
+    $render_args $display_args $audio_args \
     devine bash"
 
 echo $CMD
