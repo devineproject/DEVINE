@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>devine_scene_finder</name>
+  <name>devine_head_coordinator</name>
   <version>0.0.1</version>
-  <description>The devine_scene_finder package</description>
+  <description>The devine_head_coordinator package</description>
   <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
   <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
   <license>BSD</license>

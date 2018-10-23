@@ -1,8 +1,10 @@
-Scene Finder
+Head Coordinator
 ############
 
 Description
 ===========
+
+Scene finding:
 
 We're using april tags and the apriltags2_ros library to find the scene where the objets are located.
 
@@ -14,7 +16,7 @@ Installation
     ``git clone git@github.com:dmalyuta/apriltags2_ros.git``
 
 
-2. Copy the settings available in `./src/scene_finder/apriltags2_config` in the config directory of the newly cloned repository under `./apriltags2_ros/config`
+2. Copy the settings available in `./src/head_coordinator/apriltags2_config` in the config directory of the newly cloned repository under `./apriltags2_ros/config`
 
 3. Build the module using catkin_make:
 

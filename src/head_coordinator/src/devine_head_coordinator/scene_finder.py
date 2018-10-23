@@ -1,10 +1,16 @@
 #!/usr/bin/env python2
-""" Node to find the scene """
+"""
+Node to find the scene
+"""
+from __future__ import division
 
 from __future__ import division
 import rospy
 import tf
+
+from std_msgs.msg import Bool
 from sensor_msgs.msg import CompressedImage
+
 from devine_config import topicname
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME
 from devine_irl_control.controllers import TrajectoryClient
