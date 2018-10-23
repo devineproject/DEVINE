@@ -20,7 +20,7 @@ TTS_ANSWER_TOPIC = topicname('tts_answer')
 TTS_QUERY_TOPIC = topicname('tts_query')
 CATEGORY_TOPIC = topicname('guess_category')
 
-class MSCOCOTest:
+class ImageTest:
     ''' Test class that loads images and runs a game of GW?! '''
     def __init__(self,image_folder):
         self.image_folder = image_folder
@@ -93,7 +93,7 @@ def main(args):
     ''' Plays n games and displays their outputs  '''
     # Parse arguments
     #print(args.crop_array)
-    test = MSCOCOTest(args.dataset)
+    test = ImageTest(args.dataset)
     for i in range(0,int(args.num)):
         test.image_test(args.crop_array,args.image_name)
         print(test.outputs)
