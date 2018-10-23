@@ -38,7 +38,7 @@ fi
 
 if $use_gui
 then
-display_args='-e DISPLAY=:0'
+display_args='-e DISPLAY=:0 -v /tmp/.X11-unix:/tmp/.X11-unix'
 else
 display_args=''
 fi
@@ -50,8 +50,7 @@ else
 audio_args=''
 fi
 
-CMD="sudo docker run -p 9090:9090 -p 8080:8080 -it --rm \
-    -e QT_X11_NO_MITSHM=1 -v /tmp/.X11-unix:/tmp/.X11-unix \
+CMD="sudo docker run -p 9090:9090 -p 8080:8080 -it --rm -e QT_X11_NO_MITSHM=1 \
     $BASE_CMD $render_args $display_args $audio_args \
     devine bash"
 

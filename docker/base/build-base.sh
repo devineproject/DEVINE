@@ -26,7 +26,7 @@ else
 cmd_args='-t devine-base'
 fi
 
-CMD="sudo docker build -f $ROOT/docker/Dockerfile $cmd_args $ROOT"
+CMD="sudo docker build -f $ROOT/docker/base/Dockerfile $cmd_args $ROOT"
 
 echo $CMD
 eval $CMD
