@@ -23,21 +23,23 @@ install_devine() {
   
   pushd "$catkinsrc"
 
-  # TODO move pip installs to respective catkin package dep?
   cd DEVINE/src/guesswhat
-  unzip -o "$datapath/weights.zip" -d devine_guesswhat/data
+  python3 -m pip install --user -r requirements.txt
+  unzip -o "$datapath/weights.zip" -d data
   cd ../image_processing
-  python3 -m pip install --user Cython
-  python3 -m pip install --user scikit-image bson pymongo pycocotools keras==2.1.6 catkin_pkg rospkg
+  python3 -m pip install --user -r requirements.txt
   ln -sf "$datapath/mask_rcnn_coco.h5" mask_rcnn_coco.h5
   tar --overwrite -xzf "$datapath/vgg_16_2016_08_28.tar.gz"
   ln -sf "$(find "$(dirname "$(python3 -c 'import tf_pose;print(tf_pose.__file__)')")"/.. -name mobilenet_thin)/graph_opt.pb" mobilenet_thin.pb
-  python2 -m pip install --user paho-mqtt
+  cd ../dialog
+  python2 -m pip install --user -r requirements.txt
   cd ../robot_control
   mkdir -p ~/.rviz
   cp -f launch/irl_point.rviz ~/.rviz/default.rviz
   cd ../scene_finder
   cp -f apriltags2_config/* ../../../apriltags2_ros/apriltags2_ros/config
+  cd ../common
+  python2 -m pip install --user -r requirements.txt
 
   cd ../../../..
   catkin_make
@@ -61,11 +63,11 @@ install_base() {
   as_su sh -c 'echo "deb https://ftp.osuosl.org/pub/ros/packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
   as_su apt-key adv --keyserver hkp://ha.pool.sks-keyservers.net --recv-key 421C365BD9FF1F717815A3895523BAEEB01FA116 || exit 1
   as_su sh -c 'echo "deb https://debian.snips.ai/stretch stable main" > /etc/apt/sources.list.d/snips.list'
-  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455 || exit 1
+  as_su apt-key adv --keyserver hkp://pgp.mit.edu --recv-key F727C778CCB0A455 || \
   curl -L https://github.com/devineproject/static/releases/download/v0.0.1/snips.key | as_su apt-key add -
   as_su apt-get update
   as_su apt-get upgrade -y libstdc++6
-  as_su apt-get install -y python3 python3-tk python3-pip python python-pip
+  as_su apt-get install -y python3 python3-tk python3-pip python python-pip cython3
   as_su apt-get install -y ros-kinetic-desktop-full ros-kinetic-ros-control ros-kinetic-ros-controllers ros-kinetic-gazebo-ros-control
   as_su apt-get install -y ros-kinetic-openni-launch ros-kinetic-openni-camera ros-kinetic-openni-description ros-kinetic-compressed-image-transport
   as_su apt-get install -y ros-kinetic-rosbridge-server

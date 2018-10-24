@@ -9,17 +9,27 @@ from std_msgs.msg import String
 IMAGE_TOPIC = topicname("segmentation_image")
 SEGMENTATION_IMAGE_TOPIC = topicname("objects")
 
-IMAGE_PUB = rospy.Publisher(IMAGE_TOPIC, CompressedImage, queue_size=1)
+IMAGE_PUB = rospy.Publisher(IMAGE_TOPIC, CompressedImage, queue_size=1, latch=True)
 
 IMAGE_MSG = "image_msg"
 FILENAME = "filename"
 EXPECTED_OBJECTS = "expected_objects"
+LAST_STAMP = None
 
 def segment_image(image):
+    global LAST_STAMP
     # send over node
     IMAGE_PUB.publish(image[IMAGE_MSG])
     # receive data
-    return rospy.wait_for_message(SEGMENTATION_IMAGE_TOPIC, String)
+    while True:
+        data = rospy.wait_for_message(SEGMENTATION_IMAGE_TOPIC, String)
+        stamp = json.loads(data.data)["timestamp"]
+        if LAST_STAMP is None or stamp != LAST_STAMP:
+            LAST_STAMP = stamp
+            break
+        else:
+            sleep(0.5)
+    return data
 
 def load_test_images(file, test_filepath):
     """ Loads test data and images"""

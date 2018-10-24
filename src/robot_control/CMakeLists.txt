@@ -9,6 +9,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   control_msgs
   trajectory_msgs
+  geometry_msgs
+  visualization_msgs
   jn0_face_msgs
 )
 

@@ -18,8 +18,8 @@ class TestSegmentationQuality(unittest.TestCase):
             self.assertFalse(rospy.is_shutdown())
             images_objects_found.append(self.get_objects_found(image))
 
-        kinect_missed_objects = helper.get_missed_objects(expected_objects, images_objects_found[0])
-        s8_missed_objects = helper.get_missed_objects(expected_objects, images_objects_found[1])
+        kinect_missed_objects = len(helper.get_missed_objects(expected_objects, images_objects_found[0]))
+        s8_missed_objects = len(helper.get_missed_objects(expected_objects, images_objects_found[1]))
 
         self.assertAlmostEqual(kinect_missed_objects, s8_missed_objects, delta=1)
         self.assertLessEqual(kinect_missed_objects, 1)
