@@ -23,6 +23,8 @@ def main():
                                     JointTrajectoryPoint, queue_size=1)
 
     while not rospy.is_shutdown():
+        #TODO: Revamp
+        
         time = 1
         # Init head
         rospy.loginfo('Init')

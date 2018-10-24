@@ -1,16 +1,11 @@
 #!/usr/bin/env python2
-"""
-Node to find the scene
-"""
-from __future__ import division
+""" Node to find the scene """
 
 from __future__ import division
 import rospy
 import tf
-
 from std_msgs.msg import Bool
 from sensor_msgs.msg import CompressedImage
-
 from devine_config import topicname
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME
 from devine_irl_control.controllers import TrajectoryClient
@@ -24,7 +19,6 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
 TILT = -0.17  # TODO: Iterate over tilt too ?
-
 
 class SceneFinder(object):
     """ Scene finder based of april tags """

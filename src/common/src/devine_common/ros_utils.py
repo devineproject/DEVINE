@@ -4,12 +4,11 @@ import tf
 import os
 from geometry_msgs.msg import PoseStamped
 
-
-def pose_stamped(x, y, z, roll=0, pitch=0, yaw=0):
+def pose_stamped(x, y, z, roll=0, pitch=0, yaw=0, ref_frame='base_link'):
     """ Convert x, y, z, roll, pitch, yaw to PoseStamp """
     pose = PoseStamped()
-    pose.header.stamp = rospy.Time.now()
-    pose.header.frame_id = 'base_link'
+    pose.header.stamp = rospy.Time.now() - rospy.rostime.Duration(0.1)
+    pose.header.frame_id = ref_frame
     pose.pose.position.x = x
     pose.pose.position.y = y
     pose.pose.position.z = z
