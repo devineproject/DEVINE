@@ -1,0 +1,11 @@
+Cython
+scikit-image
+bson
+pycocotools
+keras==2.1.6
+opencv-contrib-python
+numpy
+pillow
+pymongo
+rospkg
+git+https://github.com/ildoonet/tf-pose-estimation.git@b119759e8a41828c633bd39b5c883bf5a56a214f#egg=tf_pose

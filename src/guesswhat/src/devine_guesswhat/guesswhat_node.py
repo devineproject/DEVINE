@@ -25,12 +25,12 @@ from modelwrappers import GuesserROSWrapper, OracleROSWrapper
 from devine_config import topicname
 
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-EVAL_CONF_PATH = os.path.join(ROOT_DIR, '../config/eval.json')
-GUESS_CONF_PATH = os.path.join(ROOT_DIR, '../config/guesser.json')
-QGEN_CONF_PATH = os.path.join(ROOT_DIR, '../config/qgen.json')
-GUESS_NTW_PATH = os.path.join(ROOT_DIR, '../data/guesser.ckpt')
-QGEN_NTW_PATH = os.path.join(ROOT_DIR, '../data/qgen.ckpt')
-TOKENS_PATH = os.path.join(ROOT_DIR, '../data/tokens.json')
+EVAL_CONF_PATH = os.path.join(ROOT_DIR, '../../config/eval.json')
+GUESS_CONF_PATH = os.path.join(ROOT_DIR, '../../config/guesser.json')
+QGEN_CONF_PATH = os.path.join(ROOT_DIR, '../../config/qgen.json')
+GUESS_NTW_PATH = os.path.join(ROOT_DIR, '../../data/guesser.ckpt')
+QGEN_NTW_PATH = os.path.join(ROOT_DIR, '../../data/qgen.ckpt')
+TOKENS_PATH = os.path.join(ROOT_DIR, '../../data/tokens.json')
 
 #topics
 SEGMENTATION_TOPIC = topicname('objects')

@@ -46,7 +46,6 @@ Here you can see a couple of usefull ROS commands to help you out!
 
     * See the actually ressources consumed by your ROS environment.
 
-
 Modules
 =======
 

@@ -13,12 +13,14 @@ import os
 from std_msgs.msg import String
 from utils import image_to_ros_msg
 
+
 FEATURE_IMAGE_TOPIC = topicname('features_extraction_image')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
 RESTART_TOPIC = topicname('end_of_game')
 TTS_ANSWER_TOPIC = topicname('tts_answer')
 TTS_QUERY_TOPIC = topicname('tts_query')
 CATEGORY_TOPIC = topicname('guess_category')
+
 
 class ImageTest:
     ''' Test class that loads images and runs a game of GW?! '''
