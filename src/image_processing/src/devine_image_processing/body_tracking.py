@@ -34,7 +34,7 @@ class BodyTracking(ImageProcessor):
         "RAnkle", "LHip", "LKnee", "LAnkle", "REye", "LEye", "REar", "LEar", "Background"
     ]
     def __init__(self):
-        config = tf.ConfigProto()
+        config = tf.ConfigProto(log_device_placement=True)
         config.gpu_options.allow_growth = True
         set_session(tf.Session(config=config))
         self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368)) #downscale image 

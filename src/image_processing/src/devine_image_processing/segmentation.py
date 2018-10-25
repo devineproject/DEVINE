@@ -55,7 +55,7 @@ class RCNNSegmentation(ImageProcessor):
 
     def __init__(self):
         self.config = self.InferenceConfig()
-        config = tf.ConfigProto()
+        config = tf.ConfigProto(log_device_placement=True)
         config.gpu_options.allow_growth = True
         set_session(tf.Session(config=config))
         self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=self.config)
