@@ -24,12 +24,6 @@ DEVINE uses [Pylint](https://www.pylint.org/) to enforce coding standards for Py
 
 #### 1. Pylint
 
-
-  cd DEVINE
-  python -m pip install pylint --user
-  python -m pip install pylint-quotes --user
-  python -m pip install git-pylint-commit-hook --user
-  cp -r hooks .git/
 ```
 $ pip install pylint
 $ pip install pylint-quotes
