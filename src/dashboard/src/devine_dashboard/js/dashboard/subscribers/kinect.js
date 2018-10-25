@@ -1,21 +1,20 @@
-import { RosTopic } from '../ros';
-import { distinctColors } from '../../vars/colors';
-import throttle from '../../throttle';
-import LogConsole from '../console';
-import $ from 'jquery';
+import { RosTopic } from "../ros";
+import { distinctColors } from "../../vars/colors";
+import throttle from "../../throttle";
+import LogConsole from "../console";
+import $ from "jquery";
 
 const cons = new LogConsole("Kinect", "#3498DB");
 const imageSize = { x: 640, y: 480 };
 const objectPos2d = $("#kinect_pos_found")[0];
 const objectPos3d = $("#kinect_pos_calc")[0];
 const canvas = $("#kinect_image")[0];
-const image = canvas ? canvas.getContext("2d") : undefined; 
-const delay = $('#kinect_image_delay');
+const image = canvas ? canvas.getContext("2d") : undefined;
+const delay = $("#kinect_image_delay");
 const image_selection = $("input[name=image_selection]");
 
 let history = createHistory();
-function createHistory()
-{
+function createHistory() {
   return {
     position: 1,
     image: [],
@@ -29,23 +28,21 @@ function createHistory()
 
 export default function InitKinectModule(devineTopics) {
   const topics = {
-    image:                new RosTopic(devineTopics.raw_image),
-    segmentation_image:   new RosTopic(devineTopics.segmentation_image),
-    body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
+    image: new RosTopic(devineTopics.raw_image),
+    segmentation_image: new RosTopic(devineTopics.segmentation_image),
+    body_tracking_image: new RosTopic(devineTopics.body_tracking_image),
     zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),
-    confidence:           new RosTopic(devineTopics.objects_confidence),
-    segmentation:         new RosTopic(devineTopics.objects),
-    object_position_2d:   new RosTopic(devineTopics.guess_location_image),
-    object_position_3d:   new RosTopic(devineTopics.guess_location_world),
-    body_position:        new RosTopic(devineTopics.body_tracking),
-    current_img_topic:    null
+    confidence: new RosTopic(devineTopics.objects_confidence),
+    segmentation: new RosTopic(devineTopics.objects),
+    object_position_2d: new RosTopic(devineTopics.guess_location_image),
+    object_position_3d: new RosTopic(devineTopics.guess_location_world),
+    body_position: new RosTopic(devineTopics.body_tracking),
+    current_img_topic: null
   };
 
   //We want to limit drawing for performance, yet we might want to keep all data
-  function imageSourceChanged()
-  {
-    if ($(this).is(':checked'))
-    {
+  function imageSourceChanged() {
+    if ($(this).is(":checked")) {
       history = createHistory();
       setTimeout(() => drawNoFeed(), 200);
       for (let i in topics) {
@@ -55,28 +52,42 @@ export default function InitKinectModule(devineTopics) {
       }
       let currentImgType = $(this).val();
       switch (currentImgType) {
-      case "raw_camera":
-        topics.current_img_topic = topics.image;
-        break;
-      case "segmentation":
-        topics.current_img_topic = topics.segmentation_image;
-        topics.segmentation.subscribe(handleTopicData.bind(this, history.segmentation));
-        topics.segmentation.subscribe(function(confidence, _) {
-          confidence.length = 0;
-        }.bind(this, history.confidence));
-        topics.confidence.subscribe(handleTopicData.bind(this, history.confidence));
-        break;
-      case "body_tracking":
-        topics.current_img_topic = topics.body_tracking_image;
-        topics.body_position.subscribe(handleTopicData.bind(this, history.body_tracking));
-        break;
-      case "zone_detection":
-        topics.current_img_topic = topics.zone_detection_image;
+        case "raw_camera":
+          topics.current_img_topic = topics.image;
+          break;
+        case "segmentation":
+          topics.current_img_topic = topics.segmentation_image;
+          topics.segmentation.subscribe(
+            handleTopicData.bind(this, history.segmentation)
+          );
+          topics.segmentation.subscribe(
+            function(confidence, _) {
+              confidence.length = 0;
+            }.bind(this, history.confidence)
+          );
+          topics.confidence.subscribe(
+            handleTopicData.bind(this, history.confidence)
+          );
+          break;
+        case "body_tracking":
+          topics.current_img_topic = topics.body_tracking_image;
+          topics.body_position.subscribe(
+            handleTopicData.bind(this, history.body_tracking)
+          );
+          break;
+        case "zone_detection":
+          topics.current_img_topic = topics.zone_detection_image;
       }
-      topics.object_position_2d.subscribe(handleTopicData.bind(this, history.object_position_2d));
-      topics.object_position_3d.subscribe(handleTopicData.bind(this, history.object_position_3d));
+      topics.object_position_2d.subscribe(
+        handleTopicData.bind(this, history.object_position_2d)
+      );
+      topics.object_position_3d.subscribe(
+        handleTopicData.bind(this, history.object_position_3d)
+      );
       cons.log(`Subscribed to ${currentImgType}`);
-      topics.current_img_topic.subscribe(handleTopicData.bind(this, history.image));
+      topics.current_img_topic.subscribe(
+        handleTopicData.bind(this, history.image)
+      );
     }
   }
   image_selection.change(imageSourceChanged);
@@ -86,7 +97,8 @@ export default function InitKinectModule(devineTopics) {
     let obj_pos_2d = getCurrentElement(history.object_position_2d);
     let obj_pos_3d = getCurrentElement(history.object_position_3d);
     let body_tracking = getCurrentElement(history.body_tracking);
-    let confidence = history.position == 1 ? getCurrentElement(history.confidence) : undefined;
+    let confidence =
+      history.position == 1 ? getCurrentElement(history.confidence) : undefined;
     let seg = getCurrentElement(history.segmentation);
     let img = getCurrentElement(history.image);
     let image_length = history.image.length;
@@ -94,10 +106,10 @@ export default function InitKinectModule(devineTopics) {
     writePositions(obj_pos_2d, obj_pos_3d);
 
     if (img != undefined) {
-      delay.prop('max', image_length);
+      delay.prop("max", image_length);
       let imageObject = new Image();
 
-      imageObject.onload = function () {
+      imageObject.onload = function() {
         resetImage(image, imageObject);
 
         if (obj_pos_2d != undefined) {
@@ -125,11 +137,11 @@ export default function InitKinectModule(devineTopics) {
     draw();
   }
 
-  $('#kinect_image_type').on("change", function () {
-    topics.image.name = this.value; 
+  $("#kinect_image_type").on("change", function() {
+    topics.image.name = this.value;
   });
 
-  delay.on("change", function () {
+  delay.on("change", function() {
     history.position = Math.max(this.value, 1);
     draw();
   });
@@ -137,8 +149,7 @@ export default function InitKinectModule(devineTopics) {
 }
 
 function setColor(color) {
-  if (color)
-  {
+  if (color) {
     image.strokeStyle = color;
     image.fillStyle = color;
   }
@@ -147,7 +158,7 @@ function setColor(color) {
 function drawNoFeed() {
   setColor("red");
   image.font = "bold 20pt Arial";
-  image.fillText("< No Camera Feed />", 190, (imageSize.y / 2));
+  image.fillText("< No Camera Feed />", 190, imageSize.y / 2);
 }
 
 function drawPositionFound(x, y) {
@@ -192,8 +203,9 @@ function writePositions(obj_pos_2d, obj_pos_3d) {
   }
 
   if (obj_pos_3d != undefined) {
-    let cleanFloat = number => number === null ? "N/A" : number.toFixed(2);
-    objectPos3d.innerText = `(${cleanFloat(obj_pos_3d[0])}, ` +
+    let cleanFloat = number => (number === null ? "N/A" : number.toFixed(2));
+    objectPos3d.innerText =
+      `(${cleanFloat(obj_pos_3d[0])}, ` +
       `${cleanFloat(obj_pos_3d[1])}, ${cleanFloat(obj_pos_3d[2])})`;
   }
 }
@@ -201,8 +213,27 @@ function writePositions(obj_pos_2d, obj_pos_3d) {
 function drawBodyTracking(humans) {
   //Adaptation and refactor of function draw_humans in tf_pose/estimator.py
   //Map body part with one another (e.g.: ear with eye); see CocoPairs in tf_pose/common.py
-  const BodyPartsAggr = [[1, 2], [1, 5], [2, 3], [3, 4], [5, 6], [6, 7], [1, 8], [8, 9], [9, 10], [1, 11], [11, 12], [12, 13], [1, 0], [0, 14], [14, 16], [0, 15], [15, 17]];
-  const leftEyeId = 15, rightEyeId = 14;
+  const BodyPartsAggr = [
+    [1, 2],
+    [1, 5],
+    [2, 3],
+    [3, 4],
+    [5, 6],
+    [6, 7],
+    [1, 8],
+    [8, 9],
+    [9, 10],
+    [1, 11],
+    [11, 12],
+    [12, 13],
+    [1, 0],
+    [0, 14],
+    [14, 16],
+    [0, 15],
+    [15, 17]
+  ];
+  const leftEyeId = 15,
+    rightEyeId = 14;
   for (let i in humans) {
     let centers = {};
     let human = humans[i];
@@ -214,7 +245,7 @@ function drawBodyTracking(humans) {
         y: bp.y * imageSize.y + 0.5
       };
     }
-    
+
     //For each body parts that should be linked, draw a line between these two
     for (let j in BodyPartsAggr) {
       let pair = BodyPartsAggr[j];
@@ -230,12 +261,18 @@ function drawBodyTracking(humans) {
     }
     if (centers[leftEyeId]) {
       image.beginPath();
-      image.arc(centers[leftEyeId].x, centers[leftEyeId].y, 10, 0, 2*Math.PI);
+      image.arc(centers[leftEyeId].x, centers[leftEyeId].y, 10, 0, 2 * Math.PI);
       image.stroke();
     }
     if (centers[rightEyeId]) {
       image.beginPath();
-      image.arc(centers[rightEyeId].x, centers[rightEyeId].y, 10, 0, 2*Math.PI);
+      image.arc(
+        centers[rightEyeId].x,
+        centers[rightEyeId].y,
+        10,
+        0,
+        2 * Math.PI
+      );
       image.stroke();
     }
   }

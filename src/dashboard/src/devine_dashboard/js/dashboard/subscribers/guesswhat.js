@@ -1,12 +1,12 @@
-import { RosTopic } from '../ros';
-import LogConsole from '../console';
-import $ from 'jquery';
+import { RosTopic } from "../ros";
+import LogConsole from "../console";
+import $ from "jquery";
 
 const cons = new LogConsole("GuessWhat", "#00bc8c");
 
 export default function InitGuesswhatModule(devineTopics) {
   const topics = {
-    state:    new RosTopic(devineTopics.guesswhat_status),
+    state: new RosTopic(devineTopics.guesswhat_status)
   };
 
   cons.log("Subscribed");

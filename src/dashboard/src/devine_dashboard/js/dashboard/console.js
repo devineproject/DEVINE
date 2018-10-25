@@ -1,4 +1,4 @@
-import $ from 'jquery';
+import $ from "jquery";
 
 export default class LogConsole {
   constructor(source, color) {
@@ -10,8 +10,10 @@ export default class LogConsole {
   }
 
   log(message) {
-    var logMessage = $('<span><b><font></font></b><span></span><br/></span>');
-    $("font", logMessage).text(this.source).prop("color", this.color);
+    var logMessage = $("<span><b><font></font></b><span></span><br/></span>");
+    $("font", logMessage)
+      .text(this.source)
+      .prop("color", this.color);
     $("span", logMessage).text(` > ${message}`);
 
     this.console.prepend(logMessage);

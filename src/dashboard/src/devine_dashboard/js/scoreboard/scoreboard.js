@@ -1,5 +1,5 @@
-import $ from 'jquery';
-import ROSLIB from 'roslib';
+import $ from "jquery";
+import ROSLIB from "roslib";
 
 class Player {
   constructor(playerNameOrCopiedObj, inGamePlayed = 0, inGameWon = 0) {
@@ -17,7 +17,9 @@ class Player {
     if (this.gamePlayed === 0) {
       return "0.00";
     }
-    return parseFloat(Math.round(this.gameWon * 10000 / this.gamePlayed) / 100).toFixed(2);
+    return parseFloat(
+      Math.round((this.gameWon * 10000) / this.gamePlayed) / 100
+    ).toFixed(2);
   }
 }
 
@@ -48,9 +50,13 @@ export default function createScoreboard(rosTopics) {
   const ros = new ROSLIB.Ros({ url: rosUrl });
 
   //TODO: republish to scoreboardTopic, sync up with potential other instances open
-  let [nameTopic, gameSuccessTopic, scoreboardTopic] = 
-    [rosTopics.player_name, rosTopics.object_guess_success, rosTopics.scoreboard]
-      .map(top => new ROSLIB.Topic({ros, name: top.name, messageType: top.type}));
+  let [nameTopic, gameSuccessTopic, scoreboardTopic] = [
+    rosTopics.player_name,
+    rosTopics.object_guess_success,
+    rosTopics.scoreboard
+  ].map(
+    top => new ROSLIB.Topic({ ros, name: top.name, messageType: top.type })
+  );
 
   nameTopic.subscribe(newPlayerName => {
     playerName = newPlayerName.data;
@@ -80,21 +86,21 @@ export default function createScoreboard(rosTopics) {
   });
 }
 
-
-
-function fillLeaderboardView(leaderboardArray) {  
+function fillLeaderboardView(leaderboardArray) {
   let leaderboardHtml = leaderboardArray
     //.map(object => object instanceof Player ? object : new Player(object)) //Map as Player class -- Shouldn't be necessary
     .sort((player1, player2) => player2.percentageWon - player1.percentageWon) //Order by percentageWon
-    .map((player, index) => { //Remap to html to be injected
+    .map((player, index) => {
+      //Remap to html to be injected
       return `<tr>
-        <th scope="row">${index+1}</th>
+        <th scope="row">${index + 1}</th>
         <td>${player.name}</td>
         <td>${player.gamePlayed}</td>
         <td>${player.gameWon}</td>
         <td>${player.percentageWon} %</td>
       </tr>`;
-    }).join("");
+    })
+    .join("");
 
-  $('#tbody-leaderboard').html(leaderboardHtml);
+  $("#tbody-leaderboard").html(leaderboardHtml);
 }

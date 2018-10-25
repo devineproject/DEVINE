@@ -1,6 +1,6 @@
-import $ from 'jquery';
-import ROSLIB from 'roslib';
-import LogConsole from './console';
+import $ from "jquery";
+import ROSLIB from "roslib";
+import LogConsole from "./console";
 
 const cons = new LogConsole("ROS", "grey");
 const btnReconnect = $("#reconnect_to_ros");
@@ -23,11 +23,11 @@ function logAndShowReconnect(message) {
   btnReconnect.show();
 }
 
-ros.on('connection', () => cons.log('Rosbridge connection established'));
-ros.on('error', () => logAndShowReconnect('Rosbridge connection error'));
-ros.on('close', () => logAndShowReconnect('Rosbridge connection closed'));
+ros.on("connection", () => cons.log("Rosbridge connection established"));
+ros.on("error", () => logAndShowReconnect("Rosbridge connection error"));
+ros.on("close", () => logAndShowReconnect("Rosbridge connection closed"));
 
-btnReconnect.on("click", function () {
+btnReconnect.on("click", function() {
   ros.connect(rosUrl);
   btnReconnect.hide();
 });

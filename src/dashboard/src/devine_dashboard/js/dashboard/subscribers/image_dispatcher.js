@@ -1,12 +1,11 @@
-import { RosTopic } from '../ros';
-import $ from 'jquery';
-
+import { RosTopic } from "../ros";
+import $ from "jquery";
 
 export default function InitImgDispatcherModule(devineTopics) {
   const topics = {
-    segmentation_image:   new RosTopic(devineTopics.segmentation_image),
-    body_tracking_image:  new RosTopic(devineTopics.body_tracking_image),
-    features_image:  new RosTopic(devineTopics.features_extraction_image),
+    segmentation_image: new RosTopic(devineTopics.segmentation_image),
+    body_tracking_image: new RosTopic(devineTopics.body_tracking_image),
+    features_image: new RosTopic(devineTopics.features_extraction_image)
   };
 
   let republish_from_img = function(topic) {
@@ -19,8 +18,8 @@ export default function InitImgDispatcherModule(devineTopics) {
       });
     };
   };
-  
-  $('#dispatch_segm').click(republish_from_img(topics.segmentation_image));
-  $('#dispatch_fea').click(republish_from_img(topics.features_image));
-  $('#dispatch_body').click(republish_from_img(topics.body_tracking_image));
+
+  $("#dispatch_segm").click(republish_from_img(topics.segmentation_image));
+  $("#dispatch_fea").click(republish_from_img(topics.features_image));
+  $("#dispatch_body").click(republish_from_img(topics.body_tracking_image));
 }
