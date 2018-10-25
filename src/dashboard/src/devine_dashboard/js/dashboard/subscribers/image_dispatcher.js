@@ -1,6 +1,10 @@
 import { RosTopic } from "../ros";
 import $ from "jquery";
 
+/**
+ * Initialize the module.
+ * @param {dict} devineTopics - The list of ros topics.
+ */
 export default function InitImgDispatcherModule(devineTopics) {
   const topics = {
     segmentation_image: new RosTopic(devineTopics.segmentation_image),
@@ -8,6 +12,10 @@ export default function InitImgDispatcherModule(devineTopics) {
     features_image: new RosTopic(devineTopics.features_extraction_image)
   };
 
+  /**
+   * Resend an image to update the dashboard on user action.
+   * @param {Topic} topic - The topic where to publish.
+   */
   let republish_from_img = function(topic) {
     return function() {
       const image_topic = new RosTopic(devineTopics.raw_image);

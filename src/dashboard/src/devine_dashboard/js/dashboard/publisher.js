@@ -24,6 +24,7 @@ function publish() {
 
 $("#publisher_publish").on("click", publish);
 $("#publisher_message").keypress(function(key) {
+  // Allow enter input keypress
   if (key.which == 13) {
     publish();
   }
@@ -36,7 +37,11 @@ function setTopicClick() {
   });
 }
 
-/** Insert a list of topics after an element */
+/**
+ * Insert a list of topics after an element
+ * @param {array} topicsList - The list of topics.
+ * @param {number} afterElement - Where to append the new element.
+ */
 function insertTopics(topicsList, afterElement) {
   topicsList.forEach(topic =>
     $(`<a class="dropdown-item"></a>`)
@@ -46,7 +51,10 @@ function insertTopics(topicsList, afterElement) {
   setTopicClick();
 }
 
-/** Generate list of available topics */
+/**
+ * Generate list of available topics
+ * @param {array} rosTopics - The list of ros topics.
+ */
 function setTopicsList(rosTopics) {
   if (rosTopics.length > 0) {
     insertTopics(rosTopics.topics, ".all-topics");
@@ -55,6 +63,10 @@ function setTopicsList(rosTopics) {
   }
 }
 
+/**
+ * Initialize the module.
+ * @param {dict} devineTopics - The list of ros topics.
+ */
 export default function InitPublisherModule(devineTopics) {
   insertTopics(
     Object.keys(devineTopics)

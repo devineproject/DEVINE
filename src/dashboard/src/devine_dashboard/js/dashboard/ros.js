@@ -18,14 +18,19 @@ export class RosTopic extends ROSLIB.Topic {
   }
 }
 
-function logAndShowReconnect(message) {
+/**
+ * Log in the console the reason why the connection to ros has been lost.
+ * Also show the reconnect button.
+ * @param {string} message - The message to log.
+ */
+function logErrorAndShowReconnect(message) {
   cons.log(message);
   btnReconnect.show();
 }
 
 ros.on("connection", () => cons.log("Rosbridge connection established"));
-ros.on("error", () => logAndShowReconnect("Rosbridge connection error"));
-ros.on("close", () => logAndShowReconnect("Rosbridge connection closed"));
+ros.on("error", () => logErrorAndShowReconnect("Rosbridge connection error"));
+ros.on("close", () => logErrorAndShowReconnect("Rosbridge connection closed"));
 
 btnReconnect.on("click", function() {
   ros.connect(rosUrl);

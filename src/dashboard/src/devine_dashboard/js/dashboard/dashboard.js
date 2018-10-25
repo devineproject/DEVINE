@@ -6,16 +6,20 @@ import dialog from "./subscribers/dialog";
 import guesswhat from "./subscribers/guesswhat";
 import imgdispatcher from "./subscribers/image_dispatcher";
 
-export default function CreateDashboard(topics) {
+/**
+ * Generate the dashboard.
+ * @param {dict} rosTopics - The available topics.
+ */
+export default function CreateDashboard(rosTopics) {
   $(document).ready(function() {
     // Uncheck all subscriptions
     $('[type="checkbox"]').prop("checked", false);
 
-    publisher(topics);
-    kinect(topics);
-    dialog(topics);
-    gamestate(topics);
-    guesswhat(topics);
-    imgdispatcher(topics);
+    publisher(rosTopics);
+    kinect(rosTopics);
+    dialog(rosTopics);
+    gamestate(rosTopics);
+    guesswhat(rosTopics);
+    imgdispatcher(rosTopics);
   });
 }

@@ -3,6 +3,10 @@ import ROSLIB from "roslib";
 import LogConsole from "../console";
 import $ from "jquery";
 
+/**
+ * Initialize the module.
+ * @param {dict} devineTopics - The list of ros topics.
+ */
 export default function initDialogModule(devineTopics) {
   const cons = new LogConsole("Dialog", "#F39C12");
   const answerField = $("#dialog_answer");
@@ -19,7 +23,6 @@ export default function initDialogModule(devineTopics) {
   };
 
   let queries = [];
-
   function publish() {
     const answer = answerField.val();
     if (answer !== "") {
@@ -54,6 +57,7 @@ export default function initDialogModule(devineTopics) {
     }
     cons.log(`Querying TTS (${message.uid}): ${message.text}`);
   });
+
   topics.ttsAnswer.subscribe(message => {
     let query_answered = false;
     for (let i in queries) {
@@ -64,6 +68,7 @@ export default function initDialogModule(devineTopics) {
         break;
       }
     }
+
     if (!query_answered) {
       cons.log(
         `ERROR: Answer without query for uid ${message.uid}: ${message.text}`

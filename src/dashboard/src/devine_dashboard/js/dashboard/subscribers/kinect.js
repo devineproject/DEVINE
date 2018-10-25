@@ -4,6 +4,7 @@ import throttle from "../../throttle";
 import LogConsole from "../console";
 import $ from "jquery";
 
+// Variables definition
 const cons = new LogConsole("Kinect", "#3498DB");
 const imageSize = { x: 640, y: 480 };
 const objectPos2d = $("#kinect_pos_found")[0];
@@ -13,6 +14,7 @@ const image = canvas ? canvas.getContext("2d") : undefined;
 const delay = $("#kinect_image_delay");
 const image_selection = $("input[name=image_selection]");
 
+// The history is a buffer that allow to got back in time a little
 let history = createHistory();
 function createHistory() {
   return {
@@ -26,6 +28,10 @@ function createHistory() {
   };
 }
 
+/**
+ * Initialize the module.
+ * @param {dict} devineTopics - The list of ros topics.
+ */
 export default function InitKinectModule(devineTopics) {
   const topics = {
     image: new RosTopic(devineTopics.raw_image),
@@ -36,71 +42,80 @@ export default function InitKinectModule(devineTopics) {
     segmentation: new RosTopic(devineTopics.objects),
     object_position_2d: new RosTopic(devineTopics.guess_location_image),
     object_position_3d: new RosTopic(devineTopics.guess_location_world),
-    body_position: new RosTopic(devineTopics.body_tracking),
-    current_img_topic: null
+    body_position: new RosTopic(devineTopics.body_tracking)
   };
 
-  //We want to limit drawing for performance, yet we might want to keep all data
+  /** Clear all the topics listeners */
+  function clearTopicsListeners() {
+    for (let i in topics) {
+      if (topics[i]) {
+        topics[i].removeAllListeners();
+      }
+    }
+  }
+
+  /**
+   * Subscribe to a given topic and hook the callback.
+   * @param {number} topic - The topic.
+   * @param {number} historyTopic - The history topic callback.
+   */
+  function subscribeAndBind(topic, historyTopic) {
+    topic.subscribe(handleTopicData.bind(this, historyTopic));
+  }
+
+  /** Handle image changed */
   function imageSourceChanged() {
     if ($(this).is(":checked")) {
       history = createHistory();
       setTimeout(() => drawNoFeed(), 200);
-      for (let i in topics) {
-        if (topics[i]) {
-          topics[i].removeAllListeners();
-        }
-      }
+      clearTopicsListeners();
+
+      let image_topic = null;
       let currentImgType = $(this).val();
       switch (currentImgType) {
         case "raw_camera":
-          topics.current_img_topic = topics.image;
+          image_topic = topics.image;
           break;
+
         case "segmentation":
-          topics.current_img_topic = topics.segmentation_image;
-          topics.segmentation.subscribe(
-            handleTopicData.bind(this, history.segmentation)
-          );
+          image_topic = topics.segmentation_image;
+          subscribeAndBind(topics.segmentation, history.segmentation);
+          subscribeAndBind(topics.confidence, history.confidence);
           topics.segmentation.subscribe(
             function(confidence, _) {
               confidence.length = 0;
             }.bind(this, history.confidence)
           );
-          topics.confidence.subscribe(
-            handleTopicData.bind(this, history.confidence)
-          );
           break;
+
         case "body_tracking":
-          topics.current_img_topic = topics.body_tracking_image;
-          topics.body_position.subscribe(
-            handleTopicData.bind(this, history.body_tracking)
-          );
+          image_topic = topics.body_tracking_image;
+          subscribeAndBind(topics.body_position, history.body_tracking);
           break;
+
         case "zone_detection":
-          topics.current_img_topic = topics.zone_detection_image;
+          image_topic = topics.zone_detection_image;
       }
-      topics.object_position_2d.subscribe(
-        handleTopicData.bind(this, history.object_position_2d)
-      );
-      topics.object_position_3d.subscribe(
-        handleTopicData.bind(this, history.object_position_3d)
-      );
+      subscribeAndBind(topics.object_position_2d, history.object_position_2d);
+      subscribeAndBind(topics.object_position_3d, history.object_position_3d);
+
+      subscribeAndBind(image_topic, history.image);
       cons.log(`Subscribed to ${currentImgType}`);
-      topics.current_img_topic.subscribe(
-        handleTopicData.bind(this, history.image)
-      );
     }
   }
   image_selection.change(imageSourceChanged);
   image_selection.each(imageSourceChanged); //Initialisation
 
   const draw = throttle(function draw() {
-    let obj_pos_2d = getCurrentElement(history.object_position_2d);
-    let obj_pos_3d = getCurrentElement(history.object_position_3d);
-    let body_tracking = getCurrentElement(history.body_tracking);
+    let obj_pos_2d = getCurrentHistoryElement(history.object_position_2d);
+    let obj_pos_3d = getCurrentHistoryElement(history.object_position_3d);
+    let body_tracking = getCurrentHistoryElement(history.body_tracking);
     let confidence =
-      history.position == 1 ? getCurrentElement(history.confidence) : undefined;
-    let seg = getCurrentElement(history.segmentation);
-    let img = getCurrentElement(history.image);
+      history.position == 1
+        ? getCurrentHistoryElement(history.confidence)
+        : undefined;
+    let seg = getCurrentHistoryElement(history.segmentation);
+    let img = getCurrentHistoryElement(history.image);
     let image_length = history.image.length;
 
     writePositions(obj_pos_2d, obj_pos_3d);
@@ -128,6 +143,11 @@ export default function InitKinectModule(devineTopics) {
     }
   }, 100);
 
+  /**
+   * Add upcomming data from subscribed topic into the history buffer.
+   * @param {Topic} historyTopic - The history topic.
+   * @param {object} msg - The new data.
+   */
   function handleTopicData(historyTopic, msg) {
     historyTopic.push(msg.data);
     // 50 kinect images ~= 2.6 mb
@@ -148,6 +168,10 @@ export default function InitKinectModule(devineTopics) {
   drawNoFeed(); // No feed at startup
 }
 
+/**
+ * Set the image canvas color brush for further drawing.
+ * @param {string} color - The new color.
+ */
 function setColor(color) {
   if (color) {
     image.strokeStyle = color;
@@ -155,12 +179,18 @@ function setColor(color) {
   }
 }
 
+/** Draw an old-school style ne camera feed warning */
 function drawNoFeed() {
   setColor("red");
   image.font = "bold 20pt Arial";
   image.fillText("< No Camera Feed />", 190, imageSize.y / 2);
 }
 
+/**
+ * Draw a cross an the position found
+ * @param {int} x - X coordinate.
+ * @param {int} y - Y coordinate.
+ */
 function drawPositionFound(x, y) {
   setColor("#3498DB");
   image.fillText("Found!", x + 8, y - 8);
@@ -169,6 +199,11 @@ function drawPositionFound(x, y) {
   image.fillRect(x - 1, y - 20, 2, 40);
 }
 
+/**
+ * Draw rectangle over object found on the image.
+ * @param {array} objects - The list of objects.
+ * @param {int|undefined} confidence - The confidence value, if an object was found.
+ */
 function drawObjectsRectangles(objects, confidence) {
   for (var i = 0; i < objects.length; i++) {
     setColor(distinctColors[i % 14]);
@@ -178,18 +213,33 @@ function drawObjectsRectangles(objects, confidence) {
     let width = right - left;
     let height = bottom - top;
     image.rect(left, top, width, height);
+
     image.fillText(objects[i].category, left, top - 1);
-    if (confidence !== undefined && confidence.length === objects.length)
+
+    // Show the confidence about the object found, if any.
+    if (confidence !== undefined && confidence.length === objects.length) {
       image.fillText(confidence[i].toFixed(2), left, bottom - 1);
+    }
+
     image.stroke();
     image.closePath();
   }
 }
 
-function getCurrentElement(array) {
-  return array[array.length - history.position];
+/**
+ * Retreive the current history element with the current position.
+ * @param {array} historyArray - The array to take the element from.
+ * @return {object} The element.
+ */
+function getCurrentHistoryElement(historyArray) {
+  return historyArray[historyArray.length - history.position];
 }
 
+/**
+ * Clear the canvas and reset the image.
+ * @param {canvas} image - The image canvas.
+ * @param {object} imageObject - The image data.
+ */
 function resetImage(image, imageObject) {
   image.clearRect(0, 0, imageSize.x, imageSize.y);
   image.drawImage(imageObject, 0, 0);
@@ -197,6 +247,11 @@ function resetImage(image, imageObject) {
   image.lineWidth = "2";
 }
 
+/**
+ * Write positions on the dashboard.
+ * @param {array} obj_pos_2d - The 2D position.
+ * @param {array} obj_pos_3d - The 3D position.
+ */
 function writePositions(obj_pos_2d, obj_pos_3d) {
   if (obj_pos_2d != undefined) {
     objectPos2d.innerText = `(${obj_pos_2d[0]}, ${obj_pos_2d[1]})`;
@@ -204,15 +259,21 @@ function writePositions(obj_pos_2d, obj_pos_3d) {
 
   if (obj_pos_3d != undefined) {
     let cleanFloat = number => (number === null ? "N/A" : number.toFixed(2));
+
     objectPos3d.innerText =
       `(${cleanFloat(obj_pos_3d[0])}, ` +
       `${cleanFloat(obj_pos_3d[1])}, ${cleanFloat(obj_pos_3d[2])})`;
   }
 }
 
+/**
+ * Map body part with one another (e.g.: ear with eye).
+ * Adaptation and refactor of function draw_humans in tf_pose/estimator.py
+ * @param {array} humans - The list of humans detected.
+ *
+ * @see CocoPairs in tf_pose/common.py
+ */
 function drawBodyTracking(humans) {
-  //Adaptation and refactor of function draw_humans in tf_pose/estimator.py
-  //Map body part with one another (e.g.: ear with eye); see CocoPairs in tf_pose/common.py
   const BodyPartsAggr = [
     [1, 2],
     [1, 5],
