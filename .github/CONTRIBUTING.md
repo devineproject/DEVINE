@@ -26,15 +26,17 @@ DEVINE uses [Pylint](https://www.pylint.org/) to enforce coding standards for Py
 
 ```
 $ pip install pylint
+$ pip install pylint-quotes
 ```
 
 Once installed, you can run Pylint manually on any **.py** file by typing:
 
 ```
-$ pylint MY_PYTHON_FILE.py --rcfile=PATH_TO_DEVINE_REPO/.pylintrc
+$ pylint --load-plugins pylint_quotes --rcfile=PATH_TO_DEVINE_REPO/.pylintrc PYTHON_FILE.py
 ```
 
 Note that Pylint can be integrated into various IDE as seen  [here](https://pylint.readthedocs.io/en/latest/user_guide/ide-integration.html).
+If you do this, also add the pylint arg `--load-plugins=pylint_quotes` into your IDE to ensure the conventional use of quotes.
 
 #### 2. git-pylint-commit-hook 
 
@@ -49,11 +51,11 @@ cd .git/hooks/
 mv pre-commit.sample pre-commit
 ```
 
-Delete everything thats in there and paste this in the pre-commit file
+Delete everything thats in there and paste this in the `pre-commit` file:
 
 ```
 #!/bin/sh
-git-pylint-commit-hook --pylintrc PATH_TO_DEVINE_REPO/.pylintrc --limit 8.0
+git-pylint-commit-hook --pylintrc PATH_TO_DEVINE_REPO/.pylintrc --limit 8.0 --pylint-params "--load-plugins=pylint_quotes --disable=no-name-in-module --disable=no-member --max-line-length=240"
 ```
 
 ### Understand Pylint outputs
