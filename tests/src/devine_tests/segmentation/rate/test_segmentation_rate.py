@@ -2,7 +2,7 @@
 import json
 import unittest
 import rospy
-from devine_tests import utils
+from devine_common import image_utils
 import devine_tests.segmentation.segmentation_helper as helper
 
 class TestSegmentationRate(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestSegmentationRate(unittest.TestCase):
 
     def test_segmentation_rate_on_two_frames(self):
         """ Loads images and posts the corresponding segmentation rates """
-        test_images = helper.load_test_images(__file__, utils.get_fullpath(__file__, "test.json"))
+        test_images = helper.load_test_images(__file__, image_utils.get_fullpath(__file__, "test.json"))
 
         for image in test_images:
             self.assertFalse(rospy.is_shutdown())

@@ -9,7 +9,7 @@ from sensor_msgs import point_cloud2
 from devine_config import topicname
 from sensor_msgs.msg import CompressedImage
 import numpy as np
-from utils import image_to_ros_msg
+from devine_common.image_utils import image_to_ros_msg
 
  #Topics
 IMAGE_DEPTH_TOPIC = topicname('image_depth')

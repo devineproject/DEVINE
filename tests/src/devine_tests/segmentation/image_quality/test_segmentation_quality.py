@@ -1,7 +1,7 @@
 #! /usr/bin/env python2
 import unittest
 import rospy
-from devine_tests import utils
+from devine_common import image_utils
 import devine_tests.segmentation.segmentation_helper as helper
 
 class TestSegmentationQuality(unittest.TestCase):
@@ -9,7 +9,7 @@ class TestSegmentationQuality(unittest.TestCase):
 
     def test_image_quality_should_not_affect_segmentation(self):
         """ Tests image quality """
-        test_images = helper.load_test_images(__file__, utils.get_fullpath(__file__, "test1.json"))
+        test_images = helper.load_test_images(__file__, image_utils.get_fullpath(__file__, "test1.json"))
 
         expected_objects = test_images[0][helper.EXPECTED_OBJECTS]
         images_objects_found = []
@@ -27,7 +27,7 @@ class TestSegmentationQuality(unittest.TestCase):
 
     def test_image_size_should_not_affect_segmentation_too_much(self):
         """ Tests image size """
-        test_images = helper.load_test_images(__file__, utils.get_fullpath(__file__, "test2.json"))
+        test_images = helper.load_test_images(__file__, image_utils.get_fullpath(__file__, "test2.json"))
 
         expected_objects = test_images[0][helper.EXPECTED_OBJECTS]
         images_objects_missed = []
