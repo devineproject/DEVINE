@@ -81,7 +81,7 @@ class Controller(object):
             if self.is_arms_activated:
                 if msg.pose.position != (0, 0, 0):
                     # TODO add decision left/right arms in ik.py
-                    arm_decision = 'right'
+                    arm_decision = 'left'
                     joints_position = self.calcul_arm(arm_decision)
                     self.move({'arm_' + arm_decision: joints_position},
                             self.time)
