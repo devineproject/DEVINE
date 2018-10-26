@@ -7,8 +7,8 @@
   <arg name="guesswhat" default="$(arg launch_all)" />
   <arg name="image_processing" default="$(arg launch_all)" />
   <arg name="scene_finder" default="$(arg launch_all)" />
+  <arg name="game_restarter" default="$(arg launch_all)"/>
   <arg name="jn0" default="true" />
-  <arg name="game_restarter" default="true"/>
 
   <group if="$(arg robot_control)">
     <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
