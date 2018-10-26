@@ -56,11 +56,11 @@ export default function InitKinectModule(devineTopics) {
 
   /**
    * Subscribe to a given topic and hook the callback.
-   * @param {number} topic - The topic.
-   * @param {number} historyTopic - The history topic callback.
+   * @param {Topic} topic - The topic.
+   * @param {array} historyArray - The history array to use in the callback.
    */
-  function subscribeAndBind(topic, historyTopic) {
-    topic.subscribe(handleTopicData.bind(this, historyTopic));
+  function subscribeAndBind(topic, historyArray) {
+    topic.subscribe(handleTopicData.bind(this, historyArray));
   }
 
   /** Handle image changed */
