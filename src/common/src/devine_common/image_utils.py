@@ -16,7 +16,7 @@ def image_to_ros_msg(image):
     msg = CompressedImage()
     msg.header.stamp = rospy.Time.now()
     msg.format = "png"
-    msg.data = np.array(cv2.imencode(".png", img)[1]).tostring()
+    msg.data = np.array(cv2.imencode(".png", image)[1]).tostring()
     return msg
 
 def get_fullpath(file, relative_file):

@@ -11,7 +11,7 @@ import numpy as np
 from time import sleep
 import os
 from std_msgs.msg import String
-from utils import image_to_ros_msg
+from devine_common.image_utils import image_to_ros_msg
 
 
 FEATURE_IMAGE_TOPIC = topicname('features_extraction_image')
