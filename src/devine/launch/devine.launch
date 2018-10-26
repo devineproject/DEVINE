@@ -7,7 +7,6 @@
   <arg name="guesswhat" default="$(arg launch_all)" />
   <arg name="image_processing" default="$(arg launch_all)" />
   <arg name="scene_finder" default="$(arg launch_all)" />
-  <arg name="game_restarter" default="$(arg launch_all)"/>
   <arg name="jn0" default="true" />
 
   <group if="$(arg robot_control)">
@@ -54,10 +53,5 @@
 
   <group if="$(arg guesswhat)">
     <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
-  </group>
-
-  <group if="$(arg game_restarter)">
-    <node name="restarter" pkg="devine_game_system" type="start_new_game.py" respawn="true" />
-    <node name="announcer" pkg="devine_game_system" type="announce_object.py" respawn="true" />
   </group>
 </launch>
