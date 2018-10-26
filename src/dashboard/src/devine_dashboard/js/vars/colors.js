@@ -1,4 +1,4 @@
-// 14 distincs colors 
+// 14 distincs colors
 export const distinctColors = [
   "#e6194b",
   "#3cb44b",
@@ -13,5 +13,5 @@ export const distinctColors = [
   "#800000",
   "#000080",
   "#808080",
-  "#000000",
+  "#000000"
 ];
