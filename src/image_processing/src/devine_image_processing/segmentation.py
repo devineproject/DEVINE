@@ -1,10 +1,4 @@
 #!/usr/bin/env python3
-from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
-from devine_config import topicname
-from keras.backend.tensorflow_backend import set_session
-import tensorflow as tf
-import model as modellib
-import coco
 '''ROS module for image_segmentation'''
 
 import sys
@@ -17,19 +11,24 @@ from std_msgs.msg import String
 from bson import json_util
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../Mask_RCNN'))
+import coco
+import model as modellib
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+from devine_config import topicname
 
+from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-# paths
+#paths
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 COCO_MODEL_PATH = os.path.join(ROOT_DIR, "../../mask_rcnn_coco.h5")
 MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
-# topics
+#topics
 IMAGE_TOPIC = topicname('segmentation_image')
 SEGMENTATION_TOPIC = topicname('objects')
 
 SEGMENTATION_THRESHOLD = 0.8
-
 
 class RCNNSegmentation(ImageProcessor):
     '''RCNN segmentation wrapper of Mask_RCNN for use in guesswhat'''
@@ -91,21 +90,19 @@ class RCNNSegmentation(ImageProcessor):
                 "bbox": bounding_box.tolist(),
                 "category": self.class_names[class_id],
                 "segment": [],
-                "id": current_id
-                # "area": mask.tolist()
+                "id" : current_id
+                #"area": mask.tolist()
             }
             object_array.append(current_object)
 
         result_obj['objects'] = object_array
         return json_util.dumps(result_obj)
 
-
 def main():
     '''Entry point of this file'''
     processor = ROSImageProcessingWrapper(RCNNSegmentation, IMAGE_TOPIC)
     publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10, latch=False)
-    processor.loop(lambda processor_output: publisher.publish(processor_output))
-
+    processor.loop(lambda processor_output : publisher.publish(processor_output))
 
 if __name__ == '__main__':
     main()
