@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-'''ROS module for body tracking'''
+""" ROS module for body tracking """
 
-import sys
 import os
 
 import rospy
@@ -19,38 +18,42 @@ import cv2
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 from devine_config import topicname
 
-#paths
+# paths
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-MODEL_DIR = os.path.join(ROOT_DIR, "../../mobilenet_thin.pb") # originally in './models/graph/mobilenet_thin/graph_opt.pb'
+# originally in './models/graph/mobilenet_thin/graph_opt.pb'
+MODEL_DIR = os.path.join(ROOT_DIR, "../../mobilenet_thin.pb")
 
-#topics
+# topics
 IMAGE_TOPIC = topicname('body_tracking_image')
 PUBLISH_TOPIC = topicname('body_tracking')
 
+
 class BodyTracking(ImageProcessor):
-    '''Body Tracking wrapper of tf_pose for use in guesswhat'''
+    """Body Tracking wrapper of tf_pose for use in guesswhat"""
     body_parts_names = [
         "Nose", "Neck", "RShoulder", "RElbow", "RWrist", "LShoulder", "LElbow", "LWrist", "RHip", "RKnee",
         "RAnkle", "LHip", "LKnee", "LAnkle", "REye", "LEye", "REar", "LEar", "Background"
     ]
+
     def __init__(self):
         config = tf.ConfigProto(log_device_placement=True)
         config.gpu_options.allow_growth = True
         set_session(tf.Session(config=config))
-        self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368)) #downscale image 
+        self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368))  # downscale image
 
     def process(self, img, _):
-        '''Actual body tracking of the image'''
+        """Actual body tracking of the image"""
         rospy.logdebug("Starting body tracking")
         image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-        humans = self.estimator.inference(image, resize_to_default=True, upsample_size=4.0) #True if resize is not the same size
-        
-        #Draw humans on image
+        # True if resize is not the same size
+        humans = self.estimator.inference(image, resize_to_default=True, upsample_size=4.0)
+
+        # Draw humans on image
         #image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
-        #Show image
+        # Show image
         #cv2.imshow("result", image)
-        #cv2.waitKey(1)
-        
+        # cv2.waitKey(1)
+
         rospy.logdebug("Body tracking done")
         result_obj = []
         for hum in humans:
@@ -68,11 +71,13 @@ class BodyTracking(ImageProcessor):
             result_obj.append(result_human)
         return json_util.dumps(result_obj)
 
+
 def main():
-    '''Entry point of this file'''
+    """Entry point of this file"""
     processor = ROSImageProcessingWrapper(BodyTracking, IMAGE_TOPIC)
     publisher = rospy.Publisher(PUBLISH_TOPIC, String, queue_size=10, latch=True)
-    processor.loop(lambda processor_output : publisher.publish(processor_output))
+    processor.loop(lambda processor_output: publisher.publish(processor_output))
+
 
 if __name__ == '__main__':
     main()

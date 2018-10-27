@@ -10,11 +10,13 @@ import rospy
 from sensor_msgs.msg import CompressedImage
 import signal
 import inspect
-from PIL import Image	
+from PIL import Image
 from io import BytesIO
+
 
 class ImageProcessor(object):
     ''' Base interface for an image processor'''
+
     def processor_name(self):
         '''Return the processor's name'''
         return self.__class__.__name__
@@ -23,9 +25,10 @@ class ImageProcessor(object):
         '''Callback when a new image is received and ready to be processed'''
         raise NotImplementedError()
 
+
 class ROSImageProcessingWrapper(object):
     '''Generic ROS Wrapper around an image processing class'''
-    image_queue = Queue(2) # Processing must be on the main thread for TensorFlow compatible processors
+    image_queue = Queue(2)  # Processing must be on the main thread for TensorFlow compatible processors
     image_processor = None
 
     def __init__(self, image_processor, receiving_topic):
@@ -36,7 +39,7 @@ class ROSImageProcessingWrapper(object):
         if not receiving_topic:
             raise Exception("Receiving topic must be set to an image topic")
         self.image_processor = image_processor
-        rospy.init_node(image_processor.processor_name())        
+        rospy.init_node(image_processor.processor_name())
         rospy.Subscriber(receiving_topic, CompressedImage,
                          self.image_received_callback, queue_size=1)
 
@@ -64,11 +67,14 @@ class ROSImageProcessingWrapper(object):
                     break
 
 # Thanks Mayank Jaiswal, https://stackoverflow.com/a/31464349
+
+
 class GracefulKiller:
     kill_now = False
+
     def __init__(self):
         signal.signal(signal.SIGINT, self.exit_gracefully)
         signal.signal(signal.SIGTERM, self.exit_gracefully)
 
-    def exit_gracefully(self,signum, frame):
+    def exit_gracefully(self, signum, frame):
         self.kill_now = True

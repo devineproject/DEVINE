@@ -11,7 +11,7 @@ from devine_config import topicname
 from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-#topics
+# topics
 IMAGE_TOPIC = topicname('raw_image')
 
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
@@ -19,8 +19,10 @@ ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
 FEATURES_EXTRACTION_IMAGE_TOPIC = topicname('features_extraction_image')
 
+
 class Throttle(object):
     '''ROS publisher throttler'''
+
     def __init__(self, publisher, delay):
         self.publisher = publisher
         self.last_time = 0
@@ -34,15 +36,18 @@ class Throttle(object):
         self.last_time = current_time - 0.00001
         return self.publisher.publish(*args)
 
+
 class TopicState(IntEnum):
     '''Enum of the possible states of a topic'''
     NOTHING_RECEIVED = 1 << 0
     RECEIVED_YES = 1 << 1        # validator returns true
     RECEIVED_NO = 1 << 2         # validator returns false
+
     def __contains__(self, item):
         if isinstance(item, TopicState):
             item = item.value
-        return  (self.value & item) > 0
+        return (self.value & item) > 0
+
 
 class SubscriberReady(object):
     '''Wrapper that checks if a topic was published with valid data'''
@@ -72,6 +77,7 @@ class SubscriberReady(object):
 
 class SmartImagePublisher(object):
     '''Republish an image to a topic_name based on the result of the state_validator'''
+
     def __init__(self, topic_name, state_validator, throttle_rate=None, publish_state=TopicState.NOTHING_RECEIVED | TopicState.RECEIVED_NO):
         self.publisher = rospy.Publisher(topic_name, CompressedImage, queue_size=1) if topic_name else None
         if self.publisher and throttle_rate:
@@ -102,7 +108,8 @@ class ImageDispatcher(ImageProcessor):
 
         self.smart_publishers = [
             SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=3),
-            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator, publish_state=TopicState.RECEIVED_NO),
+            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator,
+                                publish_state=TopicState.RECEIVED_NO),
             SmartImagePublisher(SEGMENTATION_IMAGE_TOPIC, seg_validator),
             SmartImagePublisher(FEATURES_EXTRACTION_IMAGE_TOPIC, features_validator),
             SmartImagePublisher(None, restart_validator),
@@ -123,10 +130,12 @@ class ImageDispatcher(ImageProcessor):
             else:
                 break
 
+
 def main():
     '''Entry point of this file'''
     processor = ROSImageProcessingWrapper(ImageDispatcher, IMAGE_TOPIC)
     processor.loop()
+
 
 if __name__ == '__main__':
     main()
