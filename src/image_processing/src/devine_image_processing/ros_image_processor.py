@@ -1,33 +1,30 @@
-'''Generic ROS Wrapper around image processing classes'''
-try:
-    from queue import Queue, Empty
-except:
-    from Queue import Queue, Empty
+"""Generic ROS Wrapper around image processing classes"""
 
+from io import BytesIO
+from Queue import Queue, Empty
 import time
-import numpy as np
-import rospy
-from sensor_msgs.msg import CompressedImage
 import signal
 import inspect
 from PIL import Image
-from io import BytesIO
+from sensor_msgs.msg import CompressedImage
+import rospy
+import numpy as np
 
 
 class ImageProcessor(object):
-    ''' Base interface for an image processor'''
+    """ Base interface for an image processor"""
 
     def processor_name(self):
-        '''Return the processor's name'''
+        """ Return the processor's name """
         return self.__class__.__name__
 
     def process(self, image):
-        '''Callback when a new image is received and ready to be processed'''
+        """ Callback when a new image is received and ready to be processed """
         raise NotImplementedError()
 
 
 class ROSImageProcessingWrapper(object):
-    '''Generic ROS Wrapper around an image processing class'''
+    """ Generic ROS Wrapper around an image processing class """
     image_queue = Queue(2)  # Processing must be on the main thread for TensorFlow compatible processors
     image_processor = None
 
@@ -35,23 +32,24 @@ class ROSImageProcessingWrapper(object):
         if inspect.isclass(image_processor) and issubclass(image_processor, ImageProcessor):
             image_processor = image_processor()
         if not isinstance(image_processor, ImageProcessor):
-            raise Exception("The image processor is not an instance of ImageProcessor")
+            raise Exception('The image processor is not an instance of ImageProcessor')
         if not receiving_topic:
-            raise Exception("Receiving topic must be set to an image topic")
+            raise Exception('Receiving topic must be set to an image topic')
+
         self.image_processor = image_processor
         rospy.init_node(image_processor.processor_name())
         rospy.Subscriber(receiving_topic, CompressedImage,
                          self.image_received_callback, queue_size=1)
 
     def image_received_callback(self, data):
-        '''Callback when a new image is received from the topic'''
+        """ Callback when a new image is received from the topic """
         if self.image_queue.full():
-            rospy.logwarn_throttle(30, rospy.get_name() + " : image receiving rate is too high.")
+            rospy.logwarn_throttle(30, rospy.get_name() + ' : image receiving rate is too high.')
             self.image_queue.get()
         self.image_queue.put(data)
 
     def loop(self, process_callback=None):
-        '''Looping method to process every image'''
+        """ Looping method to process every image """
         killable_loop = GracefulKiller()
         while True:
             try:
@@ -66,10 +64,9 @@ class ROSImageProcessingWrapper(object):
                 if rospy.is_shutdown() or killable_loop.kill_now:
                     break
 
-# Thanks Mayank Jaiswal, https://stackoverflow.com/a/31464349
-
 
 class GracefulKiller:
+    # Thanks Mayank Jaiswal, https://stackoverflow.com/a/31464349
     kill_now = False
 
     def __init__(self):

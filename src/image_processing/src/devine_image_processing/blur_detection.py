@@ -1,4 +1,5 @@
 """ Image blur detection """
+
 import cv2
 
 DETECTION_THRESHOLD = 20
