@@ -19,7 +19,8 @@ SNIPS_PORT = 1883
 SNIPS_TOPICS = {
     'yes': 'Devine-UdeS:Yes',
     'no': 'Devine-UdeS:No',
-    'na': 'Devine-UdeS:NA'
+    'na': 'Devine-UdeS:NA',
+    'name': 'Devine-UdeS:GetName'
 }
 MQTT_CLIENT = mqtt.Client()
 
@@ -42,7 +43,8 @@ def snips_ask_callback(data):
         args['init']['type'] = 'action'
         args['init']['intentFilter'] = [SNIPS_TOPICS['yes'], SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
     elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
-        raise NotImplementedError()
+        args['init']['type'] = 'action'
+        args['init']['intentFilter'] = [SNIPS_TOPICS['name']]
 
     MQTT_CLIENT.publish('hermes/dialogueManager/startSession', json.dumps(args))
 
@@ -74,9 +76,17 @@ def on_snips_message(_client, _userdata, msg):
         rospy.logwarn("Dropped intent, probability was too low")
         return
 
+    answer = intent_name.split(":")[-1].lower()
+    if intent_name == SNIPS_TOPICS['name']:
+        slots = mqtt_topic['slots']
+        if len(slots):
+            answer = slots[0]["rawValue"]
+        else:
+            answer = ""
+
     tts_answer = TtsQuery()
     tts_answer.uid = int(mqtt_topic['customData'])
-    tts_answer.text = intent_name.split(":")[-1].lower()
+    tts_answer.text = answer
 
     ROS_PUBLISHER.publish(tts_answer)
 

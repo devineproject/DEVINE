@@ -120,9 +120,13 @@
       "name": "/jn0/emo_intensity",
       "type": "jn0_face_msgs/EmoIntensity"
     },
+    "robot_facial_expression_completed": {
+      "name": "/devine/robot/facial_expression_completed",
+      "type": "std_msgs/Bool" 
+    },
     "new_game": {
       "name": "/devine/new_game",
-      "type": "std_msgs/Bool" 
+      "type": "std_msgs/Bool"
     }
   },
   "constants": {
