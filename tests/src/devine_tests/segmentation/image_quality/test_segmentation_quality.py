@@ -1,15 +1,16 @@
 #! /usr/bin/env python2
 import unittest
 import rospy
-from devine_common import image_utils
+from devine_common import ros_utils
 import devine_tests.segmentation.segmentation_helper as helper
+
 
 class TestSegmentationQuality(unittest.TestCase):
     """ Test to validate segmentation quality """
 
     def test_image_quality_should_not_affect_segmentation(self):
         """ Tests image quality """
-        test_images = helper.load_test_images(__file__, image_utils.get_fullpath(__file__, "test1.json"))
+        test_images = helper.load_test_images(__file__, ros_utils.get_fullpath(__file__, "test1.json"))
 
         expected_objects = test_images[0][helper.EXPECTED_OBJECTS]
         images_objects_found = []
@@ -27,7 +28,7 @@ class TestSegmentationQuality(unittest.TestCase):
 
     def test_image_size_should_not_affect_segmentation_too_much(self):
         """ Tests image size """
-        test_images = helper.load_test_images(__file__, image_utils.get_fullpath(__file__, "test2.json"))
+        test_images = helper.load_test_images(__file__, ros_utils.get_fullpath(__file__, "test2.json"))
 
         expected_objects = test_images[0][helper.EXPECTED_OBJECTS]
         images_objects_missed = []
@@ -43,7 +44,6 @@ class TestSegmentationQuality(unittest.TestCase):
         objects_missed_from_smaller_image = images_objects_missed[0]
         for i in range(2, len(images_objects_missed)):
             self.assertGreaterEqual(objects_missed_from_smaller_image, len(images_objects_missed[i]) + 1)
-
 
     def get_objects_found(self, test_image):
         """ Trigger the segmentation on a given image """

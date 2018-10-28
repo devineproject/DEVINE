@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-'''Image dispatching node'''
+""" Image dispatching node """
 
 from threading import RLock
 from enum import IntEnum
@@ -11,7 +11,7 @@ from devine_config import topicname
 from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-#topics
+# Topics
 IMAGE_TOPIC = topicname('raw_image')
 
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
@@ -19,37 +19,42 @@ ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
 FEATURES_EXTRACTION_IMAGE_TOPIC = topicname('features_extraction_image')
 
+
 class Throttle(object):
-    '''ROS publisher throttler'''
+    """ ROS publisher throttler """
+
     def __init__(self, publisher, delay):
         self.publisher = publisher
         self.last_time = 0
         self.delay = delay
 
     def publish(self, *args):
-        '''Call at a throttled rate'''
+        """ Call at a throttled rate """
         current_time = time()
         if self.last_time + self.delay > current_time:
             return False
         self.last_time = current_time - 0.00001
         return self.publisher.publish(*args)
 
+
 class TopicState(IntEnum):
-    '''Enum of the possible states of a topic'''
+    """ Enum of the possible states of a topic """
     NOTHING_RECEIVED = 1 << 0
     RECEIVED_YES = 1 << 1        # validator returns true
     RECEIVED_NO = 1 << 2         # validator returns false
+
     def __contains__(self, item):
         if isinstance(item, TopicState):
             item = item.value
-        return  (self.value & item) > 0
+        return (self.value & item) > 0
+
 
 class SubscriberReady(object):
-    '''Wrapper that checks if a topic was published with valid data'''
+    """ Wrapper that checks if a topic was published with valid data """
 
     def __init__(self, topic, topic_type, validator=lambda x: bool(x.data)):
         self.__lock = RLock()
-        self.__sub = rospy.Subscriber(topic, topic_type, self.__topic_callback)
+        self.__sub = rospy.Subscriber(topic, topic_type, self._topic_callback)
         self.validator = validator
         self.topic_state = TopicState.NOTHING_RECEIVED
 
@@ -64,14 +69,15 @@ class SubscriberReady(object):
             self.topic_state = TopicState.NOTHING_RECEIVED
             return state
 
-    def __topic_callback(self, data):
-        '''Callback when topic is published'''
+    def _topic_callback(self, data):
+        """ Callback when topic is published """
         with self.__lock:
             self.topic_state = TopicState.RECEIVED_YES if self.validator(data) else TopicState.RECEIVED_NO
 
 
 class SmartImagePublisher(object):
-    '''Republish an image to a topic_name based on the result of the state_validator'''
+    """ Republish an image to a topic_name based on the result of the state_validator """
+
     def __init__(self, topic_name, state_validator, throttle_rate=None, publish_state=TopicState.NOTHING_RECEIVED | TopicState.RECEIVED_NO):
         self.publisher = rospy.Publisher(topic_name, CompressedImage, queue_size=1) if topic_name else None
         if self.publisher and throttle_rate:
@@ -81,7 +87,7 @@ class SmartImagePublisher(object):
         self.publish_state = publish_state
 
     def process(self, payload):
-        '''Process func for a specific publisher'''
+        """ Process func for a specific publisher """
         state = self.state_validator()
         if self.publish_state in state:
             if self.publisher:
@@ -90,7 +96,7 @@ class SmartImagePublisher(object):
 
 
 class ImageDispatcher(ImageProcessor):
-    '''Dispatcher of frames to nodes'''
+    """ Dispatcher of frames to nodes """
 
     def __init__(self):
         body_tracking_validator = SubscriberReady(topicname('player_name'), String)
@@ -102,7 +108,8 @@ class ImageDispatcher(ImageProcessor):
 
         self.smart_publishers = [
             SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=3),
-            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator, publish_state=TopicState.RECEIVED_NO),
+            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator,
+                                publish_state=TopicState.RECEIVED_NO),
             SmartImagePublisher(SEGMENTATION_IMAGE_TOPIC, seg_validator),
             SmartImagePublisher(FEATURES_EXTRACTION_IMAGE_TOPIC, features_validator),
             SmartImagePublisher(None, restart_validator),
@@ -111,9 +118,9 @@ class ImageDispatcher(ImageProcessor):
         self.pub_index = 0
 
     def process(self, img, img_payload):
-        '''Remove blurry images and submit the images to the current module'''
+        """ Remove blurry images and submit the images to the current module """
         if is_image_blurry(img):
-            rospy.logwarn("Discarding blurry image")
+            rospy.logwarn('Discarding blurry image')
             return
         while not rospy.is_shutdown():
             image_publisher = self.smart_publishers[self.pub_index]
@@ -123,10 +130,12 @@ class ImageDispatcher(ImageProcessor):
             else:
                 break
 
+
 def main():
-    '''Entry point of this file'''
+    """ Entry point of this file """
     processor = ROSImageProcessingWrapper(ImageDispatcher, IMAGE_TOPIC)
     processor.loop()
+
 
 if __name__ == '__main__':
     main()
