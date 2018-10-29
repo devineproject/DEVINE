@@ -2,18 +2,14 @@
 
 ''' Depth mask of images based on a distance threshold '''
 
-from threading import Lock
 import rospy
-from sensor_msgs.msg import PointCloud2
-from sensor_msgs import point_cloud2
 from devine_config import topicname
-from sensor_msgs.msg import CompressedImage
 import numpy as np
 from sensor_msgs.msg import Image as ROS_Image
+from sensor_msgs.msg import CompressedImage
 from devine_common.image_utils import image_to_ros_msg
-from PIL import Image
-from io import BytesIO
 from cv_bridge import CvBridge, CvBridgeError
+import message_filters
 
  #Topics
 IMAGE_DEPTH_TOPIC = '/camera/depth/image' #topicname('image_depth')
@@ -25,50 +21,32 @@ DEPTH_THRESHOLD = 1.5 # meters of depth
 class DepthMask(object):
     ''' Callback executed when a depth image is received from openni '''
     def __init__(self):
-        self.depth_subscription = rospy.Subscriber(IMAGE_DEPTH_TOPIC, ROS_Image, self.openni_depth_callback)
-        self.img_subscription = rospy.Subscriber(IMAGE_TOPIC, CompressedImage, self.img_callback)
-        self.mutex = Lock() #Lock mutex to sync up point_cloud and 2D position calculation
-        self.current_point_cloud = None
-        self.current_img = None
+        self.bridge = CvBridge()
+        image_sub = message_filters.Subscriber("camera/rgb/image_color", ROS_Image)
+        depth_sub = message_filters.Subscriber("camera/depth/image", ROS_Image)
+
+        self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 10, 0.5) # check these params
+        self.ts.registerCallback(self.callback)
         self.depth_mask_publisher = rospy.Publisher(IMAGE_PUB_TOPIC, CompressedImage, queue_size=10)
        
-    def img_callback(self, data):
-        self.mutex.acquire()
-        self.current_img = data
-        self.mutex.release()
-        self.do_mask()
-        
-    def openni_depth_callback(self, data):
-        ''' Callback executed when a depth image is received from openni '''
-        self.mutex.acquire()
-        self.current_point_cloud = data
-        self.mutex.release()
-        self.do_mask()
-        
-    def do_mask(self):
-         if self.current_img is not None and self.current_point_cloud is not None:
-             self.mutex.acquire()
-             #np_img = np.fromstring(self.current_img.data, np.uint8)
-             np_img = np.array(Image.open(BytesIO(self.current_img.data))).astype(np.uint8)
-             coordinates = np.array(np.meshgrid(np.array(range(0,481)), np.array(range(0,641)))).T.reshape(-1,2)
-             #gen = point_cloud2.read_points(self.current_point_cloud, field_names=('z'),uvs = coordinates,  skip_nans=True)
-             coordinates = CvBridge().imgmsg_to_cv2(self.current_point_cloud.data, desired_encoding="passthrough")
-             print(coordinates.shape)
-             self.mutex.release() 	
-             #print(np_img.shape)
-             #print(sum([1 for _ in gen]))
-             for item in gen:
-                 print(item)
-             for [u, v, z] in gen:
-                 if z > DEPTH_THRESHOLD:
-                     print(x,y,z)
-                     np_img[x,y,:] = 0
-             print(np_img.shape)
-             msg = image_to_ros_msg(np_img)
-             self.depth_mask_publisher.publish(msg)
-             self.current_img = None
-             self.current_point_cloud = None
-            
+    def callback(self, rgb_data, depth_data):
+        try:
+            image = self.bridge.imgmsg_to_cv2(rgb_data, "bgr8")
+            depth_image = self.bridge.imgmsg_to_cv2(depth_data, "passthrough")
+        except CvBridgeError, e:
+            print e
+        depth_image = np.nan_to_num(depth_image)
+        depth_image[depth_image == 0] = DEPTH_THRESHOLD + 1 
+        #print(depth_image)
+        mask = depth_image < DEPTH_THRESHOLD
+        print(mask)
+        self.masked_image = np.array([pixel if mask_val ==  True else np.array([0,0,0]) for pixel_row,bool_row in zip(image,mask) for pixel,mask_val in zip(pixel_row,bool_row)])
+        print(self.masked_image)
+        print(self.masked_image.shape)
+        self.masked_image = np.reshape(self.masked_image,[480,640,3])
+        print(self.masked_image.shape)
+        msg = image_to_ros_msg(self.masked_image)
+        self.depth_mask_publisher.publish(msg)
             
             
 def main():
