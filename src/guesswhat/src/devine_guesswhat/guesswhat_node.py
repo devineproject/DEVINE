@@ -1,14 +1,10 @@
 #!/usr/bin/env python3
-'''ROS node for guesswhat'''
+""" ROS node for guesswhat """
 
 import json
-import os
-import sys
 from queue import Queue, Empty
-
 import rospy
 from std_msgs.msg import String, Int32MultiArray, Float64MultiArray
-
 import tensorflow as tf
 import numpy as np
 
@@ -21,165 +17,190 @@ from guesswhat.data_provider.guesswhat_tokenizer import GWTokenizer
 from guesswhat.data_provider.looper_batchifier import LooperBatchifier
 
 from modelwrappers import GuesserROSWrapper, OracleROSWrapper
-
 from devine_config import topicname
+from devine_common import ros_utils
 
-ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-EVAL_CONF_PATH = os.path.join(ROOT_DIR, '../../config/eval.json')
-GUESS_CONF_PATH = os.path.join(ROOT_DIR, '../../config/guesser.json')
-QGEN_CONF_PATH = os.path.join(ROOT_DIR, '../../config/qgen.json')
-GUESS_NTW_PATH = os.path.join(ROOT_DIR, '../../data/guesser.ckpt')
-QGEN_NTW_PATH = os.path.join(ROOT_DIR, '../../data/qgen.ckpt')
-TOKENS_PATH = os.path.join(ROOT_DIR, '../../data/tokens.json')
+EVAL_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/eval.json')
+GUESS_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/guesser.json')
+QGEN_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/qgen.json')
+GUESS_NTW_PATH = ros_utils.get_fullpath(__file__, '../../data/guesser.ckpt')
+QGEN_NTW_PATH = ros_utils.get_fullpath(__file__, '../../data/qgen.ckpt')
+TOKENS_PATH = ros_utils.get_fullpath(__file__, '../../data/tokens.json')
 
-#topics
+# topics
 SEGMENTATION_TOPIC = topicname('objects')
 FEATURES_TOPIC = topicname('image_features')
 STATUS_TOPIC = topicname('guesswhat_status')
-# TODO merge these topics to one
+# TODO: merge these topics to one
 OBJECT_TOPIC = topicname('guess_location_image')
 CATEGORY_TOPIC = topicname('guess_category')
 
-segmentations = Queue(1)
-features = Queue(1)
 
 class ImgFeaturesLoader():
-    '''Loads image from memory'''
+    """ Loads image from memory """
+
     def __init__(self, data):
         self.data = data
 
-    def get_image(self, *args, **kwargs):
-        '''get_image interface'''
+    def get_image(self, *_args, **_kwargs):
+        """ get_image interface """
         return self.data
 
+
 class ImgFeaturesBuilder():
-    '''Builds the image loader'''
+    """ Builds the image loader """
+
     def __init__(self, data):
         self.data = data
 
-    def build(self, *args, **kwargs):
-        '''build interface'''
+    def build(self, *_args, **_kwargs):
+        """build interface"""
         return ImgFeaturesLoader(self.data)
 
+
 class SingleGameIterator():
-    '''Single game iterator'''
+    """ Single game iterator """
+
     def __init__(self, tokenizer, game):
         self.n_examples = 1
         self.batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
         self.game = game
 
     def __iter__(self):
-        '''Applies batching (and transforms into dict)'''
+        """ Applies batching (and transforms into dict) """
         # Futurely consider yielding games from the queue for the same looper
         return iter([self.batchifier.apply([self.game])])
 
-def open_config(path):
-    '''Reads json config'''
-    with open(path) as conf:
-        return json.load(conf)
 
-def segmentation_callback(data):
-    '''Callback for the segmantion topic'''
-    if segmentations.full():
-        segmentations.get()
+class GuessWhatNode():
+    """ The GuessWhat node """
 
-    try:
-        segmentations.put(json.loads(data.data))
-    except json.JSONDecodeError:
-        rospy.logerr('Garbage on {}, expects json'.format(SEGMENTATION_TOPIC))
+    def __init__(self):
+        self.segmentations = Queue(1)
+        self.features = Queue(1)
 
-def features_callback(data):
-    '''Callback for the features topic'''
-    if features.full():
-        features.get()
+        rospy.Subscriber(SEGMENTATION_TOPIC, String, self.segmentation_callback)
+        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self.features_callback)
+        self.object_found = rospy.Publisher(OBJECT_TOPIC, Int32MultiArray, queue_size=1)
+        self.category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
+        self.status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
 
-    features.put(np.array(data.data))
+        self.eval_config = self.open_config(EVAL_CONF_PATH)
+        self.guesser_config = self.open_config(GUESS_CONF_PATH)
+        self.qgen_config = self.open_config(QGEN_CONF_PATH)
 
-if __name__ == '__main__':
-    rospy.init_node('guesswhat')
-    rospy.Subscriber(SEGMENTATION_TOPIC, String, segmentation_callback)
-    rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, features_callback)
-    object_found = rospy.Publisher(OBJECT_TOPIC, Int32MultiArray, queue_size=1)
-    category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
-    status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
+        self.tokenizer = GWTokenizer(TOKENS_PATH)
 
-    eval_config = open_config(EVAL_CONF_PATH)
-    guesser_config = open_config(GUESS_CONF_PATH)
-    qgen_config = open_config(QGEN_CONF_PATH)
+        self.tf_config = tf.ConfigProto(log_device_placement=True)
+        self.tf_config.gpu_options.allow_growth = True
 
-    tokenizer = GWTokenizer(TOKENS_PATH)
+    def open_config(self, path):
+        """ Reads json config """
+        with open(path) as conf:
+            return json.load(conf)
 
-    tf_config = tf.ConfigProto(log_device_placement=True)
-    tf_config.gpu_options.allow_growth = True
-    with tf.Session(config=tf_config) as sess:
-        guesser_network = GuesserNetwork(guesser_config['model'], num_words=tokenizer.no_words)
-        guesser_var = [v for v in tf.global_variables() if 'guesser' in v.name]
-        guesser_saver = tf.train.Saver(var_list=guesser_var)
-        guesser_saver.restore(sess, GUESS_NTW_PATH)
-        guesser_wrapper = GuesserROSWrapper(guesser_network)
+    def segmentation_callback(self, data):
+        """ Callback for the segmantion topic """
+        if self.segmentations.full():
+            self.segmentations.get()
 
-        qgen_network = QGenNetworkLSTM(qgen_config['model'],
-                                       num_words=tokenizer.no_words,
-                                       policy_gradient=False)
-        qgen_var = [v for v in tf.global_variables() if 'qgen' in v.name]
-        qgen_saver = tf.train.Saver(var_list=qgen_var)
-        qgen_saver.restore(sess, QGEN_NTW_PATH)
-        qgen_network.build_sampling_graph(qgen_config['model'],
-                                          tokenizer=tokenizer,
-                                          max_length=eval_config['loop']['max_depth'])
-        qgen_wrapper = QGenWrapper(qgen_network, tokenizer,
-                                   max_length=eval_config['loop']['max_depth'],
-                                   k_best=eval_config['loop']['beam_k_best'])
+        try:
+            self.segmentations.put(json.loads(data.data))
+        except json.JSONDecodeError:
+            rospy.logerr('Garbage on %s, expects json', SEGMENTATION_TOPIC)
 
-        oracle_wrapper = OracleROSWrapper(tokenizer)
+    def features_callback(self, data):
+        """ Callback for the features topic """
+        if self.features.full():
+            self.features.get()
 
-        batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
+        self.features.put(np.array(data.data))
 
-        status.publish('Waiting for image processing')
+    def start_session(self):
+        """ Launch the tensorflow session and start the GuessWhat loop """
+        with tf.Session(config=self.tf_config) as sess:
+            guesser_network = GuesserNetwork(self.guesser_config['model'], num_words=self.tokenizer.no_words)
+            guesser_var = [v for v in tf.global_variables() if 'guesser' in v.name]
+            guesser_saver = tf.train.Saver(var_list=guesser_var)
+            guesser_saver.restore(sess, GUESS_NTW_PATH)
+            guesser_wrapper = GuesserROSWrapper(guesser_network)
+
+            qgen_network = QGenNetworkLSTM(self.qgen_config['model'],
+                                           num_words=self.tokenizer.no_words,
+                                           policy_gradient=False)
+            qgen_var = [v for v in tf.global_variables() if 'qgen' in v.name]
+            qgen_saver = tf.train.Saver(var_list=qgen_var)
+            qgen_saver.restore(sess, QGEN_NTW_PATH)
+            qgen_network.build_sampling_graph(self.qgen_config['model'],
+                                              tokenizer=self.tokenizer,
+                                              max_length=self.eval_config['loop']['max_depth'])
+            qgen_wrapper = QGenWrapper(qgen_network, self.tokenizer,
+                                       max_length=self.eval_config['loop']['max_depth'],
+                                       k_best=self.eval_config['loop']['beam_k_best'])
+
+            oracle_wrapper = OracleROSWrapper(self.tokenizer)
+
+            # batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
+            self.loop(sess, guesser_wrapper, qgen_wrapper, oracle_wrapper)
+
+    def loop(self, sess, guesser_wrapper, qgen_wrapper, oracle_wrapper):
+        """ The GuessWhat game loop """
         while not rospy.is_shutdown():
+            self.status.publish('Waiting for image processing')
             try:
-                seg = segmentations.get(timeout=1)
-                feats = features.get(timeout=1)
+                seg = self.segmentations.get(timeout=1)
+                feats = self.features.get(timeout=1)
             except Empty:
                 continue
 
-            status.publish('Starting new game')
-            img = {'id': 0, 'width': 640, 'height': 480, 'coco_url': ''}
+            self.status.publish('Starting new game')
 
             objects = []
             for obj in seg['objects']:
+                # Adapting bounding box to GuessWhat
                 bbox = obj['bbox']
-                obj['bbox'] = [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]]
-                objects.append(obj)
-            seg['objects'] = objects
+                objects.append([bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]])
 
             game = Game(id=0,
                         object_id=0,
-                        objects=seg['objects'],
+                        objects=objects,
                         qas=[],
-                        image=img,
-                        status="false",
+                        image={'id': 0, 'width': 640, 'height': 480, 'coco_url': ''},
+                        status='false',
                         which_set=None,
                         image_builder=ImgFeaturesBuilder(feats),
                         crop_builder=None)
 
-            looper = BasicLooper(eval_config,
+            looper = BasicLooper(self.eval_config,
                                  guesser_wrapper=guesser_wrapper,
                                  qgen_wrapper=qgen_wrapper,
                                  oracle_wrapper=oracle_wrapper,
-                                 tokenizer=tokenizer,
+                                 tokenizer=self.tokenizer,
                                  batch_size=1)
 
-            iterator = SingleGameIterator(tokenizer, game)
+            iterator = SingleGameIterator(self.tokenizer, game)
             looper.process(sess, iterator, mode='beam_search', store_games=True)
 
-            storage = looper.storage[0]
-            choice_index = storage['guess_object_id']
-            choice = next(obj for obj in storage['game'].objects if obj.id == choice_index)
-            choice_bbox = choice.bbox
-            object_found.publish(Int32MultiArray(data=[int(choice_bbox.x_center),
-                                                       int(choice_bbox.y_center)]))
-            status.publish('Object guessed')
-            category.publish(choice.category)
+            self.resolve_choice(looper)
 
-            status.publish('Waiting for image processing')
+    def resolve_choice(self, looper):
+        """ Resolve what object GuessWhat chose """
+        storage = looper.storage[0]
+        choice = next(obj for obj in storage['game'].objects
+                      if obj.id == storage['guess_object_id'])
+
+        self.object_found.publish(Int32MultiArray(data=[int(choice.bbox.x_center),
+                                                        int(choice.bbox.y_center)]))
+        self.status.publish('Object guessed')
+        self.category.publish(choice.category)
+
+
+def main():
+    """ Entry point of this file """
+    rospy.init_node('guesswhat')
+    node = GuessWhatNode()
+    node.start_session()
+
+
+if __name__ == '__main__':
+    main()
