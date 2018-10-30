@@ -1,27 +1,37 @@
-import $ from 'jquery';
-import ROSLIB from 'roslib';
+import $ from "jquery";
+import ROSLIB from "roslib";
 
+/** Class representing a player on the leaderboard. */
 class Player {
-  constructor(playerNameOrCopiedObj, inGamePlayed = 0, inGameWon = 0) {
+  constructor(playerNameOrCopiedObj, gamePlayed = 0, gameWon = 0) {
     if (typeof playerNameOrCopiedObj === "string") {
       // player ctor
       this.name = playerNameOrCopiedObj;
-      this.gamePlayed = inGamePlayed;
-      this.gameWon = inGameWon;
+      this.gamePlayed = gamePlayed;
+      this.gameWon = gameWon;
     } else {
       // Copy ctor
       playerNameOrCopiedObj && Object.assign(this, playerNameOrCopiedObj);
     }
   }
+
+  /** Get the percentage won. */
   get percentageWon() {
     if (this.gamePlayed === 0) {
       return "0.00";
     }
-    return parseFloat(Math.round(this.gameWon * 10000 / this.gamePlayed) / 100).toFixed(2);
+    return parseFloat(
+      Math.round((this.gameWon * 10000) / this.gamePlayed) / 100
+    ).toFixed(2);
   }
 }
 
+/** Class allowing to save the leaderboard in the localstorage. */
 class BrowserStorage {
+  /**
+   * Save the leaderboard.
+   * @param {array} leaderboardArray - The list of player in the leaderboard.
+   */
   set leaderboard(leaderboardArray) {
     //Enforce array storage to not corrupt localstorage
     if (typeof leaderboardArray !== "object" || !leaderboardArray.sort) {
@@ -29,6 +39,8 @@ class BrowserStorage {
     }
     localStorage.devineLeaderboard = JSON.stringify(leaderboardArray);
   }
+
+  /** Get the leaderboard. */
   get leaderboard() {
     if (localStorage.devineLeaderboard === undefined) {
       return [];
@@ -38,6 +50,10 @@ class BrowserStorage {
   }
 }
 
+/**
+ * Update the scoreboard when a player complete a game.
+ * @param {dict} rosTopics - The available topics.
+ */
 export default function createScoreboard(rosTopics) {
   let browserStorage = new BrowserStorage();
   let leaderboard = browserStorage.leaderboard;
@@ -48,9 +64,13 @@ export default function createScoreboard(rosTopics) {
   const ros = new ROSLIB.Ros({ url: rosUrl });
 
   //TODO: republish to scoreboardTopic, sync up with potential other instances open
-  let [nameTopic, gameSuccessTopic, scoreboardTopic] = 
-    [rosTopics.player_name, rosTopics.object_guess_success, rosTopics.scoreboard]
-      .map(top => new ROSLIB.Topic({ros, name: top.name, messageType: top.type}));
+  let [nameTopic, gameSuccessTopic, scoreboardTopic] = [
+    rosTopics.player_name,
+    rosTopics.object_guess_success,
+    rosTopics.scoreboard
+  ].map(
+    top => new ROSLIB.Topic({ ros, name: top.name, messageType: top.type })
+  );
 
   nameTopic.subscribe(newPlayerName => {
     playerName = newPlayerName.data;
@@ -75,26 +95,30 @@ export default function createScoreboard(rosTopics) {
       ++player.gameWon;
     }
 
-    browserStorage.leaderboard = leaderboard; //update browser storage
-    fillLeaderboardView(leaderboard); //update view
+    browserStorage.leaderboard = leaderboard;
+    fillLeaderboardView(leaderboard);
   });
 }
 
-
-
-function fillLeaderboardView(leaderboardArray) {  
+/**
+ * Convert a list of player stats to an html leaderboard and update the view.
+ * @param {array} leaderboardArray - The list of player in the leaderboard.
+ */
+function fillLeaderboardView(leaderboardArray) {
   let leaderboardHtml = leaderboardArray
     //.map(object => object instanceof Player ? object : new Player(object)) //Map as Player class -- Shouldn't be necessary
     .sort((player1, player2) => player2.percentageWon - player1.percentageWon) //Order by percentageWon
-    .map((player, index) => { //Remap to html to be injected
+    .map((player, index) => {
+      //Remap to html to be injected
       return `<tr>
-        <th scope="row">${index+1}</th>
+        <th scope="row">${index + 1}</th>
         <td>${player.name}</td>
         <td>${player.gamePlayed}</td>
         <td>${player.gameWon}</td>
         <td>${player.percentageWon} %</td>
       </tr>`;
-    }).join("");
+    })
+    .join("");
 
-  $('#tbody-leaderboard').html(leaderboardHtml);
+  $("#tbody-leaderboard").html(leaderboardHtml);
 }

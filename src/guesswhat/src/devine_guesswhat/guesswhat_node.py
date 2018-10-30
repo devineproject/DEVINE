@@ -109,7 +109,7 @@ if __name__ == '__main__':
 
     tokenizer = GWTokenizer(TOKENS_PATH)
 
-    tf_config = tf.ConfigProto()
+    tf_config = tf.ConfigProto(log_device_placement=True)
     tf_config.gpu_options.allow_growth = True
     with tf.Session(config=tf_config) as sess:
         guesser_network = GuesserNetwork(guesser_config['model'], num_words=tokenizer.no_words)

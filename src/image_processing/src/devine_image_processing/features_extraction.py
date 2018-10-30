@@ -45,7 +45,7 @@ if __name__ == '__main__':
                             name='image')
     _, end_points = vgg.vgg_16(holder, is_training=False, dropout_keep_prob=1.0)
 
-    tf_config = tf.ConfigProto()
+    tf_config = tf.ConfigProto(log_device_placement=True)
     tf_config.gpu_options.allow_growth = True
     with tf.Session(config=tf_config) as sess:
         saver = tf.train.Saver()
