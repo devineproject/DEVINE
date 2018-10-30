@@ -1,19 +1,17 @@
 #! /usr/bin/env python2
-
-''' Example to find scene '''
+""" Example to find scene """
 
 import rospy
-
 from std_msgs.msg import String
 from trajectory_msgs.msg import JointTrajectoryPoint
-
 from devine_config import topicname
 
 ZONE_DETECTION_TOPIC = topicname('zone_detection')
 TOPIC_HEAD_JOINT_STATE = topicname('robot_head_joint_traj_point')
 
+
 def main():
-    ''' Example to look for a scene '''
+    """ Example to look for a scene """
     # Start ROS node
     node_name = 'devine_common_find_scene_example'
     rospy.init_node(node_name)
@@ -50,7 +48,7 @@ def main():
 
         rospy.sleep(3)
 
-         # Move Head to play game
+        # Move Head to play game
         rospy.loginfo('Move Head to play game')
         ros_packet = JointTrajectoryPoint(positions=[1, 0],
                                           time_from_start=rospy.Duration(time))
@@ -60,7 +58,7 @@ def main():
 
         # Go back to known zone
         rospy.loginfo('Go back to known zone')
-        payload = "{\"top_left_corner\": [-1, -1], \"bottom_right_corner\": [-1, -1]}"
+        payload = '{"top_left_corner": [-1, -1], "bottom_right_corner": [-1, -1]}'
         ros_packet = String(payload)
         pub_zone_detection.publish(ros_packet)
 
@@ -68,21 +66,22 @@ def main():
 
         # Known zone is gone
         rospy.loginfo('Known zone is gone: Head should sweep')
-        payload = "{\"top_left_corner\": [-1, -1], \"bottom_right_corner\": [-1, -1]}"
+        payload = '{"top_left_corner": [-1, -1], "bottom_right_corner": [-1, -1]}'
         ros_packet = String(payload)
         pub_zone_detection.publish(ros_packet)
 
         rospy.sleep(3)
 
-         # Known zone is not found
+        # Known zone is not found
         rospy.loginfo('Known zone is not found: Head should sweep')
-        payload = "{\"top_left_corner\": [-1, -1], \"bottom_right_corner\": [-1, -1]}"
+        payload = '{"top_left_corner": [-1, -1], "bottom_right_corner": [-1, -1]}'
         ros_packet = String(payload)
         pub_zone_detection.publish(ros_packet)
 
         rospy.sleep(3)
 
         rospy.loginfo('Test done')
+
 
 if __name__ == '__main__':
     main()
