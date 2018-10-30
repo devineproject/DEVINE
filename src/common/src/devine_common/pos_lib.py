@@ -49,7 +49,10 @@ class PosLib(object):
         self.current_point_cloud = data
         self.mutex.release()
         self.do_point_transform()
-        # points = math_utils.plot_3d_matrix(self.deserialize(data))
+
+    def plot_openni_3d_data_matrix(data):
+        """ Plot the matrix in 3D. Return the list of points. """
+        return math_utils.plot_3d_matrix(self.deserialize(data))
 
     def object_position_callback(self, data):
         """ Callback executed when an object is found by guesswhat and brodcast its position """
