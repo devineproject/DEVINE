@@ -43,7 +43,6 @@ class PosLib(object):
 
     def openni_depth_callback(self, data):
         """ Callback executed when a depth image is received from openni """
-        # self.subscription.unregister() # only do it once
         rospy.loginfo('Received a new pointcloud, image size: %ix%i', data.width, data.height)
         self.mutex.acquire()
         self.current_point_cloud = data
