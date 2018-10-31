@@ -34,10 +34,27 @@ class OracleROSWrapper(object):
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
         self.questions = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1, latch=True)
+        self.previous_question = None
+        self.previous_answer = None
 
     def initialize(self, sess):
         '''initialize interface'''
         pass
+
+    def is_same_question(self, question):
+        '''checks if question is repeated'''
+        return self.previous_question is not None and question == self.previous_question
+
+    def select_answer(self, question):
+        '''repeat answer or send speech'''
+        if self.is_same_question(question):
+            rospy.logwarn("Skipped repeated question")
+            return self.previous_answer
+        else:
+            answer = send_speech(self.questions, question, TTSAnswerType.YES_NO)
+            self.previous_question = question
+            self.previous_answer = answer
+            return answer
 
     def answer_question(self, sess, question, **kwargs):
         '''answer_question interface for the looper'''
@@ -46,7 +63,7 @@ class OracleROSWrapper(object):
 
         text_question = self.tokenizer.decode(question[0]).replace('<padding>', '').strip()
 
-        answer = send_speech(self.questions, text_question, TTSAnswerType.YES_NO)
+        answer = self.select_answer(text_question)
 
         if answer == 'yes':
             token = self.tokenizer.yes_token

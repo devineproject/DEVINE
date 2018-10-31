@@ -1,37 +1,35 @@
 #!/usr/bin/env python3
-'''ROS module for image_segmentation'''
+""" ROS module for image_segmentation """
 
 import sys
 import os
 import datetime
-
 import rospy
 from std_msgs.msg import String
-
 from bson import json_util
+from devine_common import ros_utils
 
 sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../Mask_RCNN'))
+
 import coco
 import model as modellib
 import tensorflow as tf
 from keras.backend.tensorflow_backend import set_session
 from devine_config import topicname
-
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-#paths
-ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "../../mask_rcnn_coco.h5")
-MODEL_DIR = os.path.join(ROOT_DIR, "logs")
+# Paths
+COCO_MODEL_PATH = ros_utils.get_fullpath(__file__, '../../mask_rcnn_coco.h5')
+MODEL_DIR = ros_utils.get_fullpath(__file__, 'logs')
 
-#topics
+# Topics
 IMAGE_TOPIC = topicname('segmentation_image')
 SEGMENTATION_TOPIC = topicname('objects')
 
 SEGMENTATION_THRESHOLD = 0.8
 
 class RCNNSegmentation(ImageProcessor):
-    '''RCNN segmentation wrapper of Mask_RCNN for use in guesswhat'''
+    """ RCNN segmentation wrapper of Mask_RCNN for use in guesswhat """
     class_names = ['BG', 'person', 'bicycle', 'car', 'motorcycle', 'airplane',
                    'bus', 'train', 'truck', 'boat', 'traffic light',
                    'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird',
@@ -49,7 +47,7 @@ class RCNNSegmentation(ImageProcessor):
                    'teddy bear', 'hair drier', 'toothbrush']
 
     class InferenceConfig(coco.CocoConfig):
-        '''Configuration class'''
+        """ Configuration class """
         GPU_COUNT = 1
         IMAGES_PER_GPU = 1
 
@@ -58,27 +56,29 @@ class RCNNSegmentation(ImageProcessor):
         config = tf.ConfigProto(log_device_placement=True)
         config.gpu_options.allow_growth = True
         set_session(tf.Session(config=config))
-        self.model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=self.config)
+        self.model = modellib.MaskRCNN(mode='inference', model_dir=MODEL_DIR, config=self.config)
         self.model.load_weights(COCO_MODEL_PATH, by_name=True)
 
     def process(self, image, _):
-        '''Actual segmentation of the image'''
-        rospy.logdebug("Starting segmentation")
+        """ Actual segmentation of the image """
+        rospy.logdebug('Starting segmentation')
         height, width, _ = image.shape
         timestamp = '{:%Y-%b-%d %H:%M:%S}'.format(datetime.datetime.now())
         results = self.model.detect([image])
+
         if len(results) != 1:
-            rospy.logerr("Couldn't segment image")
-            return "{}"
-        rospy.logdebug("Segmentation done")
+            rospy.logerr('Couldn\'t segment image')
+            return '{}'
+
+        rospy.logdebug('Segmentation done')
         result = results[0]
         result_obj = {
-            "timestamp": timestamp,
-            "image": {
-                "height": height,
-                "width": width
+            'timestamp': timestamp,
+            'image': {
+                'height': height,
+                'width': width
             },
-            "objects": []
+            'objects': []
         }
         object_array = []
 
@@ -86,12 +86,12 @@ class RCNNSegmentation(ImageProcessor):
             if score < SEGMENTATION_THRESHOLD:
                 continue
             current_object = {
-                "category_id": int(class_id),
-                "bbox": bounding_box.tolist(),
-                "category": self.class_names[class_id],
-                "segment": [],
-                "id" : current_id
-                #"area": mask.tolist()
+                'category_id': int(class_id),
+                'bbox': bounding_box.tolist(),
+                'category': self.class_names[class_id],
+                'segment': [],
+                'id' : current_id,
+                'area': mask.tolist()
             }
             object_array.append(current_object)
 
@@ -99,7 +99,7 @@ class RCNNSegmentation(ImageProcessor):
         return json_util.dumps(result_obj)
 
 def main():
-    '''Entry point of this file'''
+    """ Entry point of this file """
     processor = ROSImageProcessingWrapper(RCNNSegmentation, IMAGE_TOPIC)
     publisher = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=10, latch=False)
     processor.loop(lambda processor_output : publisher.publish(processor_output))

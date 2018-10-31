@@ -15,12 +15,20 @@
         "Before we begin, I just need to know your name!"
     ],
     "ready": [
-        "Great! Are you ready to start?"
+        "Great! Are you ready to start {player_name}?"
     ],
     "instructions": [
         "Good! So now think about one of the objects on the table, and I will ask you some questions in order to find it."
     ],
     "bye_bye": [
         "All right, good bye."
+    ],
+    "ask_got_it_right": [
+        "Is it the {object_name}?",
+        "Hmmm, I think it's the {object_name}. Did I get it right ?"
+    ],
+    "ask_play_again": [
+        "Would you like to play again ?",
+        "Do you want to play again with me ?"
     ]
 }

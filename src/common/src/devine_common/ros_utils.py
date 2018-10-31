@@ -1,11 +1,12 @@
-''' ROS Utils '''
-
+""" ROS Utils """
 import rospy
 import tf
+import os
 from geometry_msgs.msg import PoseStamped
 
+
 def pose_stamped(x, y, z, roll=0, pitch=0, yaw=0):
-    ''' Convert x, y, z, roll, pitch, yaw to PoseStamp '''
+    """ Convert x, y, z, roll, pitch, yaw to PoseStamp """
     pose = PoseStamped()
     pose.header.stamp = rospy.Time.now()
     pose.header.frame_id = 'base_link'
@@ -20,3 +21,12 @@ def pose_stamped(x, y, z, roll=0, pitch=0, yaw=0):
     pose.pose.orientation.w = quaternion[3]
 
     return pose
+
+
+def get_fullpath(file, relative_file):
+    """ Return the full path of a file in a directory relative to this one
+    Inputs:
+    - file: the __file__ variable of the python file to get the reference path from
+    - relative_file: the file relative path to __file__
+    """
+    return os.path.join(os.path.dirname(os.path.abspath(file)), relative_file)

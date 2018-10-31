@@ -56,7 +56,7 @@ install_base() {
   local tensorflow_package=$2
 
   pushd "$catkinsrc"
-
+  mkdir -p "$datapath"
   as_su apt-get update
   as_su apt-get install -y apt-transport-https git libffi-dev
   as_su add-apt-repository -y ppa:ubuntu-toolchain-r/test
@@ -79,7 +79,6 @@ install_base() {
   python3 -m pip install --user $tensorflow_package
   python2 -m pip install --user opencv-contrib-python
   python3 -m pip install --user opencv-contrib-python
-  mkdir -p "$datapath"
   ensure_data https://github.com/matterport/Mask_RCNN/releases/download/v2.0/mask_rcnn_coco.h5
   ensure_data https://storage.googleapis.com/download.tensorflow.org/models/vgg_16_2016_08_28.tar.gz
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/weights.zip

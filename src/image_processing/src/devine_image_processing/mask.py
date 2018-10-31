@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-''' Depth mask of images based on a distance threshold '''
+""" Depth mask of images based on a distance threshold """
 
 import rospy
 from devine_config import topicname
@@ -41,14 +41,14 @@ class DepthMask(object):
         self.masked_image = np.reshape(self.masked_image,image.shape)
         msg = image_to_ros_msg(self.masked_image)
         self.depth_mask_publisher.publish(msg)
-            
-            
+                        
 def main():
-    ''' Init node '''
+    """ Init node """
     rospy.init_node('devine_depth_mask')
     DepthMask()
-    rospy.loginfo("Node initialized")
+    rospy.loginfo('Node initialized')
     rospy.spin()
-    
+
+
 if __name__ == '__main__':
     main()

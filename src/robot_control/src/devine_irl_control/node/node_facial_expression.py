@@ -22,8 +22,9 @@ class RobotExpression(Enum):
 OBJECT_CONFIDENCE_TOPIC = topicname('objects_confidence')
 GAME_SUCCESS_TOPIC = topicname('object_guess_success')
 ROBOT_EXPRESSION_TOPIC = topicname('robot_facial_expression')
+FACIAL_EXPRESSION_COMPLETED = topicname('robot_facial_expression_completed')
 
-class FacialExpression():
+class FacialExpression(object):
     """ Subscribes to object confidence and publishes facial expression for a specific duration """
 
     EXPRESSION_DURATION = 10
@@ -33,7 +34,8 @@ class FacialExpression():
         self.initialize_for_new_game()
         self.robot_expression_publisher = rospy.Publisher(ROBOT_EXPRESSION_TOPIC,
                                                           EmoIntensity, queue_size=1)
-
+        self.expression_completed_pub = rospy.Publisher(FACIAL_EXPRESSION_COMPLETED,
+                                                        Bool, queue_size=1)
         rospy.Subscriber(OBJECT_CONFIDENCE_TOPIC, Float64MultiArray,
                          self.on_new_object_confidence)
 
@@ -72,6 +74,8 @@ class FacialExpression():
         face_expression = EmoIntensity(name=expression.value, value=0)
         self.robot_expression_publisher.publish(face_expression)
         self.initialize_for_new_game()
+        rospy.sleep(0.5)
+        self.expression_completed_pub.publish(True)
 
     def initialize_for_new_game(self):
         """ Init vars """

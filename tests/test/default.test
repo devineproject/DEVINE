@@ -9,5 +9,5 @@
     <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
   </group>
 
-  <test test-name="unit" type="test_suite.py" pkg="devine_tests"/>
+  <test test-name="unit" type="test_suite.py" pkg="devine_tests" time-limit="120"/>
 </launch>
