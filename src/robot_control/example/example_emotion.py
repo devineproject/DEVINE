@@ -1,6 +1,5 @@
 #! /usr/bin/env python2
-
-''' Example to emote robot emotion with command line '''
+""" Example to emote robot emotion with command line """
 
 import argparse
 import rospy
@@ -13,8 +12,9 @@ from devine_config import topicname
 TOPIC_GUESSWHAT_CONFIDENCE = topicname('objects_confidence')
 TOPIC_GUESSWHAT_SUCCEED = topicname('object_guess_success')
 
+
 def main(arguments):
-    ''' Publish on GuessWhat?! confidence and success topic '''
+    """ Publish on GuessWhat?! confidence and success topic """
 
     # Parse arguments
     confidence_array = [float(i) for i in arguments.confidence.split(',')]
@@ -23,8 +23,8 @@ def main(arguments):
     # Start ROS node
     node_name = 'devine_irl_control_example_emotion'
     rospy.init_node(node_name)
-    rospy.loginfo('Running node \'' + node_name + '\'with\n\tconfidence: ' +
-                  str(confidence_array) + '\n\tsucceed: ' + str(is_guesswhat_succeed))
+    rospy.loginfo('Running node \'%s\' with\n\tconfidence: %d\n\tsucceed: %d',
+                  node_name, confidence_array, is_guesswhat_succeed)
 
     while not rospy.is_shutdown():
         pub_confidence = rospy.Publisher(TOPIC_GUESSWHAT_CONFIDENCE,
@@ -42,11 +42,11 @@ def main(arguments):
         pub_is_guesswhat_succeed.publish(ros_packet_bool)
 
         rospy.sleep(10)
-        rospy.loginfo('SHOULD BE DONE')
+        rospy.loginfo('Game should be completed.')
+
 
 def parser():
-    ''' Command Line Parser'''
-
+    """ Command Line Parser"""
     arg_fmt = argparse.RawDescriptionHelpFormatter
     arg_parser = argparse.ArgumentParser(formatter_class=arg_fmt, description=main.__doc__)
     required = arg_parser.add_argument_group('required arguments')
@@ -54,6 +54,7 @@ def parser():
     required.add_argument('-s', '--succeed', required=True, help='Did GuessWhat?! succeed')
     arguments = arg_parser.parse_args(rospy.myargv()[1:])
     return arguments
+
 
 if __name__ == '__main__':
     main(parser())

@@ -1,4 +1,4 @@
-''' MarkerArray to see object in RViz, to calculate TF and angle errors '''
+""" MarkerArray to see object in RViz, to calculate TF and angle errors """
 
 import random
 import rospy
@@ -7,8 +7,9 @@ from geometry_msgs.msg import PoseStamped
 from visualization_msgs.msg import Marker
 from visualization_msgs.msg import MarkerArray
 
+
 class ObjectMaker(object):
-    ''' On topic_name changes, marker array is updated '''
+    """ On topic_name changes, marker array is updated """
 
     def __init__(self, topic_name):
         self.object_location = None
@@ -16,32 +17,29 @@ class ObjectMaker(object):
         rospy.Subscriber(topic_name, PoseStamped, self.object_location_callback)
 
     def object_location_callback(self, msg):
-        ''' Create marker array at /object_location position '''
-
+        """ Create marker array at /object_location position """
         if self.object_location != msg:
-            rospy.loginfo('New object location: %s', msg.pose.position)
-            self.object_location = msg
             position = msg.pose.position
+            rospy.loginfo('New object location: %s', position)
+            self.object_location = msg
             self.markers.set_marker_array([[position.x, position.y, position.z]])
             self.markers.publish()
 
+
 class Markers(object):
-    ''' Wrapper of MarkerArray '''
+    """ Wrapper of MarkerArray """
 
     def __init__(self, markers_position=None):
-        topic = 'visualization_marker_array'
-        self._pub = rospy.Publisher(topic, MarkerArray, queue_size=10)
+        self._pub = rospy.Publisher('visualization_marker_array', MarkerArray, queue_size=10)
         if markers_position:
             self.set_marker_array(markers_position)
 
     def publish(self):
-        ''' Publisher for MarkerArray '''
-
+        """ Publisher for MarkerArray """
         self._pub.publish(self.marker_array)
 
     def set_marker_array(self, markers_position):
-        ''' Create random color MarkerArray from reference frame '''
-
+        """ Create random color MarkerArray from reference frame """
         self.marker_array = MarkerArray()
         marker_id = 0
         for marker_position in markers_position:
