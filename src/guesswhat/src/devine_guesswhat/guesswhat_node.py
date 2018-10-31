@@ -79,42 +79,20 @@ class GuessWhatNode():
         self.segmentations = Queue(1)
         self.features = Queue(1)
 
-        rospy.Subscriber(SEGMENTATION_TOPIC, String, self.segmentation_callback)
-        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self.features_callback)
+        rospy.Subscriber(SEGMENTATION_TOPIC, String, self._segmentation_callback)
+        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self._features_callback)
         self.object_found = rospy.Publisher(OBJECT_TOPIC, Int32MultiArray, queue_size=1)
         self.category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
         self.status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
 
-        self.eval_config = self.open_config(EVAL_CONF_PATH)
-        self.guesser_config = self.open_config(GUESS_CONF_PATH)
-        self.qgen_config = self.open_config(QGEN_CONF_PATH)
+        self.eval_config = self._load_config(EVAL_CONF_PATH)
+        self.guesser_config = self._load_config(GUESS_CONF_PATH)
+        self.qgen_config = self._load_config(QGEN_CONF_PATH)
 
         self.tokenizer = GWTokenizer(TOKENS_PATH)
 
         self.tf_config = tf.ConfigProto(log_device_placement=True)
         self.tf_config.gpu_options.allow_growth = True
-
-    def open_config(self, path):
-        """ Reads json config """
-        with open(path) as conf:
-            return json.load(conf)
-
-    def segmentation_callback(self, data):
-        """ Callback for the segmantion topic """
-        if self.segmentations.full():
-            self.segmentations.get()
-
-        try:
-            self.segmentations.put(json.loads(data.data))
-        except json.JSONDecodeError:
-            rospy.logerr('Garbage on %s, expects json', SEGMENTATION_TOPIC)
-
-    def features_callback(self, data):
-        """ Callback for the features topic """
-        if self.features.full():
-            self.features.get()
-
-        self.features.put(np.array(data.data))
 
     def start_session(self):
         """ Launch the tensorflow session and start the GuessWhat loop """
@@ -181,9 +159,31 @@ class GuessWhatNode():
             iterator = SingleGameIterator(self.tokenizer, game)
             looper.process(sess, iterator, mode='beam_search', store_games=True)
 
-            self.resolve_choice(looper)
+            self._resolve_choice(looper)
 
-    def resolve_choice(self, looper):
+    def _load_config(self, path):
+        """ Reads json config """
+        with open(path) as conf:
+            return json.load(conf)
+
+    def _segmentation_callback(self, data):
+        """ Callback for the segmantion topic """
+        if self.segmentations.full():
+            self.segmentations.get()
+
+        try:
+            self.segmentations.put(json.loads(data.data))
+        except json.JSONDecodeError:
+            rospy.logerr('Garbage on %s, expects json', SEGMENTATION_TOPIC)
+
+    def _features_callback(self, data):
+        """ Callback for the features topic """
+        if self.features.full():
+            self.features.get()
+
+        self.features.put(np.array(data.data))
+
+    def _resolve_choice(self, looper):
         """ Resolve what object GuessWhat chose """
         storage = looper.storage[0]
         choice = next(obj for obj in storage['game'].objects
