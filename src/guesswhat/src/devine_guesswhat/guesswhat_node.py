@@ -118,7 +118,6 @@ class GuessWhatNode():
 
             oracle_wrapper = OracleROSWrapper(self.tokenizer)
 
-            # batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
             self.loop(sess, guesser_wrapper, qgen_wrapper, oracle_wrapper)
 
     def loop(self, sess, guesser_wrapper, qgen_wrapper, oracle_wrapper):
