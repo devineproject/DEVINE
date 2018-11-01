@@ -54,7 +54,7 @@ class SceneFinder(object):
         direction = 1
         while not rospy.is_shutdown():
             [pan, tilt] = self.joint_ctrl.get_position()
-            tilt = TILT
+            tilt = TILT # Add some function to modulate Tilt
             top_left_pos = self.look_up_tag_position(TOP_LEFT_TOPIC)
             bottom_right_pos = self.look_up_tag_position(BOTTOM_RIGHT_TOPIC)
 
@@ -89,6 +89,7 @@ class SceneFinder(object):
         try:
             time = self.tf.getLatestCommonTime(CAMERA_FRAME_TOPIC, topic)
             if abs(time.to_sec() - rospy.get_rostime().to_sec()) < 4:  # If it was found in the last 4 sec
+                # Make sure you use the same time as TF, why is it slow
                 position, _ = self.tf.lookupTransform(CAMERA_FRAME_TOPIC, topic, time)
         except tf.Exception as err:
             rospy.loginfo(err)  # Sometime they are not yet initialized

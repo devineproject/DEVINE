@@ -50,8 +50,9 @@ else
 audio_args=''
 fi
 
+mount_points='-v /home/felixlabelle/git_repo3/DEVINE/tests:/usr/src/DEVINE/tests -v /home/felixlabelle/git_repo3/DEVINE/src/image_processing/src/devine_image_processing:/usr/src/DEVINE/src/image_processing/src/devine_image_processing -v /home/felixlabelle/git_repo3/DEVINE/src/devine/launch:/usr/src/DEVINE/src/devine/launch -v /home/felixlabelle/bag_data:/usr/src/DEVINE/data'
 CMD="sudo docker run -p 9090:9090 -p 8080:8080 -it --rm -e QT_X11_NO_MITSHM=1 \
-    $render_args $display_args $audio_args \
+    $mount_points $render_args $display_args $audio_args \
     devine bash"
 
 echo $CMD
