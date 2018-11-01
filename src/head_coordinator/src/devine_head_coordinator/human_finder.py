@@ -39,17 +39,17 @@ class LookAtHumanActionServer(object):
 
     def get_human_eye(self, human):
         """ Return the eye position of an human """
-        leye = None
-        reye = None
+        left_eye = None
+        right_eye = None
         for body_part in human['body_parts']:
-            if body_part['name'] == 'LEye':
-                leye = body_part
+            if body_part['name'] == 'left_eye':
+                left_eye = body_part
                 break
-            elif body_part['name'] == 'REye':
-                reye = body_part
+            elif body_part['name'] == 'right_eye':
+                right_eye = body_part
                 # Keep looking for the left eye for consistent results
 
-        target_eye = leye if leye else reye
+        target_eye = left_eye or right_eye
         if target_eye:
             centered = upper_left_to_zero_center(target_eye['x'], target_eye['y'], 640, 480) #TODO: Dynamic image size
             in_meters = pixel_to_meters(centered[0], centered[1], 1) #TODO: Dynamic z calculation
@@ -65,7 +65,7 @@ class LookAtHumanActionServer(object):
         end_time = rospy.Time.now() + goal.period
         neck_iterator = iter(self._ctrl_iterator)
 
-        while (is_infinite and not rospy.is_shutdown()) or rospy.Time.now() > end_time:
+        while (is_infinite and not rospy.is_shutdown()) or rospy.Time.now() < end_time:
             try:
                 human_object = rospy.wait_for_message(BODY_TRACKING, String, timeout=0.1)
                 humans = json.loads(human_object.data)

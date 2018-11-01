@@ -53,6 +53,14 @@ class NeckActionIterator(object):
         """ Python 2 support of __next__ """
         return self.__next__()
 
+    def change_pan_direction(self):
+        """ Change direction of the pan movement """
+        self.neck_pan_delta *= -1
+    
+    def change_tilt_direction(self):
+        """ Change direction of the tilt movement """
+        self.neck_tilt_delta *= -1
+
     def _move_joints(self, positions):
         """ Wrapper to move a joint and wait for the result """
         self.joint_ctrl.clear()
@@ -67,11 +75,3 @@ class NeckActionIterator(object):
             rospy.logerr('Failed to move joint: ' + result.error_string)
             return False
         return True
-
-    def change_pan_direction(self):
-        """ Change direction of the pan movement """
-        self.neck_pan_delta *= -1
-    
-    def change_tilt_direction(self):
-        """ Change direction of the tilt movement """
-        self.neck_tilt_delta *= -1

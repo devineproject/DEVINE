@@ -3,6 +3,7 @@
 import math
 import matplotlib.pyplot as plt
 
+FOV_CAM = 57 # fov angle in kinect spects
 
 def quaternion_mult(q, r):
     """ Quaternion multiplication """
@@ -26,9 +27,8 @@ def upper_left_to_zero_center(x, y, width, height):
     return (x - int(width/2), y - int(height/2))
 
 def pixel_to_meters(x, y, z_meters, width):
-    '''Compute (x, y) pixel coords to (x, y, z) pixel coords in meters'''
-    # 57 = fov angle in kinect spects
-    f = width / (2 * math.tan(math.radians(57/2)))
+    """ Compute (x, y) pixel coords to (x, y, z) pixel coords in meters """
+    f = width / (2 * math.tan(math.radians(FOV_CAM/2)))
     d = z_meters / f
     x = d * x
     y = d * y
@@ -59,8 +59,4 @@ def plot_3d_matrix(points):
 
 def clip(number, min_nb, max_nb):
     """ Clip a number between min and max inclusively """
-    if number <= min_nb:
-        return min_nb
-    elif number >= max_nb:
-        return max_nb
-    return number
+    return max(min_nb, min(number, max_nb))
