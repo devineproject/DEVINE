@@ -70,7 +70,7 @@ class NeckActionIterator(object):
         self.current_pan = positions[0]
         self.current_tilt = positions[1]
         result = self.joint_ctrl.result()
-        success = result.error_code == 0
+        success = result and result.error_code == 0
         if not success and result.error_string:
             rospy.logerr('Failed to move joint: ' + result.error_string)
             return False

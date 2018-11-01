@@ -42,18 +42,21 @@ class LookAtHumanActionServer(object):
         left_eye = None
         right_eye = None
         for body_part in human['body_parts']:
-            if body_part['name'] == 'left_eye':
+            if body_part['name'] == 'LEye':
                 left_eye = body_part
                 break
-            elif body_part['name'] == 'right_eye':
+            elif body_part['name'] == 'REye':
                 right_eye = body_part
                 # Keep looking for the left eye for consistent results
 
         target_eye = left_eye or right_eye
         if target_eye:
-            centered = upper_left_to_zero_center(target_eye['x'], target_eye['y'], 640, 480) #TODO: Dynamic image size
-            in_meters = pixel_to_meters(centered[0], centered[1], 1) #TODO: Dynamic z calculation
-            return in_meters
+            (image_width, image_height) = (640, 480) #TODO: Dynamic image size
+            target_x = target_eye['x'] * image_width + 0.5
+            target_y = target_eye['y'] * image_height + 0.5
+            centered = upper_left_to_zero_center(target_x, target_y, image_width, image_height) 
+            in_meters = pixel_to_meters(centered[0], -centered[1], 2, image_width) #TODO: Dynamic z calculation, inversed y
+            return [target_eye['stamp'], in_meters]
 
         return None
 
@@ -67,15 +70,14 @@ class LookAtHumanActionServer(object):
 
         while (is_infinite and not rospy.is_shutdown()) or rospy.Time.now() < end_time:
             try:
-                human_object = rospy.wait_for_message(BODY_TRACKING, String, timeout=0.1)
+                human_object = rospy.wait_for_message(BODY_TRACKING, String, timeout=None) #0.55
                 humans = json.loads(human_object.data)
             except rospy.ROSException:
                 humans = []
 
             eyes = map(self.get_human_eye, humans) # Find the eyes of the bodies
             eyes = filter(lambda i: i is not None, eyes) #Filter out body w/o eyes
-            eyes.sort(key=lambda pos: (pos[0] ** 2) + (pos[1] ** 2)) #Sort by closest to where the robot is seeing
-
+            eyes.sort(key=lambda pos: (pos[1][0] ** 2) + (pos[1][1] ** 2)) #Sort by closest to where the robot is seeing
             self._feedback.nb_humans = len(eyes)
             self._as.publish_feedback(self._feedback)
 
@@ -87,8 +89,10 @@ class LookAtHumanActionServer(object):
             if self._feedback.nb_humans is 0:
                 next(neck_iterator)
             else:
-                [x, y, z] = eyes[0]
-                self._ctrl.publish(pose_stamped(x, y, z, 0, 0, 0, CAM_FRAME_OPTICAL))
+                stamp = eyes[0][0]
+                [x, y, z] = eyes[0][1]
+                y += 0.5 #TODO: fct of the z value
+                self._ctrl.publish(pose_stamped(x, y, z, 0, 0, 0, CAM_FRAME_OPTICAL, rospy.Time(0, stamp)))
 
             self.iter_rate.sleep()
 

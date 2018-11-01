@@ -34,7 +34,7 @@ class Controller(object):
     def __init__(self, is_head_activated=True, is_arms_activated=True, is_gripper_activated=True):
         self.arm_data = None
         self.head_data = None
-        self.time = 3
+        self.time = 1 #TODO: Calc speed
         self.tf_listener = tf.TransformListener()
         self.is_arms_activated = is_arms_activated
 
