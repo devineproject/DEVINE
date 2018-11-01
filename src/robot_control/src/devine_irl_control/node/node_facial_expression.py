@@ -26,6 +26,8 @@ GAME_SUCCESS_TOPIC = topicname('object_guess_success')
 ROBOT_EXPRESSION_TOPIC = topicname('robot_facial_expression')
 FACIAL_EXPRESSION_COMPLETED = topicname('robot_facial_expression_completed')
 
+NODE_NAME = 'facial_expression'
+
 
 class FacialExpression(object):
     """ Subscribes to object confidence and publishes facial expression for a specific duration """
@@ -95,6 +97,7 @@ class FacialExpression(object):
                     expression = RobotExpression.SURPRISE
                 else:
                     expression = RobotExpression.JOY
+
             # Devine Lost
             else:
                 if 0 <= confidence < 0.6:
@@ -106,6 +109,7 @@ class FacialExpression(object):
 
 
 if __name__ == '__main__':
-    rospy.init_node('facial_expression')
+    rospy.init_node(NODE_NAME)
+    rospy.loginfo('Running node \'%s\'', NODE_NAME)
     FacialExpression()
     rospy.spin()

@@ -19,11 +19,11 @@ def arms_pan_tilt(controller, obj_x, obj_y, obj_z):
     else:
         raise Exception('The specified controller is not supported.')
 
-    pan = math.acos(d_2 / (math.sqrt(math.pow(obj_x, 2) + math.pow(obj_y, 2)))) \
-        - math.atan2(obj_x, obj_y)
+    pan = math.acos(d_2 / (math.sqrt(math.pow(obj_x, 2) + math.pow(obj_y, 2))))
+    pan -= math.atan2(obj_x, obj_y)
 
-    tilt = -math.atan2(obj_z, (math.pow(obj_x, 2) + math.pow(obj_y, 2) - math.pow(d_2, 2))) \
-           - (math.pi / 2)
+    tilt = -math.atan2(obj_z, (math.pow(obj_x, 2) + math.pow(obj_y, 2) - math.pow(d_2, 2)))
+    tilt -= (math.pi / 2)
 
     positions = [pan, tilt, 0, 0]
 

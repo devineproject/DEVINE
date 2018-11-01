@@ -61,7 +61,7 @@ class Movement(object):
         self.controller.move_init(5)
 
     def head_down_shoulder_in(self):
-        """ Sad emotion movement"""
+        """ Sad emotion movement """
         right_joints_position = ui_to_traj([-0.22, 0.47, 0.18, -0.4])
         left_joints_position = ui_to_traj([-0.70, -0.62, -0.31, -0.67])
         head_joints_position = [-0.15, 0.79]
@@ -92,7 +92,7 @@ class Movement(object):
         rospy.sleep(1)
 
     def head_shake_hand_up(self):
-        """ Disappointed emotion movement"""
+        """ Disappointed emotion movement """
         right_joints_position = ui_to_traj([-0.75, -0.31, 0.31, -1.07])
         left_joints_position = ui_to_traj([-0.75, 0.31, -0.31, -1.07])
         head_joints_position = [0.4, 0.47]
@@ -121,7 +121,7 @@ class Movement(object):
         rospy.sleep(0.1)
 
     def head_up_arm_up(self):
-        """ Satisfied emotion movement"""
+        """ Satisfied emotion movement """
         right_joints_position = ui_to_traj([-0.34, -0.22, 0, -2.48])
         left_joints_position = ui_to_traj([-0.34, 0.22, 0, -2.48])
         head_joints_position = [-0.5, -0.17]

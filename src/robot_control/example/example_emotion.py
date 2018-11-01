@@ -42,7 +42,7 @@ def main(arguments):
         pub_is_guesswhat_succeed.publish(ros_packet_bool)
 
         rospy.sleep(10)
-        rospy.loginfo('Game should be completed.')
+        rospy.loginfo('Robot movement should be completed.')
 
 
 def parser():
