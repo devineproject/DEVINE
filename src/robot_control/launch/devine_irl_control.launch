@@ -1,5 +1,4 @@
 <launch>
-  <arg name="jn0" default="false"/>
   <arg name="control" default="true"/>
   <arg name="head" default="true"/>
   <arg name="arms" default="true"/>
@@ -7,13 +6,11 @@
   <arg name="facial_expression" default="true"/>
   <arg name="point_detail" default="true"/>
   <arg name="prod" default="true"/>
-
-  <group if="$(arg jn0)">
-    <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
-  </group>
+  <arg name="sim" default="false"/>
 
   <group if="$(arg control)">
     <node name="devine_irl_control" pkg="devine_irl_control" type="node_control.py" respawn="$(arg prod)">
+        <param name="is_sim" value="$(arg sim)" />
         <param name="is_head_activated" value="$(arg head)" />
         <param name="is_arms_activated" value="$(arg arms)" />
         <param name="is_grippers_activated" value="$(arg gripper)" />

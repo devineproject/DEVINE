@@ -192,12 +192,13 @@ def main():
     rospy.init_node(node_name)
     rospy.loginfo('Running node \'%s\'', node_name)
 
-    is_head_activated = rospy.get_param('/'.join(['', node_name, 'is_head_activated']))
-    is_arms_activated = rospy.get_param('/'.join(['', node_name, 'is_arms_activated']))
-    is_grippers_activated = rospy.get_param('/'.join(['', node_name, 'is_grippers_activated']))
+    is_head_activated = rospy.get_param('~is_head_activated')
+    is_arms_activated = rospy.get_param('~is_arms_activated')
+    is_grippers_activated = rospy.get_param('~is_grippers_activated')
 
-    # Wait for gazebo before initializing controllers
-    rospy.wait_for_service('gazebo/set_physics_properties')
+    if rospy.get_param('~is_sim'):
+        # Wait for gazebo before initializing controllers
+        rospy.wait_for_service('gazebo/set_physics_properties')
 
     controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
     Movement(controller)
