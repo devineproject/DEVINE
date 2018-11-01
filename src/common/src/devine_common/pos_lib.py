@@ -33,7 +33,7 @@ def plot_openni_3d_data_matrix(data):
 
 
 def deserialize(pcloud):
-    """ Deserialize a cloudpoit into an array of (x, y, z) tuples """
+    """ Deserialize a cloudpoint into an array of (x, y, z) tuples """
     return list(point_cloud2.read_points(pcloud, field_names=('x', 'y', 'z'), skip_nans=True))
 
 
