@@ -4,7 +4,7 @@
 import rospy
 from devine_config import topicname
 import numpy as np
-from sensor_msgs.msg import Image as ROS_Image
+from sensor_msgs.msg import Image as ROSImage
 from sensor_msgs.msg import CompressedImage
 from devine_common.image_utils import image_to_ros_msg
 from cv_bridge import CvBridge, CvBridgeError
@@ -18,8 +18,8 @@ class DepthMask(object):
     """ Node that applies a depth mask to RGB image and resends the masked image """
     def __init__(self):
         self.bridge = CvBridge()
-        image_sub = message_filters.Subscriber('camera/rgb/image_color', ROS_Image)
-        depth_sub = message_filters.Subscriber('camera/depth/image', ROS_Image)
+        image_sub = message_filters.Subscriber('camera/rgb/image_color', ROSImage)
+        depth_sub = message_filters.Subscriber('camera/depth/image', ROSImage)
 
         self.ts = message_filters.ApproximateTimeSynchronizer([image_sub, depth_sub], 1, 0.5)
         self.ts.registerCallback(self.callback)
@@ -30,8 +30,11 @@ class DepthMask(object):
         try:
             image = self.bridge.imgmsg_to_cv2(rgb_data, 'bgr8')
             depth_image = self.bridge.imgmsg_to_cv2(depth_data, 'passthrough')
+            self.send_masked_image(image,depth_image)
         except CvBridgeError, e:
             rospy.logerr(e)
+
+    def send_masked_image(self,image,depth_image):
         nan_indices = np.isnan(depth_image)
         idx = np.where(~nan_indices,np.arange(nan_indices.shape[1]),0)
         np.maximum.accumulate(idx,axis=1, out=idx)
