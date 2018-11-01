@@ -36,7 +36,7 @@ install_devine() {
   cd ../robot_control
   mkdir -p ~/.rviz
   cp -f launch/irl_point.rviz ~/.rviz/default.rviz
-  cd ../scene_finder
+  cd ../head_coordinator
   cp -f apriltags2_config/* ../../../apriltags2_ros/apriltags2_ros/config
   cd ../common
   python2 -m pip install --user -r requirements.txt

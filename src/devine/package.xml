@@ -15,6 +15,7 @@
   <depend>devine_guesswhat</depend>
   <depend>devine_image_processing</depend>
   <depend>devine_irl_control</depend>
+  <depend>devine_head_coordinator</depend>
   <depend>openni_camera</depend>
   <depend>openni_launch</depend>
   <export>

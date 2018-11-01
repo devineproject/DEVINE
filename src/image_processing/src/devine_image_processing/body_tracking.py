@@ -69,9 +69,8 @@ class BodyTracking(ImageProcessor):
 def main():
     """ Entry point of this file """
     processor = ROSImageProcessingWrapper(BodyTracking, IMAGE_TOPIC)
-    publisher = rospy.Publisher(PUBLISH_TOPIC, String, queue_size=10, latch=True)
+    publisher = rospy.Publisher(PUBLISH_TOPIC, String, queue_size=1, latch=True)
     processor.loop(lambda processor_output: publisher.publish(processor_output))
-
 
 if __name__ == '__main__':
     main()

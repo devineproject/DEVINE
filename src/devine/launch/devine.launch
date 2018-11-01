@@ -6,7 +6,7 @@
   <arg name="dashboard" default="$(arg launch_all)" />
   <arg name="guesswhat" default="$(arg launch_all)" />
   <arg name="image_processing" default="$(arg launch_all)" />
-  <arg name="scene_finder" default="$(arg launch_all)" />
+  <arg name="head_coordinator" default="$(arg launch_all)" />
   <arg name="jn0" default="true" />
 
   <group if="$(arg robot_control)">
@@ -36,13 +36,13 @@
     <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
   </group>
 
-  <group if="$(arg scene_finder)">
+  <group if="$(arg head_coordinator)">
     <include file="$(find apriltags2_ros)/launch/continuous_detection.launch">
       <arg name="camera_name" value="/camera/rgb" />
       <arg name="image_topic" value="image_rect_mono" />
       <arg name="camera_frame" value="openni_rgb_optical_frame" />
     </include>
-    <node name="scene_finder" pkg="devine_scene_finder" type="scene_finder.py" respawn="true" />
+    <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" respawn="true" />
   </group>
 
   <group if="$(arg dashboard)">
