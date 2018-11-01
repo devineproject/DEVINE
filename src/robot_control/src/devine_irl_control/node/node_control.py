@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-''' Node to control robot joints '''
+""" Node to control robot joints """
 
 import rospy
 import tf
@@ -14,9 +14,10 @@ from devine_irl_control import irl_constant
 from devine_irl_control.movement import Movement
 from devine_irl_control.controllers import TrajectoryClient
 from devine_irl_control.gripper import Gripper
-import devine_irl_control.ik as ik
+from devine_irl_control import ik
 
 ROBOT_NAME = irl_constant.ROBOT_NAME
+
 # IN
 TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
 TOPIC_HEAD_LOOK_AT = topicname('robot_look_at')
@@ -28,7 +29,7 @@ TOPIC_IS_LOOKING = topicname('is_looking')
 
 
 class Controller(object):
-    ''' Arms, head and gripper controller '''
+    """ Arms, head and gripper controller """
 
     def __init__(self, is_head_activated=True, is_arms_activated=True, is_gripper_activated=True):
         self.arm_data = None
@@ -68,30 +69,29 @@ class Controller(object):
                                                   Bool, queue_size=1)
 
     def head_joint_traj_point_callback(self, msg):
-        ''' On topic /head_joint_traj_point, move head '''
-
+        """ On topic /head_joint_traj_point, move head """
         pos = msg.positions
         time = msg.time_from_start
         self.move({'head': pos}, time.to_sec())
 
     def arm_pose_callback(self, msg):
-        ''' On topic /object_location, compute and move joints '''
+        """ On topic /object_location, compute and move joints """
         if self.arm_data != msg:
             self.arm_data = msg
             if self.is_arms_activated:
                 if msg.pose.position != (0, 0, 0):
-                    # TODO add decision left/right arms in ik.py
+                    # TODO: add decision left/right arms in ik.py
                     arm_decision = 'left'
                     joints_position = self.calcul_arm(arm_decision)
                     self.move({'arm_' + arm_decision: joints_position},
-                            self.time)
+                              self.time)
                 else:
                     self.move_init(10)
 
             self.pub_is_pointing.publish(True)
 
     def head_pose_callback(self, msg):
-        ''' On topic /look_at, compute and move joints '''
+        """ On topic /look_at, compute and move joints """
         if self.head_data != msg:
             self.head_data = msg
             if msg.pose.position != (0, 0, 0):
@@ -104,12 +104,11 @@ class Controller(object):
             self.pub_is_looking.publish(True)
 
     def calcul_arm(self, controller):
-        ''' Get arm translation from TF and apply inverse kinematic '''
-
+        """ Get arm translation from TF and apply inverse kinematic """
         arm_joints_position = None
 
         topic_robot_shoulder_frame = irl_constant.ROBOT_LINK['r_shoulder_fixed']
-        if controller is 'left':
+        if controller == 'left':
             topic_robot_shoulder_frame = irl_constant.ROBOT_LINK['l_shoulder_fixed']
 
         try:
@@ -128,8 +127,7 @@ class Controller(object):
         return arm_joints_position
 
     def calcul_head(self):
-        ''' Get head translation from TF and apply inverse kinematic '''
-
+        """ Get head translation from TF and apply inverse kinematic """
         head_joints_position = None
 
         try:
@@ -147,17 +145,15 @@ class Controller(object):
         return head_joints_position
 
     def move_init(self, time):
-        ''' Move joints to initial position '''
-
-        self.move({'head': [0, 0],
-                   'arm_left':  [0, 0, 0, 0],
-                   'arm_right':  [0, 0, 0, 0]
-                  },
-                  time)
+        """ Move joints to initial position """
+        self.move({
+            'head': [0, 0],
+            'arm_left':  [0, 0, 0, 0],
+            'arm_right':  [0, 0, 0, 0]
+        }, time)
 
     def move(self, controller_joints_positions, time):
-        ''' Move joints '''
-
+        """ Move joints """
         move_gripper = False
 
         times = get_joints_time(controller_joints_positions, time)
@@ -178,10 +174,10 @@ class Controller(object):
                 rospy.sleep(0.5)
                 i = i + 1
 
-def get_joints_time(controller_joints, time):
-    ''' Converte a single time to an array of time '''
 
-    if isinstance(time, int) or isinstance(time, float):
+def get_joints_time(controller_joints, time):
+    """ Converte a single time to an array of time """
+    if isinstance(time, (int, float)):
         times = {}
         for key in controller_joints:
             times[key] = time
@@ -189,12 +185,12 @@ def get_joints_time(controller_joints, time):
         times = time
     return times
 
-def main():
-    ''' Node initialize controllers '''
 
+def main():
+    """ Node initialize controllers """
     node_name = 'devine_irl_control'
     rospy.init_node(node_name)
-    rospy.loginfo('Running node \'' + node_name + '\'')
+    rospy.loginfo('Running node \'%s\'', node_name)
 
     is_head_activated = rospy.get_param('/'.join(['', node_name, 'is_head_activated']))
     is_arms_activated = rospy.get_param('/'.join(['', node_name, 'is_arms_activated']))
@@ -207,6 +203,7 @@ def main():
     Movement(controller)
 
     rospy.spin()
+
 
 if __name__ == '__main__':
     main()

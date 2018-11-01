@@ -1,11 +1,12 @@
-''' IRL-1 Gripper use /command topic for 2 fingers on right & left hand '''
+""" IRL-1 Gripper use /command topic for 2 fingers on right & left hand """
 
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER
 
 from devine_irl_control.controllers import CommandPublisher
 
+
 class Gripper(object):
-    ''' Gripper Controller '''
+    """ Gripper Controller """
 
     def __init__(self, robot_name, gripper):
         self._joints_limit = ROBOT_CONTROLLER[gripper + '_gripper_up_controller']['joints_limit']
@@ -19,13 +20,13 @@ class Gripper(object):
             self._gripper_down = CommandPublisher(robot_name, 'right_gripper_down_controller')
 
     def close(self, percentage=1):
-        ''' Close gripper with a percentage of maximum gripper closure '''
-
-        self._gripper_down.publish(percentage * self._joints_limit_interval + self._joints_limit[0])
-        self._gripper_up.publish(percentage * self._joints_limit_interval + self._joints_limit[0])
+        """ Close gripper with a percentage of maximum gripper closure """
+        msg = percentage * self._joints_limit_interval + self._joints_limit[0]
+        self._gripper_down.publish(msg)
+        self._gripper_up.publish(msg)
 
     def open(self, percentage=1):
-        ''' Open gripper with a percentage of maximum gripper openness '''
-
-        self._gripper_down.publish(percentage * -self._joints_limit_interval + self._joints_limit[1])
-        self._gripper_up.publish(percentage * -self._joints_limit_interval + self._joints_limit[1])
+        """ Open gripper with a percentage of maximum gripper openness """
+        msg = percentage * -self._joints_limit_interval + self._joints_limit[1]
+        self._gripper_down.publish(msg)
+        self._gripper_up.publish(msg)

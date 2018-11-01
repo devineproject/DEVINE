@@ -11,27 +11,33 @@ from std_msgs.msg import Float64MultiArray
 from jn0_face_msgs.msg import EmoIntensity
 from devine_config import topicname
 
+
 class RobotExpression(Enum):
     """ Valid expressions """
 
-    SURPRISE = "Surprise"
-    SAD = "Sad"
-    ANGER = "Anger"
-    JOY = "Joy"
+    SURPRISE = 'Surprise'
+    SAD = 'Sad'
+    ANGER = 'Anger'
+    JOY = 'Joy'
+
 
 OBJECT_CONFIDENCE_TOPIC = topicname('objects_confidence')
 GAME_SUCCESS_TOPIC = topicname('object_guess_success')
 ROBOT_EXPRESSION_TOPIC = topicname('robot_facial_expression')
 FACIAL_EXPRESSION_COMPLETED = topicname('robot_facial_expression_completed')
 
+NODE_NAME = 'facial_expression'
+
+
 class FacialExpression(object):
     """ Subscribes to object confidence and publishes facial expression for a specific duration """
 
     EXPRESSION_DURATION = 10
 
-
     def __init__(self):
-        self.initialize_for_new_game()
+        self.showing_emotion = False
+        self.confidence = None
+
         self.robot_expression_publisher = rospy.Publisher(ROBOT_EXPRESSION_TOPIC,
                                                           EmoIntensity, queue_size=1)
         self.expression_completed_pub = rospy.Publisher(FACIAL_EXPRESSION_COMPLETED,
@@ -43,14 +49,11 @@ class FacialExpression(object):
                          self.on_game_success)
 
     def on_new_object_confidence(self, objects_confidence):
-        """ callback on new object confidence. Updates max confidence """
-
+        """ Callback on new object confidence. Updates max confidence """
         self.confidence = max(objects_confidence.data)
 
-
     def on_game_success(self, game_success):
-        """ callback on end game. Shows emotion depending on success and confidence """
-
+        """ Callback on end game. Shows emotion depending on success and confidence """
         expression = self.get_expression(self.confidence, game_success.data)
 
         if expression is not None and not self.showing_emotion:
@@ -58,7 +61,7 @@ class FacialExpression(object):
 
     def show_expression_for(self, expression, duration):
         """ Publishes the expression for a specific duration"""
-        value = 1 # default value
+        value = 1  # default value
         self.showing_emotion = True
 
         # Special case for anger which is a bit too intense
@@ -68,23 +71,19 @@ class FacialExpression(object):
         face_expression = EmoIntensity(name=expression.value, value=value)
         self.robot_expression_publisher.publish(face_expression)
 
-        d = rospy.Duration(duration, 0)
-        rospy.sleep(d)
+        rospy.sleep(duration)
 
         face_expression = EmoIntensity(name=expression.value, value=0)
         self.robot_expression_publisher.publish(face_expression)
-        self.initialize_for_new_game()
+
+        # Initialize for a new game
+        self.showing_emotion = False
+        self.confidence = None
         rospy.sleep(0.5)
         self.expression_completed_pub.publish(True)
 
-    def initialize_for_new_game(self):
-        """ Init vars """
-        self.showing_emotion = False
-        self.confidence = None
-
     def get_expression(self, confidence, success):
-        """
-        returns the wanted expression depending on the received confidence.
+        """ Get the wanted expression depending on the received confidence.
         Defaults to ANGER
         """
         expression = None
@@ -94,20 +93,23 @@ class FacialExpression(object):
 
             # Devine Won
             if success:
-                if 0 <= confidence < .6:
+                if 0 <= confidence < 0.6:
                     expression = RobotExpression.SURPRISE
                 else:
                     expression = RobotExpression.JOY
+
             # Devine Lost
             else:
-                if 0 <= confidence < .6:
+                if 0 <= confidence < 0.6:
                     expression = RobotExpression.SAD
                 else:
                     expression = RobotExpression.ANGER
 
         return expression
 
+
 if __name__ == '__main__':
-    rospy.init_node('facial_expression')
+    rospy.init_node(NODE_NAME)
+    rospy.loginfo('Running node \'%s\'', NODE_NAME)
     FacialExpression()
     rospy.spin()

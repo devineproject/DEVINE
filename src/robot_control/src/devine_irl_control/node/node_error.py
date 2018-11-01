@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 
-''' Calculates the error in real-time '''
+""" Calculates the error in real-time """
 
 import math
 import rospy
@@ -17,8 +17,9 @@ TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
 # OUT
 TOPIC_POINT_ERR = topicname('robot_err_pointing')
 
+
 class ErrorPoint(object):
-    ''' Compute error when pointing with arms '''
+    """ Compute error when pointing with arms """
 
     def __init__(self):
         self.pose_stamp = None
@@ -27,8 +28,7 @@ class ErrorPoint(object):
         self.pub_err_top = rospy.Publisher(TOPIC_POINT_ERR, Float64MultiArray, queue_size=1)
 
     def compute_err(self):
-        ''' Compute and publish error '''
-
+        """ Compute and publish error """
         if self.pose_stamp:
             try:
                 self.pose_stamp.header.stamp = self.tf_listener.getLatestCommonTime(
@@ -54,27 +54,28 @@ class ErrorPoint(object):
                 rospy.logerr(err)
 
     def pose_stamp_callback(self, msg):
-        ''' Callback PoseStamped '''
-
+        """ Callback PoseStamped """
         self.pose_stamp = msg
 
+
 def angle(pos_x, pos_y):
-    ''' Angle in degrees of 2D point '''
+    """ Angle in degrees of 2D point """
     angle_rad = math.atan(abs(pos_y/pos_x))
     angle_degree = math.degrees(angle_rad)
 
     return angle_degree
 
-def main():
-    ''' Start Node '''
 
+def main():
+    """ Start Node """
     node_name = 'devine_irl_control_error'
     rospy.init_node(node_name)
-    rospy.loginfo('Running node \'' + node_name + '\'')
+    rospy.loginfo('Running node \'%s\'', node_name)
     err = ErrorPoint()
     while not rospy.is_shutdown():
         err.compute_err()
         rospy.sleep(rospy.Duration(0.5))
+
 
 if __name__ == '__main__':
     main()
