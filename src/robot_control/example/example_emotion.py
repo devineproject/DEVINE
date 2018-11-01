@@ -46,7 +46,7 @@ def main(arguments):
 
 
 def parser():
-    """ Command Line Parser"""
+    """ Command Line Parser """
     arg_fmt = argparse.RawDescriptionHelpFormatter
     arg_parser = argparse.ArgumentParser(formatter_class=arg_fmt, description=main.__doc__)
     required = arg_parser.add_argument_group('required arguments')
