@@ -13,16 +13,16 @@ from sensor_msgs import point_cloud2
 from std_msgs.msg import Int32MultiArray
 from geometry_msgs.msg import PoseStamped
 
-from devine_config import topicname
+from devine_config import topicname, constant
 from devine_common import math_utils, ros_utils
+
+
+CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 
 # Topics
 IMAGE_DEPTH_TOPIC = topicname('image_depth')
 OBJECT_IMAGE_LOCATION_TOPIC = topicname('guess_location_image')
 OBJECT_WORLD_LOCATION_TOPIC = topicname('guess_location_world')
-
-ROBOT_BASE_LINK_FRAME = '/base_link'
-CAMERA_BASE_LINK_FRAME = '/openni_base_link'
 
 ROS_PUBLISHER = rospy.Publisher(OBJECT_WORLD_LOCATION_TOPIC, PoseStamped, queue_size=10)
 
@@ -60,25 +60,17 @@ class PosLib(object):
     def do_point_transform(self, position_to_transform, point_cloud):
         """ Do the 2d -> 3d transformation if we got the necessary information """
         [x, y] = position_to_transform
-        center_point = math_utils.upper_left_to_zero_center(x, y, point_cloud.width, point_cloud.height)
+        center_points = math_utils.upper_left_to_zero_center(x, y, point_cloud.width, point_cloud.height)
         [z] = next(point_cloud2.read_points(point_cloud, field_names='z',
                                             skip_nans=False, uvs=[(x, y)]))
 
-        (trans, rot) = self.get_trans(ROBOT_BASE_LINK_FRAME, CAMERA_BASE_LINK_FRAME)
-        position = math_utils.calc_geometric_location(center_point[0], center_point[1], z,
-                                                      point_cloud.width, point_cloud.height,
-                                                      trans, rot)
+        pos_xyz = math_utils.pixel_to_meters(center_points[0], center_points[1],
+                                             z, point_cloud.width)
 
-        ros_packet = ros_utils.pose_stamped(position[0], position[1], position[2])
+        ros_packet = ros_utils.pose_stamped(pos_xyz[0], pos_xyz[1], pos_xyz[2], 0, 0, 0, CAM_FRAME_OPTICAL)
         ROS_PUBLISHER.publish(ros_packet)
         rospy.loginfo('Object 3D position calculated: (%.2f, %.2f, %.2f)',
-                      position[0], position[1], position[2])
-
-    def get_trans(self, target_frame, source_frame):
-        """ Get translation between 2 frames """
-        time = self.tf_listener.getLatestCommonTime(target_frame, source_frame)
-        (trans, rot) = self.tf_listener.lookupTransform(target_frame, source_frame, time)
-        return (trans, rot)
+                      pos_xyz[0], pos_xyz[1], pos_xyz[2])
 
 
 def main():

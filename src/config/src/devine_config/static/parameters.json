@@ -79,7 +79,7 @@
     "tts_answer": {
       "name": "/devine/tts/answer",
       "type": "devine_dialog/TtsQuery"
-    },    
+    },
     "objects_confidence": {
       "name": "/devine/objects_confidence",
       "type": "std_msgs/Float64MultiArray"
@@ -105,16 +105,16 @@
       "type": "trajectory_msgs/JointTrajectoryPoint"
     },
     "is_pointing_object": {
-      "name" : "/devine/robot/is_pointing",
-      "type" : "std_msgs/Bool"
+      "name": "/devine/robot/is_pointing",
+      "type": "std_msgs/Bool"
     },
     "is_looking": {
-      "name" : "/devine/robot/is_looking",
-      "type" : "std_msgs/Bool"
+      "name": "/devine/robot/is_looking",
+      "type": "std_msgs/Bool"
     },
     "end_of_game": {
-      "name" : "/devine/end_of_game/",
-      "type" : "std_msgs/Bool"
+      "name": "/devine/end_of_game/",
+      "type": "std_msgs/Bool"
     },
     "robot_facial_expression": {
       "name": "/jn0/emo_intensity",
@@ -122,7 +122,7 @@
     },
     "robot_facial_expression_completed": {
       "name": "/devine/robot/facial_expression_completed",
-      "type": "std_msgs/Bool" 
+      "type": "std_msgs/Bool"
     },
     "new_game": {
       "name": "/devine/new_game",
@@ -130,5 +130,6 @@
     }
   },
   "constants": {
+    "cam_frame_optical": "openni_rgb_optical_frame"
   }
 }
