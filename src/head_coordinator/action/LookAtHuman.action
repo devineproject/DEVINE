@@ -1,0 +1,8 @@
+# goal
+duration period
+---
+# result
+int32 nb_humans
+---
+# feedback
+int32 nb_humans

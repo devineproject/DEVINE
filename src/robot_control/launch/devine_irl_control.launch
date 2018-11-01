@@ -6,7 +6,6 @@
   <arg name="gripper" default="true"/>
   <arg name="facial_expression" default="true"/>
   <arg name="point_detail" default="true"/>
-  <arg name="scene_finder" default="true"/>
   <arg name="prod" default="true"/>
 
   <group if="$(arg jn0)">
