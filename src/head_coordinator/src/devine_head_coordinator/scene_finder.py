@@ -18,6 +18,7 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
+DELTA_TILT = 0.01
 TILT = -0.17  # TODO: Iterate over tilt too ?
 
 class SceneFinder(object):
@@ -52,31 +53,45 @@ class SceneFinder(object):
         rate = rospy.Rate(1/DELTA_TIME)
         not_in_bound_ctr = 0
         direction = 1
+        tilt_direction = 0
         while not rospy.is_shutdown():
             [pan, tilt] = self.joint_ctrl.get_position()
             tilt = TILT # Add some function to modulate Tilt
             top_left_pos = self.look_up_tag_position(TOP_LEFT_TOPIC)
             bottom_right_pos = self.look_up_tag_position(BOTTOM_RIGHT_TOPIC)
+            tilt_direction = 0
 
             if top_left_pos and bottom_right_pos:
                 self.scene_position = [pan, tilt]
+                # use magic command to center screen
                 break
             if not bottom_right_pos and top_left_pos:
                 direction = -1
+                tilt_direction = 1
             elif bottom_right_pos and not top_left_pos:
                 direction = 1
-
+                tilt_direction = -1
             delta_pan = direction * DELTA_POS
-
-            if not self.in_bounds(pan + delta_pan, tilt):
+            delta_tilt = tilt_direction * DELTA_TILT
+ 
+            if not self.in_bounds(pan + delta_pan, tilt + delta_tilt):
                 if not_in_bound_ctr > 2:
                     rospy.logerr('Couldn\'t find the scene :(')
                     break
-                not_in_bound_ctr += 1
-                direction *= -1
-                delta_pan = direction * DELTA_POS
+                
+                if not self.pan_is_ok(pan + delta_pan):    
+                    direction *= -1
+                    not_in_bound_ctr += 1
+                    delta_pan = direction * DELTA_POS
+                    # Naive way to update, could be based on past angles
+                    # Record all angles and only keep unique angles
+                    delta_tilt = (tilt_limits[1] - tilt_limits[0])/3 #increase sweep angle
 
-            if not self.move_joints([pan+delta_pan, tilt]):
+                if not self.tilt_is_ok(tilt + delta_tilt):
+		    tilt_direction *= -1
+                    delta_tilt = DELTA_TILT * tilt_direction
+            
+            if not self.move_joints([pan+delta_pan, tilt+delta_tilt]):
                 break
             rate.sleep()
 
@@ -98,9 +113,14 @@ class SceneFinder(object):
     def in_bounds(self, pan, tilt):
         """ Check if neck pan and tilt are in the limits """
         [pan_limits, tilt_limits] = self.limits
-        return pan_limits[0] <= pan <= pan_limits[1] and \
-            tilt_limits[0] <= tilt <= tilt_limits[1]
+        return self.pan_is_ok(pan) and \
+            self.tilt_is_ok(tilt)
 
+    def tilt_is_ok(self,tilt):
+	return tilt_limits[0] <= tilt <= tilt_limits[1]
+
+    def pan_is_ok(self,pan)
+	return pan_limits[0] <= pan <= pan_limits[1]
 
 def main():
     """ Entry point of this file """
