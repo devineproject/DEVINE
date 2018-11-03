@@ -50,7 +50,7 @@
     },
     "guess_location_image": {
       "name": "/devine/guess_location/image",
-      "type": "std_msgs/Int32MultiArray"
+      "type": "geometry_msgs/PointStamped"
     },
     "guess_location_world": {
       "name": "/devine/guess_location/world",

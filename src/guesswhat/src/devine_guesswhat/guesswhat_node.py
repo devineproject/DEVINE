@@ -4,7 +4,8 @@
 import json
 from queue import Queue, Empty
 import rospy
-from std_msgs.msg import String, Int32MultiArray, Float64MultiArray
+from std_msgs.msg import String, Float64MultiArray
+from geometry_msgs.msg import PointStamped
 import tensorflow as tf
 import numpy as np
 
@@ -81,7 +82,7 @@ class GuessWhatNode():
 
         rospy.Subscriber(SEGMENTATION_TOPIC, String, self._segmentation_callback)
         rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self._features_callback)
-        self.object_found = rospy.Publisher(OBJECT_TOPIC, Int32MultiArray, queue_size=1)
+        self.object_found = rospy.Publisher(OBJECT_TOPIC, PointStamped, queue_size=1)
         self.category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
         self.status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
 
@@ -188,8 +189,11 @@ class GuessWhatNode():
         choice = next(obj for obj in storage['game'].objects
                       if obj.id == storage['guess_object_id'])
 
-        self.object_found.publish(Int32MultiArray(data=[int(choice.bbox.x_center),
-                                                        int(choice.bbox.y_center)]))
+        object_location = PointStamped()
+        object_location.header.stamp = rospy.Time.now() #TODO: Fix time
+        object_location.point.x = int(choice.bbox.x_center)
+        object_location.point.y = int(choice.bbox.y_center)
+        self.object_found.publish(object_location)
         self.status.publish('Object guessed')
         self.category.publish(choice.category)
 

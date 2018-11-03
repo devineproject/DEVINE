@@ -10,12 +10,10 @@ import tf
 import message_filters
 from sensor_msgs.msg import PointCloud2
 from sensor_msgs import point_cloud2
-from std_msgs.msg import Int32MultiArray
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PoseStamped, PointStamped
 
 from devine_config import topicname, constant
 from devine_common import math_utils, ros_utils
-
 
 CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 
@@ -46,20 +44,18 @@ class PosLib(object):
         self.tf_listener = tf.TransformListener()
 
         message_filters.ApproximateTimeSynchronizer([
-            message_filters.Subscriber(obj_pos_topic, Int32MultiArray),
+            message_filters.Subscriber(obj_pos_topic, PointStamped),
             message_filters.Subscriber(depth_topic, PointCloud2)
-        ], 1, 0.5).registerCallback(self.synchronized_callback)
-
-    def synchronized_callback(self, obj_pos_data, depth_data):
-        """ Callback executed when a depth image and an object pos are received """
-        rospy.loginfo('Received a new pointcloud and 2D position, image size: %ix%i',
-                      depth_data.width, depth_data.height)
-
-        self.do_point_transform(obj_pos_data.data, depth_data)
+        ], 1, 0.5).registerCallback(self.do_point_transform)
 
     def do_point_transform(self, position_to_transform, point_cloud):
         """ Do the 2d -> 3d transformation if we got the necessary information """
-        [x, y] = position_to_transform
+
+        rospy.loginfo('Received a new pointcloud and 2D position, image size: %ix%i',
+                      point_cloud.width, point_cloud.height)
+
+        x = int(position_to_transform.point.x)
+        y = int(position_to_transform.point.y)
         center_points = math_utils.upper_left_to_zero_center(x, y, point_cloud.width, point_cloud.height)
         [z] = next(point_cloud2.read_points(point_cloud, field_names='z',
                                             skip_nans=False, uvs=[(x, y)]))
@@ -67,7 +63,9 @@ class PosLib(object):
         pos_xyz = math_utils.pixel_to_meters(center_points[0], center_points[1],
                                              z, point_cloud.width)
 
-        ros_packet = ros_utils.pose_stamped(pos_xyz[0], pos_xyz[1], pos_xyz[2], 0, 0, 0, CAM_FRAME_OPTICAL)
+        ros_packet = ros_utils.pose_stamped(pos_xyz[0], pos_xyz[1], pos_xyz[2])
+        ros_packet.header = position_to_transform.header
+        ros_packet.header.frame_id = CAM_FRAME_OPTICAL
         ROS_PUBLISHER.publish(ros_packet)
         rospy.loginfo('Object 3D position calculated: (%.2f, %.2f, %.2f)',
                       pos_xyz[0], pos_xyz[1], pos_xyz[2])
