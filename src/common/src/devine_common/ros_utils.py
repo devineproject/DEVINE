@@ -5,7 +5,8 @@ import os
 from geometry_msgs.msg import PoseStamped
 
 def pose_stamped(x, y, z, roll=0, pitch=0, yaw=0, ref_frame='base_link', stamp=None):
-    """ Convert x, y, z, roll, pitch, yaw to PoseStamp """
+    """ Convert x, y, z, roll, pitch, yaw to PoseStamped """
+    
     pose = PoseStamped()
     pose.header.stamp = stamp or rospy.Time.now() - rospy.rostime.Duration(0.1)
     pose.header.frame_id = ref_frame
