@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 """ ROS module for body tracking """
 
 import rospy
@@ -19,7 +19,6 @@ MODEL_DIR = ros_utils.get_fullpath(__file__, '../../mobilenet_thin.pb')
 IMAGE_TOPIC = topicname('body_tracking_image')
 PUBLISH_TOPIC = topicname('body_tracking')
 
-
 class BodyTracking(ImageProcessor):
     """ Body Tracking wrapper of tf_pose for use in guesswhat """
 
@@ -34,14 +33,13 @@ class BodyTracking(ImageProcessor):
         set_session(tf.Session(config=config))
         self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368))  # downscale image
 
-    def process(self, img, _):
+    def process(self, img, img_payload):
         """ Actual body tracking of the image """
         rospy.logdebug('Starting body tracking')
         image = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
 
         # True if resize is not the same size
         humans = self.estimator.inference(image, resize_to_default=True, upsample_size=4.0)
-
         # # Draw humans on image
         # image = TfPoseEstimator.draw_humans(image, humans, imgcopy=False)
         # # Show image
@@ -50,6 +48,7 @@ class BodyTracking(ImageProcessor):
 
         rospy.logdebug('Body tracking done')
         result_obj = []
+
         for hum in humans:
             result_human = {
                 'body_parts': []
@@ -60,7 +59,8 @@ class BodyTracking(ImageProcessor):
                     'index': bp.part_idx,
                     'x': bp.x,
                     'y': bp.y,
-                    'score': bp.score
+                    'score': bp.score,
+                    'stamp': img_payload.header.stamp.to_nsec()
                 })
             result_obj.append(result_human)
         return json_util.dumps(result_obj)
@@ -69,7 +69,7 @@ class BodyTracking(ImageProcessor):
 def main():
     """ Entry point of this file """
     processor = ROSImageProcessingWrapper(BodyTracking, IMAGE_TOPIC)
-    publisher = rospy.Publisher(PUBLISH_TOPIC, String, queue_size=1, latch=True)
+    publisher = rospy.Publisher(PUBLISH_TOPIC, String, queue_size=1)
     processor.loop(lambda processor_output: publisher.publish(processor_output))
 
 if __name__ == '__main__':
