@@ -32,11 +32,11 @@
     </include>
   </group>
 
-  <group ns="devine">
-    <group if="$(arg sim)">
-      <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
-    </group>
+  <group if="$(arg sim)">
+    <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
+  </group>
 
+  <group ns="devine">
     <group if="$(arg robot_control)">
       <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
         <arg name="sim" value="$(arg sim)"/>
