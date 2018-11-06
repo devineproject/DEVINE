@@ -32,8 +32,14 @@
     </include>
   </group>
 
-  <group if="$(arg sim)">
-    <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
+  <group if="$(arg robot_control)">
+    <group if="$(arg sim)">
+      <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
+    </group>
+
+    <group unless="$(arg sim)">
+      <include file="$(find jn0_bringup)/launch/jn0_standalone.launch" />
+    </group>
   </group>
 
   <group ns="devine">
