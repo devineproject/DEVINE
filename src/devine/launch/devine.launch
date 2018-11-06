@@ -41,6 +41,7 @@
       <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
         <arg name="sim" value="$(arg sim)"/>
       </include>
+      <node name="set_admittance" pkg="irl_can_ros_ctrl" type="set_admittance.py" unless="$(arg sim)" args="-s left -v 15 15 15 15" />
     </group>
 
     <group if="$(eval arg('robot_control') and arg('kinect'))">
