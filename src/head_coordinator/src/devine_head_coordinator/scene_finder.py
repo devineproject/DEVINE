@@ -119,7 +119,7 @@ class SceneFinder(object):
     def tilt_is_ok(self,tilt):
 	return tilt_limits[0] <= tilt <= tilt_limits[1]
 
-    def pan_is_ok(self,pan)
+    def pan_is_ok(self,pan):
 	return pan_limits[0] <= pan <= pan_limits[1]
 
 def main():
