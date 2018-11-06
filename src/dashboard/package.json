@@ -6,7 +6,7 @@
     "build": "webpack",
     "build-watch": "webpack --watch",
     "serve": "python3 ./src/devine_dashboard/serve.py",
-    "start": "npm run serve | webpack --watch"
+    "start": "npm run serve | xdg-open http://localhost:8080 | npm run build-watch"
   },
   "author": "DEVINE",
   "license": "BSD",

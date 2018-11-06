@@ -1,15 +1,15 @@
 {
   "topics": {
     "raw_image": {
-      "name": "/camera/rgb/image_color/compressed",
+      "name": "/openni/rgb/image_rect_color/compressed",
       "type": "sensor_msgs/CompressedImage"
     },
     "image_depth": {
-      "name": "/camera/depth/points",
+      "name": "/openni/depth/points",
       "type": "sensor_msgs/PointCloud2"
     },
     "segmentation_image": {
-      "name": "/devine/image/segmentation",
+      "name": "image/segmentation",
       "type": "sensor_msgs/CompressedImage"
     },
     "zone_detection_image_out": {
@@ -17,103 +17,103 @@
       "type": "sensor_msgs/CompressedImage"
     },
     "zone_detection_image_in": {
-      "name": "/devine/image/zone_detection",
+      "name": "image/zone_detection",
       "type": "sensor_msgs/CompressedImage"
     },
     "features_extraction_image": {
-      "name": "/devine/image/features_extraction",
+      "name": "image/features_extraction",
       "type": "sensor_msgs/CompressedImage"
     },
     "body_tracking_image": {
-      "name": "/devine/image/body_tracking",
+      "name": "image/body_tracking",
       "type": "sensor_msgs/CompressedImage"
     },
     "objects": {
-      "name": "/devine/objects",
+      "name": "objects",
       "type": "std_msgs/String"
     },
     "zone_detection": {
-      "name": "/devine/zone_detection",
+      "name": "zone_detection",
       "type": "std_msgs/String"
     },
     "scene_found": {
-      "name": "/devine/scene_found",
+      "name": "scene_found",
       "type": "std_msgs/Bool"
     },
     "image_features": {
-      "name": "/devine/image_features",
+      "name": "image_features",
       "type": "std_msgs/Float64MultiArray"
     },
     "body_tracking": {
-      "name": "/devine/body_tracking",
+      "name": "body_tracking",
       "type": "std_msgs/String"
     },
     "guess_location_image": {
-      "name": "/devine/guess_location/image",
+      "name": "guess_location/image",
       "type": "geometry_msgs/PointStamped"
     },
     "guess_location_world": {
-      "name": "/devine/guess_location/world",
+      "name": "guess_location/world",
       "type": "geometry_msgs/PoseStamped"
     },
     "robot_look_at": {
-      "name": "/devine/robot/look_at",
+      "name": "robot/look_at",
       "type": "geometry_msgs/PoseStamped"
     },
     "robot_err_pointing": {
-      "name": "/devine/robot/err_pointing",
+      "name": "robot/err_pointing",
       "type": "std_msgs/Float64MultiArray"
     },
     "guess_category": {
-      "name": "/devine/guess_category",
+      "name": "guess_category",
       "type": "std_msgs/String"
     },
     "guesswhat_status": {
-      "name": "/devine/guesswhat_status",
+      "name": "guesswhat_status",
       "type": "std_msgs/String"
     },
     "tts_query": {
-      "name": "/devine/tts/query",
+      "name": "tts/query",
       "type": "devine_dialog/TtsQuery"
     },
     "tts_answer": {
-      "name": "/devine/tts/answer",
+      "name": "tts/answer",
       "type": "devine_dialog/TtsQuery"
     },
     "objects_confidence": {
-      "name": "/devine/objects_confidence",
+      "name": "objects_confidence",
       "type": "std_msgs/Float64MultiArray"
     },
     "game_system_state": {
-      "name": "/devine/game_system_state",
+      "name": "game_system_state",
       "type": "std_msgs/String"
     },
     "scoreboard": {
-      "name": "/devine/scoreboard",
+      "name": "scoreboard",
       "type": "std_msgs/String"
     },
     "object_guess_success": {
-      "name": "/devine/object_guess_success",
+      "name": "object_guess_success",
       "type": "std_msgs/Bool"
     },
     "player_name": {
-      "name": "/devine/player_name",
+      "name": "player_name",
       "type": "std_msgs/String"
     },
     "robot_head_joint_traj_point": {
-      "name": "/devine/robot/head_joint_traj_point",
+      "name": "robot/head_joint_traj_point",
       "type": "trajectory_msgs/JointTrajectoryPoint"
     },
     "is_pointing_object": {
-      "name": "/devine/robot/is_pointing",
+      "name": "robot/is_pointing",
       "type": "std_msgs/Bool"
     },
     "is_looking": {
-      "name": "/devine/robot/is_looking",
+      "name": "robot/is_looking",
       "type": "std_msgs/Bool"
     },
     "end_of_game": {
-      "name": "/devine/end_of_game/",
+      "name": "end_of_game/",
       "type": "std_msgs/Bool"
     },
     "robot_facial_expression": {
@@ -121,11 +121,11 @@
       "type": "jn0_face_msgs/EmoIntensity"
     },
     "robot_facial_expression_completed": {
-      "name": "/devine/robot/facial_expression_completed",
+      "name": "robot/facial_expression_completed",
       "type": "std_msgs/Bool"
     },
     "new_game": {
-      "name": "/devine/new_game",
+      "name": "new_game",
       "type": "std_msgs/Bool"
     }
   },

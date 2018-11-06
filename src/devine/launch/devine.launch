@@ -8,54 +8,76 @@
   <arg name="guesswhat" default="$(arg launch_all)" />
   <arg name="image_processing" default="$(arg launch_all)" />
   <arg name="head_coordinator" default="$(arg launch_all)" />
-  
-  <group if="$(arg sim)">
-    <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
-  </group>
 
-  <group if="$(arg robot_control)">
-    <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
-      <arg name="sim" value="$(arg sim)"/>
+  <group if="$(arg kinect)">
+    <param name="/openni/driver/data_skip" value="6" /> <!-- 5Hz -->
+    <include file="$(find openni_launch)/launch/openni.launch">
+      <arg name="camera"                          value="openni" />
+      <arg name="publish_tf"                      value="false" /> <!-- Done by the IRL-1 repo -->
+      <arg name="depth_registration"              value="false" />
+      <arg name="ir_processing"                   value="false"/>
+      <arg name="disparity_processing"            value="false"/>
+      <arg name="disparity_registered_processing" value="false"/>
+      <arg name="hw_registered_processing"        value="false" />
+      <arg name="sw_registered_processing"        value="false" />
     </include>
   </group>
 
-  <group if="$(arg kinect)">
-    <param name="/camera/driver/data_skip" value="6" /> <!-- 5Hz -->
-    <include file="$(find openni_launch)/launch/openni.launch" />
-    <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
-  </group>
-
-  <group if="$(eval arg('robot_control') and arg('kinect'))">
-    <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" />
-  </group>
-
-  <group if="$(arg dialog)">
-    <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
-    <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" respawn="true" />
-  </group>
-
+  <!-- April tags detection library -->
   <group if="$(arg image_processing)">
-    <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
-    <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
-    <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
-  </group>
-
-  <group if="$(arg head_coordinator)">
     <include file="$(find apriltags2_ros)/launch/continuous_detection.launch">
-      <arg name="camera_name" value="/camera/rgb" />
+      <arg name="camera_name" value="/openni/rgb" />
       <arg name="image_topic" value="image_rect_mono" />
       <arg name="camera_frame" value="openni_rgb_optical_frame" />
     </include>
-    <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" respawn="true" />
   </group>
 
-  <group if="$(arg dashboard)">
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
-    <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
-    <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
+  <group if="$(arg robot_control)">
+    <group if="$(arg sim)">
+      <include file="$(find jn0_gazebo)/launch/jn0_empty_world.launch" />
+    </group>
+
+    <group unless="$(arg sim)">
+      <include file="$(find jn0_bringup)/launch/jn0_standalone.launch" />
+    </group>
   </group>
 
-  <group if="$(arg guesswhat)">
-    <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
+  <group ns="devine">
+    <group if="$(arg robot_control)">
+      <include file="$(find devine_irl_control)/launch/devine_irl_control.launch">
+        <arg name="sim" value="$(arg sim)"/>
+      </include>
+      <node name="set_admittance" pkg="irl_can_ros_ctrl" type="set_admittance.py" unless="$(arg sim)" args="-s left -v 15 15 15 15" />
+    </group>
+
+    <group if="$(eval arg('robot_control') and arg('kinect'))">
+      <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" />
+    </group>
+
+    <group if="$(arg dialog)">
+      <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
+      <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" respawn="true" />
+    </group>
+
+    <group if="$(arg image_processing)">
+      <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
+      <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
+      <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
+      <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
+    </group>
+
+    <group if="$(arg head_coordinator)">
+      <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" respawn="true" />
+    </group>
+
+    <group if="$(arg dashboard)">
+      <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" />
+      <node name="dashboard" pkg="devine_dashboard" type="serve.py" respawn="true" />
+      <node name="dashboard_frontend" pkg="devine_dashboard" type="build_watch.py" respawn="true" />
+    </group>
+
+    <group if="$(arg guesswhat)">
+      <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
+    </group>
   </group>
 </launch>
