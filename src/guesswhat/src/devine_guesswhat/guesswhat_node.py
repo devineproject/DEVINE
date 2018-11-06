@@ -20,6 +20,7 @@ from guesswhat.data_provider.looper_batchifier import LooperBatchifier
 from modelwrappers import GuesserROSWrapper, OracleROSWrapper
 from devine_config import topicname
 from devine_common import ros_utils
+from devine_image_processing.msg import SegmentedImage, SceneObject
 
 EVAL_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/eval.json')
 GUESS_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/guesser.json')
@@ -80,7 +81,7 @@ class GuessWhatNode():
         self.segmentations = Queue(1)
         self.features = Queue(1)
 
-        rospy.Subscriber(SEGMENTATION_TOPIC, String, self._segmentation_callback)
+        rospy.Subscriber(SEGMENTATION_TOPIC, SegmentedImage, self._segmentation_callback)
         rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self._features_callback)
         self.object_found = rospy.Publisher(OBJECT_TOPIC, PointStamped, queue_size=1)
         self.category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
@@ -92,7 +93,7 @@ class GuessWhatNode():
 
         self.tokenizer = GWTokenizer(TOKENS_PATH)
 
-        self.tf_config = tf.ConfigProto(log_device_placement=True)
+        self.tf_config = tf.ConfigProto(log_device_placement=False)
         self.tf_config.gpu_options.allow_growth = True
 
     def start_session(self):
@@ -134,10 +135,10 @@ class GuessWhatNode():
             self.status.publish('Starting new game')
 
             objects = []
-            for obj in seg['objects']:
+            for obj in seg.objects:
                 # Adapting bounding box to GuessWhat
-                bbox = obj['bbox']
-                objects.append([bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]])
+                bbox = obj.bounding_box
+                objects.append([bbox.x_offset, bbox.y_offset, bbox.width, bbox.height])
 
             game = Game(id=0,
                         object_id=0,
@@ -171,10 +172,7 @@ class GuessWhatNode():
         if self.segmentations.full():
             self.segmentations.get()
 
-        try:
-            self.segmentations.put(json.loads(data.data))
-        except json.JSONDecodeError:
-            rospy.logerr('Garbage on %s, expects json', SEGMENTATION_TOPIC)
+        self.segmentations.put(data)
 
     def _features_callback(self, data):
         """ Callback for the features topic """
