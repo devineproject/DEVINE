@@ -21,7 +21,6 @@ CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 # OUT
 TOPIC_HEAD_LOOK_AT = topicname('robot_look_at')
 
-
 class LookAtHumanActionServer(object):
     """ Action server to look at humans for a fixed period of time """
 
