@@ -8,4 +8,5 @@ https://trello.com/c/1rbIWyXP
     :maxdepth: 1
 
     distributed/index
+    sequence_diagram/index
 

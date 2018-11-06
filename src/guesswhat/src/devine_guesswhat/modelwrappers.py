@@ -1,12 +1,9 @@
-'''ROS wrappers for guesswhat models'''
-
-from queue import Queue, Empty
+""" ROS wrappers for guesswhat models """
 
 import rospy
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import Float64MultiArray
 from devine_dialog.msg import TtsQuery
 from devine_dialog import TTSAnswerType, send_speech
-
 from guesswhat.models.guesser.guesser_wrapper import GuesserWrapper
 from devine_config import topicname
 
@@ -14,23 +11,27 @@ TTS_ANSWER_TOPIC = topicname('tts_answer')
 TTS_QUERY_TOPIC = topicname('tts_query')
 CONFIDENCE_TOPIC = topicname('objects_confidence')
 
+
 class GuesserROSWrapper(GuesserWrapper):
-    '''Wraps the guesser model and publishes confidence levels'''
+    """ Wraps the guesser model and publishes confidence levels """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.confidence = rospy.Publisher(CONFIDENCE_TOPIC, Float64MultiArray, queue_size=1, latch=True)
 
     def find_object(self, *args, **kwargs):
-        '''find_object interface for the looper'''
+        """ find_object interface for the looper """
         found, softmax, selected_object = super().find_object(*args, **kwargs)
-        found = [False] # found is based on the oracle's choice, which we dont know
+        found = [False]  # found is based on the oracle's choice, which we dont know
 
         self.confidence.publish(Float64MultiArray(data=softmax[0].tolist()))
 
         return found, softmax, selected_object
 
+
 class OracleROSWrapper(object):
-    '''Wraps the oracle model, publishes questions and waits for their answers'''
+    """ Wraps the oracle model, publishes questions and waits for their answers """
+
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
         self.questions = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1, latch=True)
@@ -38,26 +39,26 @@ class OracleROSWrapper(object):
         self.previous_answer = None
 
     def initialize(self, sess):
-        '''initialize interface'''
+        """ Initialize interface """
         pass
 
     def is_same_question(self, question):
-        '''checks if question is repeated'''
+        """ Checks if question is repeated """
         return self.previous_question is not None and question == self.previous_question
 
     def select_answer(self, question):
-        '''repeat answer or send speech'''
+        """ Repeat answer or send speech """
         if self.is_same_question(question):
-            rospy.logwarn("Skipped repeated question")
+            rospy.logwarn('Skipped repeated question')
             return self.previous_answer
-        else:
-            answer = send_speech(self.questions, question, TTSAnswerType.YES_NO)
-            self.previous_question = question
-            self.previous_answer = answer
-            return answer
 
-    def answer_question(self, sess, question, **kwargs):
-        '''answer_question interface for the looper'''
+        answer = send_speech(self.questions, question, TTSAnswerType.YES_NO)
+        self.previous_question = question
+        self.previous_answer = answer
+        return answer
+
+    def answer_question(self, _sess, question, **kwargs):
+        """ answer_question interface for the looper """
         if self.tokenizer.stop_dialogue in question[0]:
             return [self.tokenizer.non_applicable_token]
 

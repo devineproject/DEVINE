@@ -12,10 +12,8 @@ def get_result():
 
     client.wait_for_server()
 
-    goal = LookAtHumanGoal(period=rospy.rostime.Duration(0))
-
     rospy.loginfo('Sending goal')
-    client.send_goal(goal)
+    client.send_goal(LookAtHumanGoal(period=rospy.rostime.Duration(0)))
 
     rospy.loginfo('Waiting for results')
     client.wait_for_result()

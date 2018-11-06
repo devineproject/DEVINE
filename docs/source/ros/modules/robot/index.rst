@@ -30,24 +30,31 @@ Possible Mouvements
     * Satisfied (confidence < threshold, success 1)
     * Disappointed (confidence >= threshold, success 0)
     * Sad (confidence < threshold, success 0)
-* TODO Facial expression
-    * Surprise
+* Facial expression
     * Anger
     * Joy
-
+    * Sad
+    * Surprise
 
 Running Examples
 ================
 
 Before running any examples, you need to:
 
-1. Launch jn0 with RViz UI and devine_irl_control nodes
+1. Launch jn0 with RViz UI
 
 .. code-block:: bash
 
-    roslaunch devine_irl_control devine_irl_control.launch jn0:=true
+    roslaunch jn0_gazebo jn0_empty_world.launch # for simulation
+    roslaunch jn0_bringup jn0_standalone.launch # for real robot
 
-2. Load RVIZ configuration
+2. Launch devine_irl_control nodes
+
+.. code-block:: bash
+
+    roslaunch devine_irl_control devine_irl_control.launch sim:=true # for simulation
+
+3. Load RViz configuration
 
 .. code-block:: bash
 

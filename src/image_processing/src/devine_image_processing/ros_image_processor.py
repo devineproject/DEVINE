@@ -1,7 +1,10 @@
 """Generic ROS Wrapper around image processing classes"""
 
 from io import BytesIO
-from Queue import Queue, Empty
+try:
+    from queue import Queue, Empty
+except ImportError:
+    from Queue import Queue, Empty
 import time
 import signal
 import inspect
