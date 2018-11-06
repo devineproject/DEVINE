@@ -81,11 +81,15 @@ class GuessWhatNode():
         self.segmentations = Queue(1)
         self.features = Queue(1)
 
-        rospy.Subscriber(SEGMENTATION_TOPIC, SegmentedImage, self._segmentation_callback)
-        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray, self._features_callback)
-        self.object_found = rospy.Publisher(OBJECT_TOPIC, PointStamped, queue_size=1)
+        rospy.Subscriber(SEGMENTATION_TOPIC, SegmentedImage,
+                         self._segmentation_callback)
+        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray,
+                         self._features_callback)
+        self.object_found = rospy.Publisher(
+            OBJECT_TOPIC, PointStamped, queue_size=1)
         self.category = rospy.Publisher(CATEGORY_TOPIC, String, queue_size=1)
-        self.status = rospy.Publisher(STATUS_TOPIC, String, queue_size=1, latch=True)
+        self.status = rospy.Publisher(
+            STATUS_TOPIC, String, queue_size=1, latch=True)
 
         self.eval_config = self._load_config(EVAL_CONF_PATH)
         self.guesser_config = self._load_config(GUESS_CONF_PATH)
@@ -99,8 +103,10 @@ class GuessWhatNode():
     def start_session(self):
         """ Launch the tensorflow session and start the GuessWhat loop """
         with tf.Session(config=self.tf_config) as sess:
-            guesser_network = GuesserNetwork(self.guesser_config['model'], num_words=self.tokenizer.no_words)
-            guesser_var = [v for v in tf.global_variables() if 'guesser' in v.name]
+            guesser_network = GuesserNetwork(
+                self.guesser_config['model'], num_words=self.tokenizer.no_words)
+            guesser_var = [v for v in tf.global_variables()
+                           if 'guesser' in v.name]
             guesser_saver = tf.train.Saver(var_list=guesser_var)
             guesser_saver.restore(sess, GUESS_NTW_PATH)
             guesser_wrapper = GuesserROSWrapper(guesser_network)
@@ -122,6 +128,20 @@ class GuessWhatNode():
 
             self.loop(sess, guesser_wrapper, qgen_wrapper, oracle_wrapper)
 
+    def segmented_image_to_img_obj(self, segmented_image):
+        """ Transform a segmented image obj to the image object expected for GW """
+        bbox = segmented_image.bounding_box
+        mask = np.array(segmented_image.mask_array).reshape(
+            (segmented_image.mask_height, segmented_image.mask_width))
+        return {
+            'id': 0,
+            'category': segmented_image.category_name,
+            'category_id': segmented_image.category_id,
+            'bbox': [bbox.x_offset, bbox.y_offset, bbox.width, bbox.height],
+            'area': mask,
+            'segment': None
+        }
+
     def loop(self, sess, guesser_wrapper, qgen_wrapper, oracle_wrapper):
         """ The GuessWhat game loop """
         while not rospy.is_shutdown():
@@ -134,17 +154,13 @@ class GuessWhatNode():
 
             self.status.publish('Starting new game')
 
-            objects = []
-            for obj in seg.objects:
-                # Adapting bounding box to GuessWhat
-                bbox = obj.bounding_box
-                objects.append([bbox.x_offset, bbox.y_offset, bbox.width, bbox.height])
-
+            objects = list(map(self.segmented_image_to_img_obj, seg.objects))
             game = Game(id=0,
                         object_id=0,
                         objects=objects,
                         qas=[],
-                        image={'id': 0, 'width': 640, 'height': 480, 'coco_url': ''},
+                        image={'id': 0, 'width': 640,
+                               'height': 480, 'coco_url': ''},
                         status='false',
                         which_set=None,
                         image_builder=ImgFeaturesBuilder(feats),
@@ -158,9 +174,10 @@ class GuessWhatNode():
                                  batch_size=1)
 
             iterator = SingleGameIterator(self.tokenizer, game)
-            looper.process(sess, iterator, mode='beam_search', store_games=True)
+            looper.process(sess, iterator, mode='beam_search',
+                           store_games=True)
 
-            self._resolve_choice(looper)
+            self._resolve_choice(seg.header, looper)
 
     def _load_config(self, path):
         """ Reads json config """
@@ -181,14 +198,14 @@ class GuessWhatNode():
 
         self.features.put(np.array(data.data))
 
-    def _resolve_choice(self, looper):
+    def _resolve_choice(self, msg_header, looper):
         """ Resolve what object GuessWhat chose """
         storage = looper.storage[0]
         choice = next(obj for obj in storage['game'].objects
                       if obj.id == storage['guess_object_id'])
 
         object_location = PointStamped()
-        object_location.header.stamp = rospy.Time.now() #TODO: Fix time
+        object_location.header = msg_header
         object_location.point.x = int(choice.bbox.x_center)
         object_location.point.y = int(choice.bbox.y_center)
         self.object_found.publish(object_location)

@@ -8,7 +8,7 @@ import rospy
 from std_msgs.msg import String
 from bson import json_util
 from devine_common import ros_utils
-from cv_bridge import CvBridge, CvBridgeError
+from cv_bridge import CvBridge
 
 sys.path.append(os.path.join(os.path.dirname(
     os.path.realpath(__file__)), '../../Mask_RCNN'))
@@ -96,8 +96,9 @@ class RCNNSegmentation(ImageProcessor):
             scene_object.bounding_box.width = right - left
             scene_object.mask = self._bridge.cv2_to_imgmsg(
                 mask, encoding="passthrough")
+            scene_object.mask_array = mask.flatten().tolist()
+            (scene_object.mask_height, scene_object.mask_width) = mask.shape
             scene_object.score = score
-
             output.objects.append(scene_object)
 
         return output
