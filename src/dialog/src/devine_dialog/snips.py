@@ -12,7 +12,7 @@ import rospy
 import paho.mqtt.client as mqtt
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery
-from devine_dialog import TTSAnswerType
+from devine_dialog import TTSAnswerType, send_speech
 
 # Snips settings
 SNIPS_HOST = 'localhost'
@@ -72,7 +72,8 @@ def on_snips_message(_client, _userdata, msg):
     rospy.loginfo('Detected intent %s with a probability of %f', intent_name, intent_probability)
 
     if intent_probability < 0.5:
-        rospy.logwarn('Dropped intent, probability was too low')
+        rospy.logwarn('Dropped intent because probability was too low. Asking player to repeat his answer.')
+        send_speech(ROS_PUBLISHER, "I am sorry, I didn't understand your answer, can you repeat please?", TTSAnswerType.NO_ANSWER)
         return
 
     # Get the raw text from the recognition
