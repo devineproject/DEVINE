@@ -56,47 +56,49 @@ class DialogControl():
 
     def loop(self):
         """ When a human is detected, begin the robot/human dialog """
-        try:
-            self._look.at_human() # Blocks until a human is found
-            self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
-            answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
-            if not answer == 'yes':
-                raise DialogControl.HumanDialogInterrupted()
+        while not rospy.is_shutdown():
+            try:
+                self._look.at_human() # Blocks until a human is found
+                self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
+                answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
+                if not answer == 'yes':
+                    raise DialogControl.HumanDialogInterrupted()
 
-            player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
+                player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
 
-            self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
-            if not self.wait_for_player('ready', player_name=player_name):
-                raise DialogControl.HumanDialogInterrupted()
+                self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
+                if not self.wait_for_player('ready', player_name=player_name):
+                    raise DialogControl.HumanDialogInterrupted()
 
-            self._look.at_scene()
-            READY_TO_PLAY_PUBLISHER.publish(player_name)
+                self._look.at_scene()
+                READY_TO_PLAY_PUBLISHER.publish(player_name)
 
-            object_found = rospy.wait_for_message(OBJECT_CATEGORY_TOPIC, String).data
+                object_found = rospy.wait_for_message(OBJECT_CATEGORY_TOPIC, String).data
 
-            rospy.wait_for_message(IS_POINTING_OBJECT_TOPIC, Bool)
+                rospy.wait_for_message(IS_POINTING_OBJECT_TOPIC, Bool)
 
-            answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
+                answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
 
-            GUESS_SUCCEEDED.publish(answer == 'yes')
+                GUESS_SUCCEEDED.publish(answer == 'yes')
 
-            rospy.wait_for_message(EXPRESSION_DONE_TOPIC, Bool)
+                rospy.wait_for_message(EXPRESSION_DONE_TOPIC, Bool)
 
-            answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
-            if answer == 'no':
-                raise DialogControl.HumanDialogInterrupted()
-            START_NEW_GAME.publish(True)
+                answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
+                if answer == 'no':
+                    raise DialogControl.HumanDialogInterrupted()
+                START_NEW_GAME.publish(True)
 
-        except DialogControl.HumanDialogInterrupted:
-            self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
-            rospy.sleep(8)  # Sleep while the player leaves
-        finally:
-            self.can_start = True
+            except DialogControl.HumanDialogInterrupted:
+                self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
+                rospy.sleep(8)  # Sleep while the player leaves
+            finally:
+                self.can_start = True
 
 
 def hook_listeners():
     """ Create the dialogControl object and hook the listeners """
     dialog_control = DialogControl()
+    dialog_control.loop()
 
 if __name__ == '__main__':
     rospy.init_node('dialog_control')

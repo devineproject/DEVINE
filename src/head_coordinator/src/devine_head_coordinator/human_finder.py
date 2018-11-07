@@ -99,7 +99,7 @@ class LookAtHumanActionServer(object):
                 # TODO: func (to look directly eyes2eyes instead of kinect2eyes
                 y += 0.5
                 point = PointStamped(point=Point(x=x, y=y, z=z))
-                point.header.stamp = stamp
+                point.header.stamp = rospy.Time(0, stamp)
                 point.header.frame_id = CAM_FRAME_OPTICAL
                 self._ctrl.look_at(point)
 
