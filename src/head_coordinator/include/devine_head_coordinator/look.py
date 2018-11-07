@@ -3,8 +3,8 @@
 import rospy
 import actionlib
 from devine_config import topicname
-from devine_head_coordinator.msg import LookAtHumanAction, LookAtHumanGoal
 from std_msgs.msg import Bool
+from devine_head_coordinator.msg import LookAtHumanAction, LookAtHumanGoal
 
 SCENE_DETECTION_TOPIC = topicname('start_scene_detection')
 TOPIC_SCENE_FOUND = topicname('scene_found')
@@ -22,17 +22,22 @@ class Look(object):
     def at_human(self):
         """ Block until a human is found, and then look at him/her """
         # TODO: Cancel look_at_scene_goal
+        rospy.logdebug('Trying to look at human...')
         self.humans_count = 0  # Reset previous human count
         goal = LookAtHumanGoal(period=rospy.rostime.Duration(0))
         self._human_finder_client.send_goal(
             goal, feedback_cb=self._human_feedback_callback)
         self._wait_for_human()
+        rospy.logdebug('Now looking at human')
 
     def at_scene(self):
         """ Block until a scene is found, and then look at it """
+        rospy.logdebug('Trying to look at scene...')
         self._human_finder_client.cancel_all_goals()
         self._start_scene_publisher.publish(True)
-        rospy.wait_for_message(TOPIC_SCENE_FOUND, Bool, timeout=None)
+        scene_found = rospy.wait_for_message(TOPIC_SCENE_FOUND, Bool, timeout=None)
+        rospy.logdebug('Now looking at scene' if scene_found else 'Scene not found')
+        return scene_found
 
     def _human_feedback_callback(self, feedback):
         """ Callback method to update the human_count from the feedback CB """
