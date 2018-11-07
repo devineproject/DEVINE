@@ -28,9 +28,9 @@ Pre requirement Installation
 
 .. code-block:: bash
 
-    rosrun image_view image_view image:=/camera/rgb/image_color #color
-    rosrun image_view image_view image:=/camera/rgb/image_mono #mono
-    rosrun image_view disparity_view image:=/camera/depth_registered/disparity #disparity
+    rosrun image_view image_view image:=/openni/rgb/image_color #color
+    rosrun image_view image_view image:=/openni/rgb/image_mono #mono
+    rosrun image_view disparity_view image:=/openni/depth_registered/disparity #disparity
 
 4. Read the ROS `OpenNI documentation`_ for more info!
 

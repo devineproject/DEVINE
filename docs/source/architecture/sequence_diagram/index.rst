@@ -49,8 +49,8 @@ Start Game
 
      == Wait for human ==
     loop until a human is close enough and for more than 0.5 sec.
-    openni -> image_dispatcher : /camera/rgb/image_color/compressed (CompressedImage)
-    openni -> image_dispatcher : /camera/depth/points (PointCloud2)
+    openni -> image_dispatcher : /openni/rgb/image_color/compressed (CompressedImage)
+    openni -> image_dispatcher : /openni/depth/points (PointCloud2)
     image_dispatcher -> body_tracking : /devine/image/body_tracking (CompressedImage)
     body_tracking -> dialog_control : /devine/body_tracking (String)
     end
@@ -179,7 +179,7 @@ End of Game
     guesswhat -> dialog_control : /devine/objects_confidence (Float64MultiArray)
     guesswhat -> dialog_control : /devine/guess_category (String)
     guesswhat -> pos_lib : /devine/guess_location/image (Int32MultiArray)
-    openni -> pos_lib: /camera/depth/points (PointCloud2)
+    openni -> pos_lib: /openni/depth/points (PointCloud2)
     pos_lib -> robot_control : /devine/guess_location/world (PoseStamped)
     note left: referenced from 'base_link'
     robot_control -> irl1 : /jn0/<left/right>_arm_controller/follow_joint_trajectory (JointTrajectoryPoint)

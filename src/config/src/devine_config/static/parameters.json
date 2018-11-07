@@ -30,7 +30,7 @@
     },
     "objects": {
       "name": "objects",
-      "type": "std_msgs/String"
+      "type": "devine_image_processing/SegmentedImage"
     },
     "zone_detection": {
       "name": "zone_detection",

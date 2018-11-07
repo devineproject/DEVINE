@@ -6,9 +6,24 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   devine_config
+  message_generation
+)
+
+add_message_files(
+  FILES
+  SceneObject.msg
+  SegmentedImage.msg
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
+  sensor_msgs
 )
 
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package()
+catkin_package(
+  CATKIN_DEPENDS message_runtime
+)
