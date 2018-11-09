@@ -1,15 +1,20 @@
-""" Head Motor Controls Helper Library """ 
+""" Head Motor Controls Helper Library """
 import rospy
-import actionlib
-from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME
+import tf
+from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME, ROBOT_LINK
 from devine_irl_control.controllers import TrajectoryClient
+from devine_irl_control import ik
 from devine_common.math_utils import clip
 
-class NeckActionIterator(object):
+class NeckActionCtrl(object):
     """ Move iteratively the neck motors (neck_pan, neck_tilt) """
+
     def __init__(self, neck_pan_bounds, neck_tilt_bounds, neck_pan_delta, neck_tilt_delta):
+        # TODO: Wait for service instead of sleep for the TrajectoryClient
+        rospy.sleep(3)
         self.joint_ctrl = TrajectoryClient(ROBOT_NAME, 'neck_controller')
         self.limits = ROBOT_CONTROLLER[self.joint_ctrl.controller_name]['joints_limit']
+        self.tf = tf.TransformListener()
 
         if neck_pan_bounds[0] > neck_pan_bounds[1]:
             raise Exception("Expected neck pan bounds to be [min, max]")
@@ -22,29 +27,36 @@ class NeckActionIterator(object):
 
         self.neck_pan_bounds = neck_pan_bounds
         self.neck_tilt_bounds = neck_tilt_bounds
-        self.neck_pan_delta = neck_pan_delta * -1
+        self.neck_pan_delta = neck_pan_delta * -1 # Start from left to right
         self.neck_tilt_delta = neck_tilt_delta * -1
         self.current_pan = None
         self.current_tilt = None
 
     def __iter__(self):
         [current_pan, current_tilt] = self.joint_ctrl.get_position()
-        next_pan = clip(current_pan, self.neck_pan_bounds[0], self.neck_pan_bounds[1])
-        next_tilt = clip(current_tilt, self.neck_tilt_bounds[0], self.neck_tilt_bounds[1])
+        next_pan = clip(
+            current_pan, self.neck_pan_bounds[0], self.neck_pan_bounds[1])
+        next_tilt = clip(
+            current_tilt, self.neck_tilt_bounds[0], self.neck_tilt_bounds[1])
         rospy.loginfo("Moving head joints to bounded values")
         self._move_joints([next_pan, next_tilt])
         return self
 
     def __next__(self):
         next_pan = self.current_pan + self.neck_pan_delta
-        if self.neck_pan_bounds[0] > next_pan or self.neck_pan_bounds[1] < next_pan:
+        if not self._is_in_pan_bounds(next_pan):
             self.change_pan_direction()
             next_pan = self.current_pan + self.neck_pan_delta
-        
+
         next_tilt = self.current_tilt + self.neck_tilt_delta
-        if self.neck_tilt_bounds[0] > next_tilt or self.neck_tilt_bounds[1] < next_tilt:
+        if not self._is_in_tilt_bounds(next_tilt):
             self.change_tilt_direction()
             next_tilt = self.current_tilt + self.neck_tilt_delta
+
+        next_pan = clip(
+            next_pan, self.neck_pan_bounds[0], self.neck_pan_bounds[1])
+        next_tilt = clip(
+            next_tilt, self.neck_tilt_bounds[0], self.neck_tilt_bounds[1])
 
         self._move_joints([next_pan, next_tilt])
         return self.joint_ctrl.get_position()
@@ -53,10 +65,22 @@ class NeckActionIterator(object):
         """ Python 2 support of __next__ """
         return self.__next__()
 
+    def _is_in_pan_bounds(self, pan):
+        """ Returns true if pan is in the current limits """
+        return self.neck_pan_bounds[0] <= pan and self.neck_pan_bounds[1] >= pan
+
+    def _is_in_tilt_bounds(self, tilt):
+        """ Returns true if tilt is in the current limits """
+        return self.neck_tilt_bounds[0] <= tilt and self.neck_tilt_bounds[1] >= tilt
+
+    def _is_in_bounds(self, joints):
+        """ Returns true if the joints are is in the current limits """
+        return self._is_in_pan_bounds(joints[0]) and self._is_in_tilt_bounds(joints[1])
+
     def change_pan_direction(self):
         """ Change direction of the pan movement """
         self.neck_pan_delta *= -1
-    
+
     def change_tilt_direction(self):
         """ Change direction of the tilt movement """
         self.neck_tilt_delta *= -1
@@ -72,6 +96,21 @@ class NeckActionIterator(object):
         result = self.joint_ctrl.result()
         success = result and result.error_code == 0
         if not success and result.error_string:
-            rospy.logerr('Failed to move joint: ' + result.error_string)
+            rospy.logerr('Failed to move joint: %s', result.error_string)
             return False
         return True
+
+    def look_at(self, point):
+        """ Do the reverse kinematik for IRL-1 to look at a point """
+        joints = None
+        try:
+            pt_neck_ref = self.tf.transformPoint(ROBOT_LINK['neck_pan'], point)
+            joints = ik.head_pan_tilt(
+                pt_neck_ref.point.x, pt_neck_ref.point.y, pt_neck_ref.point.z)
+
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as err:
+            rospy.logerr(err)
+
+        if joints is not None and self._is_in_bounds(joints):
+            return self._move_joints(joints)
+        return False

@@ -20,6 +20,10 @@
       "name": "image/zone_detection",
       "type": "sensor_msgs/CompressedImage"
     },
+    "start_scene_detection": {
+      "name": "start_scene_detection",
+      "type": "std_msgs/Bool"
+    },
     "features_extraction_image": {
       "name": "image/features_extraction",
       "type": "sensor_msgs/CompressedImage"

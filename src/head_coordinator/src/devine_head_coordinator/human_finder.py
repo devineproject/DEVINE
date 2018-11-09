@@ -5,9 +5,10 @@ Node to find a human
 from __future__ import division
 import json
 import rospy
+import tf
 import actionlib
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import PointStamped, Point
 from devine_head_coordinator.msg import LookAtHumanAction, LookAtHumanResult, LookAtHumanFeedback
 from devine_config import topicname, constant
 from devine_common.ros_utils import pose_stamped
@@ -18,9 +19,6 @@ import neck_action_control
 BODY_TRACKING = topicname('body_tracking')
 CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 
-# OUT
-TOPIC_HEAD_LOOK_AT = topicname('robot_look_at')
-
 class LookAtHumanActionServer(object):
     """ Action server to look at humans for a fixed period of time """
 
@@ -30,13 +28,11 @@ class LookAtHumanActionServer(object):
             self._action_name, LookAtHumanAction, execute_cb=self.execute_cb, auto_start=False)
         self._feedback = LookAtHumanFeedback()
         self._result = LookAtHumanResult()
-        self._ctrl = rospy.Publisher(TOPIC_HEAD_LOOK_AT, PoseStamped, queue_size=1)
-        # TODO: Validate with IRL-1 these numbers
-        rospy.sleep(3)  # TODO: Wait for node to be initialized or starting the ctrl will fail
-        self._ctrl_iterator = neck_action_control.NeckActionIterator([-0.5, 0.5], [0, 0], -0.1, 0)
+        self._ctrl = neck_action_control.NeckActionCtrl(
+            [-0.5, 0.5], [0, 0], -0.1, 0)
         iter_time = 0.5
         self.iter_rate = rospy.Rate(1/iter_time)
-
+        self._tf = tf.TransformListener()
         self._as.start()
 
     def get_human_eye(self, human):
@@ -53,11 +49,14 @@ class LookAtHumanActionServer(object):
 
         target_eye = left_eye or right_eye
         if target_eye:
-            (image_width, image_height) = (640, 480) #TODO: Dynamic image size
+            (image_width, image_height) = (640, 480) # TODO: Dynamic image size
             target_x = target_eye['x'] * image_width + 0.5
             target_y = target_eye['y'] * image_height + 0.5
-            centered = upper_left_to_zero_center(target_x, target_y, image_width, image_height) 
-            in_meters = pixel_to_meters(centered[0], -centered[1], 2, image_width) #TODO: Dynamic z calculation, inversed y
+            centered = upper_left_to_zero_center(
+                target_x, target_y, image_width, image_height)
+            # TODO: Dynamic z calculation, inversed y
+            in_meters = pixel_to_meters(
+                centered[0], -centered[1], 2, image_width)
             return [target_eye['stamp'], in_meters]
         return None
 
@@ -67,18 +66,22 @@ class LookAtHumanActionServer(object):
 
         is_infinite = goal.period.is_zero()
         end_time = rospy.Time.now() + goal.period
-        neck_iterator = iter(self._ctrl_iterator)
+        neck_iterator = iter(self._ctrl)
 
         while (is_infinite and not rospy.is_shutdown()) or rospy.Time.now() < end_time:
             try:
-                human_object = rospy.wait_for_message(BODY_TRACKING, String, timeout=None) #0.55
+                human_object = rospy.wait_for_message(
+                    BODY_TRACKING, String, timeout=None)  # 0.55
                 humans = json.loads(human_object.data)
             except rospy.ROSException:
                 humans = []
 
-            eyes = map(self.get_human_eye, humans) # Find the eyes of the bodies
-            eyes = filter(lambda i: i is not None, eyes) #Filter out body w/o eyes
-            eyes.sort(key=lambda pos: (pos[1][0] ** 2) + (pos[1][1] ** 2)) #Sort by closest to where the robot is seeing
+            # Find the eyes of the bodies
+            eyes = map(self.get_human_eye, humans)
+            # Filter out body w/o eyes
+            eyes = filter(lambda i: i is not None, eyes)
+            # Sort by closest to where the robot is seeing
+            eyes.sort(key=lambda pos: (pos[1][0] ** 2) + (pos[1][1] ** 2))
 
             self._feedback.nb_humans = len(eyes)
             self._as.publish_feedback(self._feedback)
@@ -93,8 +96,12 @@ class LookAtHumanActionServer(object):
             else:
                 stamp = eyes[0][0]
                 [x, y, z] = eyes[0][1]
-                y += 0.5 #TODO: fct of the z value
-                self._ctrl.publish(pose_stamped(x, y, z, 0, 0, 0, CAM_FRAME_OPTICAL, rospy.Time(0, stamp)))
+                # TODO: func (to look directly eyes2eyes instead of kinect2eyes
+                y += 0.5
+                point = PointStamped(point=Point(x=x, y=y, z=z))
+                point.header.stamp = rospy.Time(0, stamp)
+                point.header.frame_id = CAM_FRAME_OPTICAL
+                self._ctrl.look_at(point)
 
             self.iter_rate.sleep()
 

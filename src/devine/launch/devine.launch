@@ -68,6 +68,7 @@
 
     <group if="$(arg head_coordinator)">
       <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" respawn="true" />
+      <node name="human_finder" pkg="devine_head_coordinator" type="human_finder.py" respawn="true" />
     </group>
 
     <group if="$(arg dashboard)">
