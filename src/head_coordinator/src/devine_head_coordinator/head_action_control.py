@@ -1,4 +1,5 @@
 """ Head Motor Controls Helper Library """
+import math
 import rospy
 import tf
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME, ROBOT_LINK
@@ -6,12 +7,10 @@ from devine_irl_control.controllers import TrajectoryClient
 from devine_irl_control import ik
 from devine_common.math_utils import clip
 
-class NeckActionCtrl(object):
-    """ Move iteratively the neck motors (neck_pan, neck_tilt) """
+class HeadActionCtrl(object):
+    """ Controller for the head motors (neck_pan, neck_tilt, eyes) """
 
     def __init__(self, neck_pan_bounds, neck_tilt_bounds, neck_pan_delta, neck_tilt_delta):
-        # TODO: Wait for service instead of sleep for the TrajectoryClient
-        rospy.sleep(3)
         self.joint_ctrl = TrajectoryClient(ROBOT_NAME, 'neck_controller')
         self.limits = ROBOT_CONTROLLER[self.joint_ctrl.controller_name]['joints_limit']
         self.tf = tf.TransformListener()
@@ -104,10 +103,16 @@ class NeckActionCtrl(object):
         """ Do the reverse kinematik for IRL-1 to look at a point """
         joints = None
         try:
-            pt_neck_ref = self.tf.transformPoint(ROBOT_LINK['neck_pan'], point)
-            joints = ik.head_pan_tilt(
-                pt_neck_ref.point.x, pt_neck_ref.point.y, pt_neck_ref.point.z)
-
+            # Average between left and right eyes for the look at
+            pt_l_eye_ref = self.tf.transformPoint('/head_l_eye_link', point)
+            pt_r_eye_ref = self.tf.transformPoint('/head_r_eye_link', point)
+            x_eyes = (pt_l_eye_ref.point.x + pt_r_eye_ref.point.x) / 2.0
+            y_eyes = (pt_l_eye_ref.point.y + pt_r_eye_ref.point.y) / 2.0
+            z_eyes = (pt_l_eye_ref.point.z + pt_r_eye_ref.point.z) / 2.0
+            joints = ik.head_pan_tilt(x_eyes, y_eyes, z_eyes)
+            current_joints = self.joint_ctrl.get_position()
+            joints[0] += current_joints[0]
+            joints[1] += current_joints[1]
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException) as err:
             rospy.logerr(err)
 
