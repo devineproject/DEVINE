@@ -7,10 +7,11 @@ from devine_irl_control.controllers import TrajectoryClient
 from devine_irl_control import ik
 from devine_common.math_utils import clip
 
+
 class HeadActionCtrl(object):
     """ Controller for the head motors (neck_pan, neck_tilt, eyes) """
 
-    def __init__(self, neck_pan_bounds, neck_tilt_bounds, neck_pan_delta, neck_tilt_delta):
+    def __init__(self, neck_pan_bounds, neck_tilt_bounds, neck_pan_delta, neck_tilt_delta, starting_position=[None, None]):
         self.joint_ctrl = TrajectoryClient(ROBOT_NAME, 'neck_controller')
         self.limits = ROBOT_CONTROLLER[self.joint_ctrl.controller_name]['joints_limit']
         self.tf = tf.TransformListener()
@@ -26,18 +27,23 @@ class HeadActionCtrl(object):
 
         self.neck_pan_bounds = neck_pan_bounds
         self.neck_tilt_bounds = neck_tilt_bounds
-        self.neck_pan_delta = neck_pan_delta * -1 # Start from left to right
+        self.neck_pan_delta = neck_pan_delta * -1  # Start from left to right
         self.neck_tilt_delta = neck_tilt_delta * -1
         self.current_pan = None
         self.current_tilt = None
+        self.starting_position = starting_position
 
     def __iter__(self):
         [current_pan, current_tilt] = self.joint_ctrl.get_position()
-        next_pan = clip(
-            current_pan, self.neck_pan_bounds[0], self.neck_pan_bounds[1])
-        next_tilt = clip(
-            current_tilt, self.neck_tilt_bounds[0], self.neck_tilt_bounds[1])
-        rospy.loginfo("Moving head joints to bounded values")
+        next_pan = self.starting_position[0]
+        next_tilt = self.starting_position[1]
+        if next_pan is None:
+            next_pan = clip(
+                current_pan, self.neck_pan_bounds[0], self.neck_pan_bounds[1])
+        if next_tilt is None:
+            next_tilt = clip(
+                current_tilt, self.neck_tilt_bounds[0], self.neck_tilt_bounds[1])
+        rospy.loginfo("Moving head joints to starting values")
         self._move_joints([next_pan, next_tilt])
         return self
 
