@@ -10,7 +10,7 @@ The documentation will automatically refresh if you change the docs!
 
 * Run ``./serve_doc.sh``
 * In your browser, navigate to ``http://localhost:8000/``
-* Profit!
+* Enjoy!
 
 
 Local Env
@@ -29,11 +29,11 @@ Environment Setup
 Build
 -----
 
-* navigate to ``/docs``;
+* Navigate to ``/docs``;
 * `make html`
-* verify build succeeded;
-* open `/build/html/index.html` in your favorite browser;
-* profit!
+* Verify build succeeded;
+* Open `/build/html/index.html` in your favorite browser;
+* Enjoy!
 
 
 .. _Sphinx Server: https://github.com/dldl/sphinx-server
