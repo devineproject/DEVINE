@@ -14,7 +14,7 @@ class Look(object):
 
     def __init__(self):
         self._human_finder_client = actionlib.SimpleActionClient(
-            'devine_human_finder', LookAtHumanAction)
+            'human_finder', LookAtHumanAction)
         self._human_finder_client.wait_for_server()
         self.humans_count = 0
         self._start_scene_publisher = rospy.Publisher(SCENE_DETECTION_TOPIC, Bool, queue_size=1)

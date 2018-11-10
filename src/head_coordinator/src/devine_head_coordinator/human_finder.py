@@ -19,6 +19,9 @@ import neck_action_control
 BODY_TRACKING = topicname('body_tracking')
 CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 
+# OUT
+# /devine/human_finder actionlib
+
 class LookAtHumanActionServer(object):
     """ Action server to look at humans for a fixed period of time """
 
@@ -29,7 +32,7 @@ class LookAtHumanActionServer(object):
         self._feedback = LookAtHumanFeedback()
         self._result = LookAtHumanResult()
         self._ctrl = neck_action_control.NeckActionCtrl(
-            [-0.5, 0.5], [0, 0], -0.1, 0)
+            [-0.5, 0.5], [-0.17, 0.79], -0.1, 0)
         iter_time = 0.5
         self.iter_rate = rospy.Rate(1/iter_time)
         self._tf = tf.TransformListener()
@@ -49,7 +52,7 @@ class LookAtHumanActionServer(object):
 
         target_eye = left_eye or right_eye
         if target_eye:
-            (image_width, image_height) = (640, 480) # TODO: Dynamic image size
+            (image_width, image_height) = (640, 480)  # TODO: Dynamic image size
             target_x = target_eye['x'] * image_width + 0.5
             target_y = target_eye['y'] * image_height + 0.5
             centered = upper_left_to_zero_center(
@@ -91,17 +94,19 @@ class LookAtHumanActionServer(object):
                 self._as.set_preempted()
                 return
 
-            if self._feedback.nb_humans is 0:
-                next(neck_iterator)
-            else:
-                stamp = eyes[0][0]
-                [x, y, z] = eyes[0][1]
+            human_found = self._feedback.nb_humans > 0
+            if human_found:
+                [stamp, [x, y, z]] = eyes[0]
                 # TODO: func (to look directly eyes2eyes instead of kinect2eyes
                 y += 0.5
                 point = PointStamped(point=Point(x=x, y=y, z=z))
                 point.header.stamp = rospy.Time(0, stamp)
                 point.header.frame_id = CAM_FRAME_OPTICAL
-                self._ctrl.look_at(point)
+                # look_at returns false if human is out of bounds
+                human_found &= self._ctrl.look_at(point)
+
+            if not human_found:
+                next(neck_iterator)
 
             self.iter_rate.sleep()
 
@@ -111,8 +116,8 @@ class LookAtHumanActionServer(object):
 
 def main():
     """ Entry point of this file """
-    rospy.init_node('devine_human_finder')
-    LookAtHumanActionServer('devine_human_finder')
+    rospy.init_node('human_finder')
+    LookAtHumanActionServer('human_finder')
     rospy.spin()
 
 
