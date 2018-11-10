@@ -99,7 +99,7 @@ class LookAtHumanActionServer(object):
             human_found = self._feedback.nb_humans > 0
             if human_found:
                 [stamp, [x, y, z]] = eyes[0]
-                point = PointStamped(point=Point(x=x, y=y, z=z))
+                point = PointStamped(point=Point(x, y, z))
                 point.header.stamp = rospy.Time(0, stamp)
                 point.header.frame_id = CAM_FRAME_OPTICAL
                 # look_at returns false if human is out of bounds

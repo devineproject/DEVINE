@@ -131,6 +131,10 @@
     "new_game": {
       "name": "new_game",
       "type": "std_msgs/Bool"
+    },
+    "eyes": {
+      "name": "/jn0/eyes_target",
+      "type": "geometry_msgs/Point"
     }
   },
   "constants": {
