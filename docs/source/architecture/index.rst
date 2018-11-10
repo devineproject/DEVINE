@@ -9,4 +9,4 @@ https://trello.com/c/1rbIWyXP
 
     distributed/index
     sequence_diagram/index
-
+    image_pipeline/index
