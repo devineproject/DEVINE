@@ -45,7 +45,6 @@ Below is a UML showing the sequence of interactions between the different module
         participant image_dispatcher
         participant feature_extraction
         participant image_segmentation
-        participant scene_finder
         participant GuessWhat
     end box
 
@@ -72,41 +71,13 @@ Below is a UML showing the sequence of interactions between the different module
     @enduml
 
 
-Specifics for each node can be found below.
+Additional Information
+======================
 
-Image Dispatcher
-=============================
-
-
-Include links to ROS module section
-
-Include brief description
-
-Body tracking
-==============
-
-Include links to ROS module section
-
-Include brief description
-
-
-Segmentation
-============
-
-Include links to ROS module section
-
-Include brief description
-
-Feature extraction
-===================
-
-Include links to ROS module section
-
-Include brief description
-
-Depth mask
-===========
-
-Where does this fit into our architecture?
-
-
+| Specifics for each node can be found at the following links:
+| Image dispatcher: :ref:`ros-image-dispatcher`
+| Image segmentation: :ref:`ros-segmentation`
+| Feature extraction: :ref:`ros-feature-extraction`
+| GuessWhat?!: :ref:`ros-segmentation`
+| Body tracking: :ref:`ros-body-tracking`
+| Depth mask: :ref:`ros-depth-mask`
