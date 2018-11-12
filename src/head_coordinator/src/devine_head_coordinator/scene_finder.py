@@ -84,7 +84,7 @@ class SceneFinder(object):
                     delta_pan = direction * DELTA_POS
                     # Naive way to update, could be based on past angles
                     # Record all angles and only keep unique angles
-                    delta_tilt = (tilt_limits[1] - tilt_limits[0])/3 #increase sweep angle
+                    delta_tilt = (self.limits[1][1] - self.limits[1][0])/3 #increase sweep angle
 
                 if not self.tilt_is_ok(tilt + delta_tilt):
 		    tilt_direction *= -1
@@ -116,10 +116,10 @@ class SceneFinder(object):
             self.tilt_is_ok(tilt)
 
     def tilt_is_ok(self,tilt):
-	return tilt_limits[0] <= tilt <= tilt_limits[1]
+	return self.limits[1][0] <= tilt <= self.limits[1][1]
 
     def pan_is_ok(self,pan):
-	return pan_limits[0] <= pan <= pan_limits[1]
+	return self.limits[0][0] <= pan <= self.limits[0][1]
 
 def main():
     """ Entry point of this file """
