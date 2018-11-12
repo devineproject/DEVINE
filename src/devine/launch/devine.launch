@@ -61,6 +61,7 @@
 
     <group if="$(arg image_processing)">
       <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
+      <node name="depth_mask" pkg="devine_image_processing" type="mask.py" respawn="true" />
       <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
       <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
       <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
