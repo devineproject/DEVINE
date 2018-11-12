@@ -34,7 +34,7 @@ function createHistory() {
  */
 export default function InitKinectModule(devineTopics) {
   const topics = {
-    image: new RosTopic(devineTopics.raw_image),
+    image: new RosTopic(devineTopics.compressed_image),
     segmentation_image: new RosTopic(devineTopics.segmentation_image),
     body_tracking_image: new RosTopic(devineTopics.body_tracking_image),
     zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),
