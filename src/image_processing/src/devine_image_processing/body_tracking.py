@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 """ ROS module for body tracking """
 
 import rospy
@@ -28,7 +28,7 @@ class BodyTracking(ImageProcessor):
     ]
 
     def __init__(self):
-        config = tf.ConfigProto(log_device_placement=True)
+        config = tf.ConfigProto(log_device_placement=False)
         config.gpu_options.allow_growth = True
         set_session(tf.Session(config=config))
         self.estimator = TfPoseEstimator(MODEL_DIR, target_size=(432, 368))  # downscale image

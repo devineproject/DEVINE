@@ -132,7 +132,7 @@ export default function InitKinectModule(devineTopics) {
         }
 
         if (seg != undefined) {
-          drawObjectsRectangles(JSON.parse(seg).objects, confidence);
+          drawObjectsRectangles(seg.objects, confidence);
         }
 
         if (body_tracking != undefined) {
@@ -149,7 +149,7 @@ export default function InitKinectModule(devineTopics) {
    * @param {object} msg - The new data.
    */
   function handleTopicData(historyTopic, msg) {
-    historyTopic.push(msg.data);
+    historyTopic.push(msg.data ? msg.data : msg);
     // 50 kinect images ~= 2.6 mb
     if (historyTopic.length >= 50) {
       historyTopic.shift();
@@ -209,16 +209,15 @@ function drawObjectsRectangles(objects, confidence) {
     setColor(distinctColors[i % 14]);
 
     image.beginPath();
-    let [top, left, bottom, right] = objects[i].bbox;
-    let width = right - left;
-    let height = bottom - top;
-    image.rect(left, top, width, height);
+    let {x_offset, y_offset, height, width} = objects[i].bounding_box;
 
-    image.fillText(objects[i].category, left, top - 1);
+    image.rect(x_offset, y_offset, width, height);
+
+    image.fillText(objects[i].category_name, x_offset, y_offset - 1);
 
     // Show the confidence about the object found, if any.
     if (confidence !== undefined && confidence.length === objects.length) {
-      image.fillText(confidence[i].toFixed(2), left, bottom - 1);
+      image.fillText(confidence[i].toFixed(2), x_offset, y_offset - 1);
     }
 
     image.stroke();

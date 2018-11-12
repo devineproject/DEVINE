@@ -57,7 +57,7 @@ def main():
                             name='image')
     _, end_points = vgg.vgg_16(holder, is_training=False, dropout_keep_prob=1.0)
 
-    tf_config = tf.ConfigProto(log_device_placement=True)
+    tf_config = tf.ConfigProto(log_device_placement=False)
     tf_config.gpu_options.allow_growth = True
 
     with tf.Session(config=tf_config) as sess:

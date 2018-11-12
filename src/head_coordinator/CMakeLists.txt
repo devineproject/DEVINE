@@ -15,6 +15,8 @@ find_package(catkin REQUIRED COMPONENTS
   devine_irl_control
 )
 
+catkin_python_setup()
+
 add_action_files(
   DIRECTORY action
   FILES LookAtHuman.action
