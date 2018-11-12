@@ -1,7 +1,7 @@
-.. _ros-segmentation:
+.. _ros-image-dispatcher:
 
-Segmentation
-############
+Image dispatcher
+#################
 
 Description
 ===========

@@ -1,7 +1,7 @@
-.. _ros-segmentation:
+.. _ros-body-tracking:
 
-Segmentation
-############
+Body tracking
+##############
 
 Description
 ===========
