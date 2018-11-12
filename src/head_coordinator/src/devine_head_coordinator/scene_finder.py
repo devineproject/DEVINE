@@ -5,12 +5,11 @@ from __future__ import division
 import rospy
 import tf
 from std_msgs.msg import Bool
-from sensor_msgs.msg import CompressedImage
 from devine_config import topicname
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME
 from devine_irl_control.controllers import TrajectoryClient
 
-ZONE_DETECTION_TOPIC = topicname('zone_detection_image_in')
+SCENE_DETECTION_TOPIC = topicname('start_scene_detection')
 TOPIC_SCENE_FOUND = topicname('scene_found')
 CAMERA_FRAME_TOPIC = '/openni_rgb_optical_frame'
 TOP_LEFT_TOPIC = '/top_left'
@@ -29,7 +28,7 @@ class SceneFinder(object):
         self.tf = tf.TransformListener()
         self.scene_position = None
         self.pub_scene_found = rospy.Publisher(TOPIC_SCENE_FOUND, Bool, queue_size=1)
-        rospy.Subscriber(ZONE_DETECTION_TOPIC, CompressedImage, self.find, queue_size=1)
+        rospy.Subscriber(SCENE_DETECTION_TOPIC, Bool, self.find, queue_size=1)
 
     def move_joints(self, positions):
         """ Wrapper to move a joint and wait for the result """

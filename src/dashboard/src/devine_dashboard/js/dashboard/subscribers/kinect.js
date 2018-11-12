@@ -19,9 +19,8 @@ const image_selection = $("input[name=image_selection]");
  * @param {dict} devineTopics - The list of ros topics.
  */
 export default function InitKinectModule(devineTopics) {
-  // The history is a buffer that allow to go back in time a little
-  const topics = {    
-    image_raw: new RosTopic(devineTopics.raw_image),
+  const topics = {
+    image_raw: new RosTopic(devineTopics.compressed_image),
     segmentation_image: new RosTopic(devineTopics.segmentation_image),
     body_tracking_image: new RosTopic(devineTopics.body_tracking_image),
     zone_detection_image: new RosTopic(devineTopics.zone_detection_image_out),

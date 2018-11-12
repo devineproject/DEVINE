@@ -11,9 +11,10 @@ from devine_config import topicname
 from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-# Topics
-IMAGE_TOPIC = topicname('raw_image')
+# IN
+IMAGE_TOPIC = topicname('compressed_image')
 
+# OUT
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
 ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
@@ -101,15 +102,13 @@ class ImageDispatcher(ImageProcessor):
     def __init__(self):
         body_tracking_validator = SubscriberReady(topicname('player_name'), String)
         zone_detection_validator = SubscriberReady(topicname('scene_found'), Bool)
-        zone_detection_validator.topic_state = TopicState.RECEIVED_NO
         seg_validator = SubscriberReady(SEGMENTATION_IMAGE_TOPIC, CompressedImage)
         features_validator = SubscriberReady(FEATURES_EXTRACTION_IMAGE_TOPIC, CompressedImage)
         restart_validator = SubscriberReady(topicname('new_game'), Bool)
 
         self.smart_publishers = [
-            SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=3),
-            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator,
-                                publish_state=TopicState.RECEIVED_NO),
+            SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=2),
+            SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator, throttle_rate=0.5),
             SmartImagePublisher(SEGMENTATION_IMAGE_TOPIC, seg_validator),
             SmartImagePublisher(FEATURES_EXTRACTION_IMAGE_TOPIC, features_validator),
             SmartImagePublisher(None, restart_validator),

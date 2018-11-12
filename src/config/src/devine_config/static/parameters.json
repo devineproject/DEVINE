@@ -1,6 +1,6 @@
 {
   "topics": {
-    "raw_image": {
+    "compressed_image": {
       "name": "/openni/rgb/image_rect_color/compressed",
       "type": "sensor_msgs/CompressedImage"
     },
@@ -19,6 +19,10 @@
     "zone_detection_image_in": {
       "name": "image/zone_detection",
       "type": "sensor_msgs/CompressedImage"
+    },
+    "start_scene_detection": {
+      "name": "start_scene_detection",
+      "type": "std_msgs/Bool"
     },
     "features_extraction_image": {
       "name": "image/features_extraction",
@@ -127,6 +131,10 @@
     "new_game": {
       "name": "new_game",
       "type": "std_msgs/Bool"
+    },
+    "eyes": {
+      "name": "/jn0/eyes_target",
+      "type": "geometry_msgs/Point"
     }
   },
   "constants": {

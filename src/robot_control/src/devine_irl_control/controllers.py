@@ -38,7 +38,7 @@ class TrajectoryClient(object):
 
     def __init__(self, robot_name, controller_name):
         self.controller_name = controller_name
-        self.full_name = '/'.join([robot_name, controller_name])
+        self.full_name = '/'.join(['', robot_name, controller_name])
         topic = self.full_name + '/follow_joint_trajectory'
         self._client = actionlib.SimpleActionClient(topic, FollowJointTrajectoryAction)
 

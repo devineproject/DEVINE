@@ -18,7 +18,7 @@ export default function InitImgDispatcherModule(devineTopics) {
    */
   let republish_from_img = function(topic) {
     return function() {
-      const image_topic = new RosTopic(devineTopics.raw_image);
+      const image_topic = new RosTopic(devineTopics.compressed_image);
       image_topic.subscribe(img => {
         topic.publish(img);
         image_topic.unsubscribe();
