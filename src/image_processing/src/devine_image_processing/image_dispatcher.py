@@ -12,7 +12,7 @@ from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
 # IN
-IMAGE_TOPIC = topicname('compressed_image')
+IMAGE_TOPIC = topicname('masked_image')
 
 # OUT
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')

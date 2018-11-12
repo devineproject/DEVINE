@@ -1,5 +1,13 @@
 {
   "topics": {
+    "image": {
+      "name": "/openni/rgb/image_rect_color",
+      "type": "sensor_msgs/Image"
+    },
+    "depth": {
+      "name": "/openni/depth/image_rect",
+      "type": "sensor_msgs/Image"
+    },
     "compressed_image": {
       "name": "/openni/rgb/image_rect_color/compressed",
       "type": "sensor_msgs/CompressedImage"
@@ -23,6 +31,10 @@
     "start_scene_detection": {
       "name": "start_scene_detection",
       "type": "std_msgs/Bool"
+    },
+    "masked_image": {
+      "name": "image/masked_image",
+      "type": "sensor_msgs/CompressedImage"
     },
     "features_extraction_image": {
       "name": "image/features_extraction",
