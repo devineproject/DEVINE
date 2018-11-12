@@ -10,21 +10,26 @@ from cv_bridge import CvBridge, CvBridgeError
 from devine_config import topicname
 from devine_common.image_utils import image_to_ros_msg
 
-#Topics
-IMAGE_PUB_TOPIC = topicname('segmentation_image')
+# IN
+IMAGE_IN_TOPIC = topicname('image')
+DEPTH_IN_TOPIC = topicname('depth')
+# OUT
+MASKED_IMAGE_TOPIC = topicname('masked_image')
+
+# Consts
 DEPTH_THRESHOLD = 1.5 # Depth in meters
 
 class DepthMask(object):
     """ Node that applies a depth mask to RGB image and resends the masked image """
     def __init__(self):
         self.bridge = CvBridge()
-        image_sub = message_filters.Subscriber('camera/rgb/image_color', ROSImage)
-        depth_sub = message_filters.Subscriber('camera/depth/image', ROSImage)
+        image_sub = message_filters.Subscriber(IMAGE_IN_TOPIC, ROSImage)
+        depth_sub = message_filters.Subscriber(DEPTH_IN_TOPIC, ROSImage)
         self.masked_image = None
         self.synched_topics = message_filters.ApproximateTimeSynchronizer([image_sub,\
  depth_sub], 1, 0.5)
         self.synched_topics.registerCallback(self.callback)
-        self.depth_mask_publisher = rospy.Publisher(IMAGE_PUB_TOPIC, CompressedImage, queue_size=1)
+        self.depth_mask_publisher = rospy.Publisher(MASKED_IMAGE_TOPIC, CompressedImage, queue_size=1)
 
     def callback(self, rgb_data, depth_data):
         """ Call back to synchronised topics that applies the depth mask"""
