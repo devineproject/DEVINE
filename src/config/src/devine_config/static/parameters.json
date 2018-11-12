@@ -1,6 +1,6 @@
 {
   "topics": {
-    "raw_image": {
+    "compressed_image": {
       "name": "/openni/rgb/image_rect_color/compressed",
       "type": "sensor_msgs/CompressedImage"
     },

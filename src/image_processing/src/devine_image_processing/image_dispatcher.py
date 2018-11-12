@@ -11,9 +11,10 @@ from devine_config import topicname
 from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-# Topics
-IMAGE_TOPIC = topicname('raw_image')
+# IN
+IMAGE_TOPIC = topicname('compressed_image')
 
+# OUT
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
 ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
