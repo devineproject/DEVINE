@@ -63,7 +63,7 @@ export default function InitKinectModule(devineTopics) {
     let seg = getCurrentHistoryElement(history.segmentation, stamp);
     let image_length = history.image.length;
 
-    writePositions(obj_pos_2d, obj_pos_3d);
+    // writePositions(obj_pos_2d, obj_pos_3d); //TODO: Refactor
 
     if (img != undefined) {
       delay.prop("max", image_length);
@@ -73,7 +73,7 @@ export default function InitKinectModule(devineTopics) {
         resetImage(image, imageObject);
 
         if (obj_pos_2d != undefined) {
-          drawPositionFound(obj_pos_2d.data[0], imageSize.y - obj_pos_2d.data[1]);
+          // drawPositionFound(obj_pos_2d.data[0], imageSize.y - obj_pos_2d.data[1]); //TODO: Refactor
         }
 
         if (seg != undefined) {
@@ -148,7 +148,8 @@ export default function InitKinectModule(devineTopics) {
 
       // Show the confidence about the object found, if any.
       if (confidence !== undefined && confidence.length === objects.length) {
-        image.fillText(confidence[i].toFixed(2), x_offset, y_offset - 1);
+        let obj_name_offset = image.measureText(objects[i].category_name).width;
+        image.fillText(`(${(confidence[i]*100).toFixed(2)}%)`, x_offset + obj_name_offset + 5, y_offset - 1);
       }
 
       image.stroke();

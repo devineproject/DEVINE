@@ -4,6 +4,10 @@
       "name": "/openni/rgb/image_rect_color",
       "type": "sensor_msgs/Image"
     },
+    "camera_info": {
+      "name": "/openni/rgb/camera_info",
+      "type": "sensor_msgs/CameraInfo"
+    },
     "depth": {
       "name": "/openni/depth/image_rect",
       "type": "sensor_msgs/Image"

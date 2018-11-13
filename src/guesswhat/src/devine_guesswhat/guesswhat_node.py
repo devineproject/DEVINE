@@ -4,7 +4,7 @@
 import json
 from queue import Queue, Empty
 import rospy
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import String
 from geometry_msgs.msg import PointStamped
 import tensorflow as tf
 import numpy as np
@@ -16,11 +16,12 @@ from guesswhat.models.looper.basic_looper import BasicLooper
 from guesswhat.data_provider.guesswhat_dataset import Game
 from guesswhat.data_provider.guesswhat_tokenizer import GWTokenizer
 from guesswhat.data_provider.looper_batchifier import LooperBatchifier
+from guesswhat.data_provider.questioner_batchifier import QuestionerBatchifier
 
 from modelwrappers import GuesserROSWrapper, OracleROSWrapper
 from devine_config import topicname
 from devine_common import ros_utils
-from devine_image_processing.msg import SegmentedImage, SceneObject
+from devine_image_processing.msg import SegmentedImage, SceneObject, VGG16Features
 
 EVAL_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/eval.json')
 GUESS_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/guesser.json')
@@ -38,7 +39,7 @@ OBJECT_TOPIC = topicname('guess_location_image')
 CATEGORY_TOPIC = topicname('guess_category')
 
 
-class ImgFeaturesLoader():
+class ImgFeaturesLoader(object):
     """ Loads image from memory """
 
     def __init__(self, data):
@@ -49,7 +50,7 @@ class ImgFeaturesLoader():
         return self.data
 
 
-class ImgFeaturesBuilder():
+class ImgFeaturesBuilder(object):
     """ Builds the image loader """
 
     def __init__(self, data):
@@ -60,12 +61,13 @@ class ImgFeaturesBuilder():
         return ImgFeaturesLoader(self.data)
 
 
-class SingleGameIterator():
+class SingleGameIterator(object):
     """ Single game iterator """
 
     def __init__(self, tokenizer, game):
         self.n_examples = 1
-        self.batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
+        #self.batchifier = LooperBatchifier(tokenizer, generate_new_games=False)
+        self.batchifier = QuestionerBatchifier(tokenizer, None)
         self.game = game
 
     def __iter__(self):
@@ -74,7 +76,7 @@ class SingleGameIterator():
         return iter([self.batchifier.apply([self.game])])
 
 
-class GuessWhatNode():
+class GuessWhatNode(object):
     """ The GuessWhat node """
 
     def __init__(self):
@@ -83,7 +85,7 @@ class GuessWhatNode():
 
         rospy.Subscriber(SEGMENTATION_TOPIC, SegmentedImage,
                          self._segmentation_callback)
-        rospy.Subscriber(FEATURES_TOPIC, Float64MultiArray,
+        rospy.Subscriber(FEATURES_TOPIC, VGG16Features,
                          self._features_callback)
         self.object_found = rospy.Publisher(
             OBJECT_TOPIC, PointStamped, queue_size=1)
@@ -99,6 +101,8 @@ class GuessWhatNode():
 
         self.tf_config = tf.ConfigProto(log_device_placement=False)
         self.tf_config.gpu_options.allow_growth = True
+
+        self.image_dim = ros_utils.get_image_dim()
 
     def start_session(self):
         """ Launch the tensorflow session and start the GuessWhat loop """
@@ -128,13 +132,14 @@ class GuessWhatNode():
 
             self.loop(sess, guesser_wrapper, qgen_wrapper, oracle_wrapper)
 
-    def segmented_image_to_img_obj(self, segmented_image):
+    def segmented_image_to_img_obj(self, id_seg):
         """ Transform a segmented image obj to the image object expected for GW """
+        (index, segmented_image) = id_seg
         bbox = segmented_image.bounding_box
         mask = np.array(segmented_image.mask_array).reshape(
             (segmented_image.mask_height, segmented_image.mask_width))
         return {
-            'id': 0,
+            'id': index,
             'category': segmented_image.category_name,
             'category_id': segmented_image.category_id,
             'bbox': [bbox.x_offset, bbox.y_offset, bbox.width, bbox.height],
@@ -144,38 +149,44 @@ class GuessWhatNode():
 
     def loop(self, sess, guesser_wrapper, qgen_wrapper, oracle_wrapper):
         """ The GuessWhat game loop """
+        wait_for_img_status_published = False
         while not rospy.is_shutdown():
-            self.status.publish('Waiting for image processing')
+            if not wait_for_img_status_published:
+                self.status.publish('Waiting for image processing')
+                wait_for_img_status_published = True
             try:
                 seg = self.segmentations.get(timeout=1)
                 feats = self.features.get(timeout=1)
+                wait_for_img_status_published = False
             except Empty:
                 continue
 
             self.status.publish('Starting new game')
 
-            objects = list(map(self.segmented_image_to_img_obj, seg.objects))
+            objects = list(map(self.segmented_image_to_img_obj,
+                            enumerate(seg.objects)))
+
             game = Game(id=0,
                         object_id=0,
                         objects=objects,
                         qas=[],
-                        image={'id': 0, 'width': 640,
-                               'height': 480, 'coco_url': ''},
+                        image={'id': 0, 'width': self.image_dim[0],
+                            'height': self.image_dim[1], 'coco_url': ''},
                         status='false',
                         which_set=None,
                         image_builder=ImgFeaturesBuilder(feats),
                         crop_builder=None)
 
             looper = BasicLooper(self.eval_config,
-                                 guesser_wrapper=guesser_wrapper,
-                                 qgen_wrapper=qgen_wrapper,
-                                 oracle_wrapper=oracle_wrapper,
-                                 tokenizer=self.tokenizer,
-                                 batch_size=1)
+                                guesser_wrapper=guesser_wrapper,
+                                qgen_wrapper=qgen_wrapper,
+                                oracle_wrapper=oracle_wrapper,
+                                tokenizer=self.tokenizer,
+                                batch_size=1)
 
             iterator = SingleGameIterator(self.tokenizer, game)
-            looper.process(sess, iterator, mode='beam_search',
-                           store_games=True)
+            looper.process(sess, iterator,
+                        mode='greedy', store_games=True) #beam_search, sampling or greedy
 
             self._resolve_choice(seg.header, looper)
 
