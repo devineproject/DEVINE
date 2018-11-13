@@ -13,6 +13,7 @@ add_message_files(
   FILES
   SceneObject.msg
   SegmentedImage.msg
+  VGG16Features.msg
 )
 
 generate_messages(

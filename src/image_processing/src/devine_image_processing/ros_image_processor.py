@@ -21,7 +21,7 @@ class ImageProcessor(object):
         """ Return the processor's name """
         return self.__class__.__name__
 
-    def process(self, image):
+    def process(self, image, image_payload):
         """ Callback when a new image is received and ready to be processed """
         raise NotImplementedError()
 
