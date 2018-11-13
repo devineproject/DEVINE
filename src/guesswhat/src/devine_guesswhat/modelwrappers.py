@@ -34,7 +34,7 @@ class OracleROSWrapper(object):
 
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
-        self.questions = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1, latch=True)
+        self.questions = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1)
         self.previous_question = None
         self.previous_answer = None
 

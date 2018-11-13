@@ -66,14 +66,14 @@ You can now execute any of the examples:
 
 .. code-block:: bash
 
-    rosrun devine_irl_control example_point.py --point 0.6,0.3,0.5 --look 1,-0.6,0.5
+    rosrun devine_irl_control example_point.py --point 0.6,0.3,0.5 --look 1,-0.6,0.5 __ns:=devine
     # Position is referenced from base_link
 
 * Do complex move (SIMULATION ONLY!!!)
 
 .. code-block:: bash
 
-    rosrun devine_irl_control example_emotion.py -c 0 -s 0
+    rosrun devine_irl_control example_emotion.py -c 0 -s 0 __ns:=devine
 
 Dependencies
 ============

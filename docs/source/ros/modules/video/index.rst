@@ -51,7 +51,7 @@ Usage
 
 .. code-block:: bash
 
-    rosrun devine_kinect pos_lib.py #run devine_kinect node
+    rosrun devine_common pos_lib.py __ns:=devine #run devine_kinect node
 
 .. code-block:: bash
 
