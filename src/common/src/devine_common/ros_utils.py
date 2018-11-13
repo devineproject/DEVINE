@@ -20,7 +20,10 @@ if IS_PYTHON2:
         pose.pose.position.z = z
 
         quaternion = tf.transformations.quaternion_from_euler(roll, pitch, yaw)
-        pose.pose.orientation = quaternion
+        pose.pose.orientation.x = quaternion[0]
+        pose.pose.orientation.y = quaternion[1]
+        pose.pose.orientation.z = quaternion[2]
+        pose.pose.orientation.w = quaternion[3]
 
         return pose
 
