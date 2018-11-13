@@ -32,7 +32,7 @@ Usage
   roscore #start ROS master
   rosrun devine_dialog snips.py #run snips node
   sam watch
-  rostopic echo /answer #listen to the answers
+  rostopic echo /tts/answer #listen to the answers
 
 
 
@@ -46,7 +46,7 @@ To send custom data to the topic used by snips, do :
 - Fill out the 'text' (ex: "Is the object blue ?"), 'uid' (ex: 1) and 'answer_type' (ex: 1) fields.
 
 Or, run this command :
-``rostopic pub /devine/tts/query devine_dialog/TtsQuery '{text: "Is the object blue?", uid: 1, answer_type: 1}'``
+``rostopic pub /tts/query devine_dialog/TtsQuery '{text: "Is the object blue?", uid: 1, answer_type: 1}'``
 
 
 .. _SNIPS: https://snips.ai/
