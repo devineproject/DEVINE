@@ -1,5 +1,5 @@
-UML Sequence Diagram
-####################
+UML Sequence Diagrams
+#####################
 
 Start Game
 ==========

@@ -35,6 +35,27 @@ Global installation process for the project can be found here
    
     installation/index
 
+
+Tests
+=====
+
+.. toctree::
+    :glob:
+    :maxdepth: 2
+   
+    tests/index
+
+
+Cheat Sheet
+===========
+
+.. toctree::
+    :glob:
+    :maxdepth: 2
+   
+    cheat-sheet/index
+    
+
 ROS
 ===
 

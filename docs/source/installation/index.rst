@@ -1,5 +1,5 @@
-Installation
-############
+Getting Started
+###############
 
 DEVINE is a project with **many** dependencies such as `ROS`_. 
 
@@ -7,8 +7,8 @@ In this section, you can find links to different installation types that we supp
 
 That being said, we **highly** recommand going with the :ref:`docker_install` way.
 
-Setups
-======
+Installation
+============
 
 .. toctree::
     :glob:
