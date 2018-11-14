@@ -36,11 +36,11 @@ ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsQuery, queue_size=10)
 def snips_ask_callback(data):
     """ Callback executed when a question is received from ROS """
     rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
-    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': str(data.uid)}
+    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': {'uid' : data.uid, 'answerType' : data.answer.type}}
 
     # Switch to check what kind of data was received
     if data.answer_type == TTSAnswerType.NO_ANSWER.value:
-        args['init']['type'] = 'notification'
+        args['init']['type'] = 'notification'        
     elif data.answer_type == TTSAnswerType.YES_NO.value:
         args['init']['type'] = 'action'
         args['init']['intentFilter'] = [SNIPS_TOPICS['yes'], SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
@@ -70,23 +70,23 @@ def on_snips_message(_client, _userdata, msg):
     intent_probability = mqtt_topic['intent']['probability']
 
     rospy.loginfo('Detected intent %s with a probability of %f', intent_name, intent_probability)
+    answer = None
 
     if intent_probability < 0.5:
         rospy.logwarn('Dropped intent because probability was too low. Asking player to repeat his answer.')
-        send_speech(ROS_PUBLISHER, "I am sorry, I didn't understand your answer, can you repeat please?", TTSAnswerType.NO_ANSWER)
-        return
-
-    # Get the raw text from the recognition
-    answer = intent_name.split(':')[-1].lower()
-    if intent_name == SNIPS_TOPICS['name']:
-        slots = mqtt_topic['slots']
-        if slots:
-            answer = slots[0]['rawValue']
-        else:
-            answer = ''
+        answer = send_speech(ROS_PUBLISHER, "I am sorry, I didn't understand your answer, can you repeat please?", mqtt_topic['customData']['answerType'])
+    else:
+        # Get the raw text from the recognition
+        answer = intent_name.split(':')[-1].lower()
+        if intent_name == SNIPS_TOPICS['name']:
+            slots = mqtt_topic['slots']
+            if slots:
+                answer = slots[0]['rawValue']
+            else:
+                answer = ''
 
     tts_answer = TtsQuery()
-    tts_answer.uid = int(mqtt_topic['customData'])
+    tts_answer.uid = mqtt_topic['customData']['uid']
     tts_answer.text = answer
 
     ROS_PUBLISHER.publish(tts_answer)
