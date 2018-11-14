@@ -26,8 +26,12 @@ export default function initDialogModule(devineTopics) {
   function publish() {
     const answer = answerField.val();
     if (answer !== "") {
-      const query = queries[queries.length - 1];
-      if (query) {
+      let query_answered = false;
+      for (let i = queries.length - 1; i >= 0; --i) {
+        const query = queries[i];
+        if (query.answered) {
+          continue;
+        }
         new RosTopic(devineTopics.tts_answer).publish(
           new ROSLIB.Message({
             text: answer,
@@ -36,7 +40,11 @@ export default function initDialogModule(devineTopics) {
           })
         );
         answerField.val("");
-      } else {
+        query.answered = true;
+        query_answered = true;
+      }
+
+      if (!query_answered) {
         cons.log("No TTS query to answer");
       }
     }
