@@ -36,7 +36,7 @@ ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsQuery, queue_size=10)
 def snips_ask_callback(data):
     """ Callback executed when a question is received from ROS """
     rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
-    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': {'uid' : data.uid, 'answerType' : data.answer.type}}
+    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': {'uid' : data.uid, 'answerType' : data.answer_type}}
 
     # Switch to check what kind of data was received
     if data.answer_type == TTSAnswerType.NO_ANSWER.value:
