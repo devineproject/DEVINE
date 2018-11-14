@@ -1,8 +1,5 @@
-ROS
-###
-
-CheatSheet
-==========
+ROS Cheat Sheet
+###############
 
 .. role:: bash(code)
    :language: bash
@@ -45,24 +42,3 @@ Here you can see a couple of usefull ROS commands to help you out!
 * :bash:`$ rosrun rqt_top rqt_top`
 
     * See the actually ressources consumed by your ROS environment.
-
-Modules
-=======
-
-All DEVINE modules:
-
-.. toctree::
-    :glob:
-    :maxdepth: 1
-   
-    modules/*/index
-
-
-Tests
-=====
-
-.. toctree::
-    :glob:
-    :maxdepth: 1
-   
-    tests/index
