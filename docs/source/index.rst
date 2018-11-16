@@ -56,6 +56,16 @@ Tests
     tests/index
 
 
+Code
+====
+
+.. toctree::
+    :glob:
+    :maxdepth: 1
+   
+    code/index
+
+
 Cheat Sheet
 ===========
 

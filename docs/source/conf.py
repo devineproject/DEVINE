@@ -12,10 +12,17 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
 
+sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('/code/src'))
+sys.path.insert(0, os.path.abspath('/code/src/guesswhat/src/devine_guesswhat'))
+
+autodoc_mock_imports = ['queue', 'rospy', 'std_msgs', 'geometry_msgs',
+                        'tensorflow', 'numpy', 'guesswhat', 'devine_dialog', 'devine_config', 'devine_common', 'devine_image_processing']
+print("DIRECTORY")
+# print(os.listdir('/code/lib/python2.7'))
 
 # -- Project information -----------------------------------------------------
 
@@ -81,10 +88,10 @@ pygments_style = 'sphinx'
 html_theme = 'sphinx_rtd_theme'
 
 html_context = {
-        'css_files': [
-            '_static/theme_overrides.css',  # overrides for wide tables in RTD theme
-            ],
-        }
+    'css_files': [
+        '_static/theme_overrides.css',  # overrides for wide tables in RTD theme
+    ],
+}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -119,7 +126,7 @@ htmlhelp_basename = 'DEVINEdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     #
-     'papersize': 'letterpaper',
+    'papersize': 'letterpaper',
 
     # The font size ('10pt', '11pt' or '12pt').
     #

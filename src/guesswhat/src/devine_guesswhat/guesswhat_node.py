@@ -164,29 +164,29 @@ class GuessWhatNode(object):
             self.status.publish('Starting new game')
 
             objects = list(map(self.segmented_image_to_img_obj,
-                            enumerate(seg.objects)))
+                               enumerate(seg.objects)))
 
             game = Game(id=0,
                         object_id=0,
                         objects=objects,
                         qas=[],
                         image={'id': 0, 'width': self.image_dim[0],
-                            'height': self.image_dim[1], 'coco_url': ''},
+                               'height': self.image_dim[1], 'coco_url': ''},
                         status='false',
                         which_set=None,
                         image_builder=ImgFeaturesBuilder(feats),
                         crop_builder=None)
 
             looper = BasicLooper(self.eval_config,
-                                guesser_wrapper=guesser_wrapper,
-                                qgen_wrapper=qgen_wrapper,
-                                oracle_wrapper=oracle_wrapper,
-                                tokenizer=self.tokenizer,
-                                batch_size=1)
+                                 guesser_wrapper=guesser_wrapper,
+                                 qgen_wrapper=qgen_wrapper,
+                                 oracle_wrapper=oracle_wrapper,
+                                 tokenizer=self.tokenizer,
+                                 batch_size=1)
 
             iterator = SingleGameIterator(self.tokenizer, game)
             looper.process(sess, iterator,
-                        mode='greedy', store_games=True) #beam_search, sampling or greedy
+                           mode='greedy', store_games=True)  # beam_search, sampling or greedy
 
             self._resolve_choice(seg.header, looper)
 
@@ -225,7 +225,6 @@ class GuessWhatNode(object):
 
 
 def main():
-    """ Entry point of this file """
     rospy.init_node('guesswhat')
     node = GuessWhatNode()
     node.start_session()

@@ -6,4 +6,8 @@
 # To remove the server, use docker rm -v sphinx-server
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-docker run --rm -it -v $DIR"/source":/web -p 8000:8000 --name sphinx-server dldl/sphinx-server
+
+docker run --rm -it \
+    -v "$DIR/source":/web \
+    -v "$DIR/../src":/code/src \
+    -p 8000:8000 --name sphinx-server dldl/sphinx-server
