@@ -75,7 +75,7 @@ def on_snips_message(_client, _userdata, msg):
     rospy.loginfo('Detected intent %s with a probability of %f',
                   intent_name, intent_probability)
 
-    orignal_query = yaml.load(mqtt_topic['customData'])
+    original_query = yaml.load(mqtt_topic['customData'])
 
     # Get the raw text from the recognition
     answer = intent_name.split(':')[-1].lower()
@@ -87,9 +87,9 @@ def on_snips_message(_client, _userdata, msg):
             answer = ''
 
     tts_answer = TtsAnswer()
-    tts_answer.orignal_query = TtsQuery(*orignal_query.values())
+    tts_answer.original_query = TtsQuery(*original_query.values())
     tts_answer.probability = intent_probability
-    tts_answer.answer = answer
+    tts_answer.text = answer
 
     ROS_PUBLISHER.publish(tts_answer)
 

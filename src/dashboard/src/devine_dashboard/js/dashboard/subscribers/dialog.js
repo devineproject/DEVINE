@@ -69,7 +69,7 @@ export default function initDialogModule(devineTopics) {
   topics.ttsAnswer.subscribe(message => {
     let query_answered = false;
     for (let i in queries) {
-      if (queries[i].uid == message.uid) {
+      if (queries[i].uid == message.original_query.uid) {
         queries = queries.splice(i, 1);
         query_answered = true;
         cons.log(`Answer STT (${message.uid}): ${message.text}`);
