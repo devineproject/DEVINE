@@ -40,10 +40,12 @@ class TopicBlocker(object):
         self._mutex.acquire()
 
     def wait_for_message(self):
+        """ Blocks until data is received from the topic """
         self._mutex.acquire()
         return self.topic_data
 
     def _topic_callback(self, topic_data):
+        """ Callback when data is received from the topic """
         self.topic_data = topic_data
         self._mutex.release()
 
