@@ -1,3 +1,3 @@
 devine_dialog/TtsQuery original_query
-uint32 probability
+float32 probability
 string text
