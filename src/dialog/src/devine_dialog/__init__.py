@@ -17,7 +17,6 @@ def wait_for_answer(answer_type, message_uid):
     while not rospy.is_shutdown():
         answer = rospy.wait_for_message(TTS_ANSWER_TOPIC, TtsAnswer, timeout=None)
         if answer.original_query.uid == message_uid:
-            assert (answer.original_query.answer_type == answer_type)  # Original type should remain
             return answer.text if answer.probability > 0.5 else None
 
 def send_speech(tts_publisher, message, answer_type):
