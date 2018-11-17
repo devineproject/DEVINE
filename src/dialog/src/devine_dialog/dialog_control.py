@@ -56,6 +56,11 @@ class DialogControl():
 
     def loop(self):
         """ When a human is detected, begin the robot/human dialog """
+        object_category_blocker = ros_utils.TopicBlocker(OBJECT_CATEGORY_TOPIC, String)
+        is_pointing_blocker = ros_utils.TopicBlocker(IS_POINTING_OBJECT_TOPIC, Bool)
+        expression_done_blocker = ros_utils.TopicBlocker(EXPRESSION_DONE_TOPIC, Bool)
+
+
         while not rospy.is_shutdown():
             try:
                 self._look.at_human() # Blocks until a human is found
@@ -73,15 +78,15 @@ class DialogControl():
                 self._look.at_scene()
                 READY_TO_PLAY_PUBLISHER.publish(player_name)
 
-                object_found = rospy.wait_for_message(OBJECT_CATEGORY_TOPIC, String).data
+                object_found = object_category_blocker.wait_for_message().data
 
-                rospy.wait_for_message(IS_POINTING_OBJECT_TOPIC, Bool)
+                is_pointing_blocker.wait_for_message()
 
                 answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
 
                 GUESS_SUCCEEDED.publish(answer == 'yes')
 
-                rospy.wait_for_message(EXPRESSION_DONE_TOPIC, Bool)
+                expression_done_blocker.wait_for_message()
 
                 answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
                 if answer == 'no':
