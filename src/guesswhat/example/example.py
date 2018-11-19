@@ -1,9 +1,10 @@
 import rospy
-from std_msgs.msg import String, Float64MultiArray
+from std_msgs.msg import Header
 import h5py
 import gzip
 import json
 from devine_config import topicname
+from devine_image_processing.msg import SegmentedImage, SceneObject, VGG16Features
 
 SEGMENTATION_TOPIC = topicname('objects')
 FEATURES_TOPIC = topicname('image_features')
@@ -14,13 +15,24 @@ seg = json.loads(next(f).decode())
 f.close()
 h5file = h5py.File('image_features.h5', 'r')
 feats = h5file['features'][0]
-rospy.loginfo(seg)
-rospy.loginfo(feats)
 
-seg_pub = rospy.Publisher(SEGMENTATION_TOPIC, String, queue_size=1, latch=True)
-seg_pub.publish(json.dumps(seg))
+head = Header(stamp=rospy.Time.now())
+seg_msg = SegmentedImage(header=head, objects=[])
+for obj in seg['objects']:
+    obj_t = SceneObject(
+      category_id=obj['category_id'],
+      category_name=obj['category']
+    )
+    obj_t.bounding_box.x_offset = int(obj['bbox'][0])
+    obj_t.bounding_box.y_offset = int(obj['bbox'][1])
+    obj_t.bounding_box.width = int(obj['bbox'][2])
+    obj_t.bounding_box.height = int(obj['bbox'][3])
+    seg_msg.objects.append(obj_t)
 
-feats_pub = rospy.Publisher(FEATURES_TOPIC, Float64MultiArray, queue_size=1, latch=True)
-feats_pub.publish(Float64MultiArray(data=feats))
+seg_pub = rospy.Publisher(SEGMENTATION_TOPIC, SegmentedImage, queue_size=1, latch=True)
+seg_pub.publish(seg_msg)
+
+feats_pub = rospy.Publisher(FEATURES_TOPIC, VGG16Features, queue_size=1, latch=True)
+feats_pub.publish(VGG16Features(header=head, data=feats))
 
 rospy.spin()
