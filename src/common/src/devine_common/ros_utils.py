@@ -4,6 +4,7 @@ import sys
 import rospy
 from sensor_msgs.msg import CameraInfo
 from devine_config import topicname
+from threading import Lock
 
 IS_PYTHON2 = sys.version_info[0] < 3
 
@@ -28,6 +29,25 @@ if IS_PYTHON2:
         pose.pose.orientation.w = quaternion[3]
 
         return pose
+
+
+class TopicBlocker(object):
+    """ Blocks until a topic message is received """
+    def __init__(self, topic_name, topic_type):
+        rospy.Subscriber(topic_name, topic_type, self._topic_callback, queue_size=1)
+        self.topic_data = None
+        self._mutex = Lock()
+        self._mutex.acquire()
+
+    def wait_for_message(self):
+        """ Blocks until data is received from the topic """
+        self._mutex.acquire()
+        return self.topic_data
+
+    def _topic_callback(self, topic_data):
+        """ Callback when data is received from the topic """
+        self.topic_data = topic_data
+        self._mutex.release()
 
 
 def get_fullpath(file_name, relative_file):

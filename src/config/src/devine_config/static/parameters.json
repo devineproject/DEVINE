@@ -98,7 +98,7 @@
     },
     "tts_answer": {
       "name": "tts/answer",
-      "type": "devine_dialog/TtsQuery"
+      "type": "devine_dialog/TtsAnswer"
     },
     "objects_confidence": {
       "name": "objects_confidence",

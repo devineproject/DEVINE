@@ -1,0 +1,3 @@
+devine_dialog/TtsQuery original_query
+float32 probability
+string text

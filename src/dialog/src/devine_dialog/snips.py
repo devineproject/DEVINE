@@ -8,11 +8,12 @@ tts_answer -> answer as TtsQuery output
 """
 
 import json
+import yaml
 import rospy
 import paho.mqtt.client as mqtt
 from devine_config import topicname
-from devine_dialog.msg import TtsQuery
-from devine_dialog import TTSAnswerType
+from devine_dialog.msg import TtsQuery, TtsAnswer
+from devine_dialog import TTSAnswerType, send_speech
 
 # Snips settings
 SNIPS_HOST = 'localhost'
@@ -30,25 +31,27 @@ TTS_QUERY = topicname('tts_query')
 TTS_ANSWER = topicname('tts_answer')
 
 # ROS
-ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsQuery, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsAnswer, queue_size=10)
 
 
 def snips_ask_callback(data):
     """ Callback executed when a question is received from ROS """
     rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
-    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': str(data.uid)}
+    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': str(data)}
 
     # Switch to check what kind of data was received
     if data.answer_type == TTSAnswerType.NO_ANSWER.value:
         args['init']['type'] = 'notification'
     elif data.answer_type == TTSAnswerType.YES_NO.value:
         args['init']['type'] = 'action'
-        args['init']['intentFilter'] = [SNIPS_TOPICS['yes'], SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
+        args['init']['intentFilter'] = [SNIPS_TOPICS['yes'],
+                                        SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
     elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
         args['init']['type'] = 'action'
         args['init']['intentFilter'] = [SNIPS_TOPICS['name']]
 
-    MQTT_CLIENT.publish('hermes/dialogueManager/startSession', json.dumps(args))
+    MQTT_CLIENT.publish(
+        'hermes/dialogueManager/startSession', json.dumps(args))
 
 
 def on_snips_connect(*_):
@@ -69,11 +72,10 @@ def on_snips_message(_client, _userdata, msg):
     intent_name = mqtt_topic['intent']['intentName']
     intent_probability = mqtt_topic['intent']['probability']
 
-    rospy.loginfo('Detected intent %s with a probability of %f', intent_name, intent_probability)
+    rospy.loginfo('Detected intent %s with a probability of %f',
+                  intent_name, intent_probability)
 
-    if intent_probability < 0.5:
-        rospy.logwarn('Dropped intent, probability was too low')
-        return
+    original_query = yaml.load(mqtt_topic['customData'])
 
     # Get the raw text from the recognition
     answer = intent_name.split(':')[-1].lower()
@@ -84,8 +86,9 @@ def on_snips_message(_client, _userdata, msg):
         else:
             answer = ''
 
-    tts_answer = TtsQuery()
-    tts_answer.uid = int(mqtt_topic['customData'])
+    tts_answer = TtsAnswer()
+    tts_answer.original_query = TtsQuery(*original_query.values())
+    tts_answer.probability = intent_probability
     tts_answer.text = answer
 
     ROS_PUBLISHER.publish(tts_answer)

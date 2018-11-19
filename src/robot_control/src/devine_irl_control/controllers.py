@@ -22,7 +22,7 @@ class CommandPublisher(object):
     def __init__(self, robot_name, controller_name):
         topic = '/'.join(['', robot_name, controller_name, 'command'])
         self._pub = rospy.Publisher(topic, Float64, queue_size=10)
-        rospy.wait_for_message('/'.join([robot_name, 'joint_states']), JointState)
+        rospy.wait_for_message('/'.join(['', robot_name, 'joint_states']), JointState)
 
     def publish(self, position):
         """ Publish joint position """

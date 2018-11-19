@@ -3,7 +3,7 @@ import uuid
 from enum import Enum
 import rospy
 from devine_config import topicname
-from devine_dialog.msg import TtsQuery
+from devine_dialog.msg import TtsQuery, TtsAnswer
 
 TTS_ANSWER_TOPIC = topicname('tts_answer')
 
@@ -14,14 +14,10 @@ class TTSAnswerType(Enum):
 
 def wait_for_answer(answer_type, message_uid):
     '''Wait on the TTS answer topic for the answer to the question'''
-    answer = None
     while not rospy.is_shutdown():
-        answer = rospy.wait_for_message(TTS_ANSWER_TOPIC, TtsQuery, timeout=None) #TODO: Handle timeouts ? -> throws a RosException when timeout
-        if answer.uid == message_uid:
-            break
-    if answer:
-        return answer.text
-    return None
+        answer = rospy.wait_for_message(TTS_ANSWER_TOPIC, TtsAnswer, timeout=None)
+        if answer.original_query.uid == message_uid:
+            return answer.text if answer.probability > 0.5 else None
 
 def send_speech(tts_publisher, message, answer_type):
     '''Convert text string to speech using the snips topic'''
@@ -31,5 +27,9 @@ def send_speech(tts_publisher, message, answer_type):
     msg.answer_type = answer_type.value
     tts_publisher.publish(msg) # Send the payload
     if answer_type != TTSAnswerType.NO_ANSWER:
-        return wait_for_answer(answer_type, msg.uid)
+        answer = wait_for_answer(answer_type, msg.uid)
+        if answer is None:
+            repeat_query = 'I\'m sorry, I didn\'t understand. '
+            return send_speech(tts_publisher, repeat_query + message.replace(repeat_query, ""), answer_type)
+        return answer
     return None

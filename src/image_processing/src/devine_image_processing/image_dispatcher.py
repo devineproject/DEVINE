@@ -107,7 +107,7 @@ class ImageDispatcher(ImageProcessor):
         restart_validator = SubscriberReady(topicname('new_game'), Bool)
 
         self.smart_publishers = [
-            SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=2),
+            SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, body_tracking_validator, throttle_rate=1),
             SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator, throttle_rate=0.5),
             SmartImagePublisher(SEGMENTATION_IMAGE_TOPIC, seg_validator),
             SmartImagePublisher(FEATURES_EXTRACTION_IMAGE_TOPIC, features_validator),

@@ -16,6 +16,7 @@ catkin_python_setup()
 add_message_files(
   FILES
   TtsQuery.msg
+  TtsAnswer.msg
 )
 
 generate_messages(
