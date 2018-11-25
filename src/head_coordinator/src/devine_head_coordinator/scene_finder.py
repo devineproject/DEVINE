@@ -15,6 +15,8 @@ from std_msgs.msg import Bool
 from devine_config import topicname
 from devine_irl_control.irl_constant import ROBOT_CONTROLLER, ROBOT_NAME
 from devine_irl_control.controllers import TrajectoryClient
+from devine_dialog.msg import TtsQuery, TtsAnswer
+from devine_dialog import TTSAnswerType, send_speech
 
 SCENE_DETECTION_TOPIC = topicname('start_scene_detection')
 TOPIC_SCENE_FOUND = topicname('scene_found')
@@ -25,6 +27,9 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
 TILT = -0.17  # TODO: Iterate over tilt too ?
+
+SPEAK_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=1)
+
 
 class SceneFinder(object):
     """ Scene finder based of april tags """
@@ -75,9 +80,9 @@ class SceneFinder(object):
             delta_pan = direction * DELTA_POS
 
             if not self.in_bounds(pan + delta_pan, tilt):
-                if not_in_bound_ctr > 2:
-                    rospy.logerr('Couldn\'t find the scene :(')
-                    break
+                if (not_in_bound_ctr % 4) == 3:
+                    send_speech(SPEAK_PUBLISHER, 'I can\'t find the scene. Are the april tags visible ?', TTSAnswerType.YES_NO)
+                    rospy.logwarn('Couldn\'t find the scene :(')
                 not_in_bound_ctr += 1
                 direction *= -1
                 delta_pan = direction * DELTA_POS
