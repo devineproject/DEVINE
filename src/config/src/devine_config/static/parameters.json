@@ -136,6 +136,10 @@
       "name": "end_of_game/",
       "type": "std_msgs/Bool"
     },
+    "robot_talking_expression": {
+      "name": "/jn0/emo_pulse",
+      "type": "jn0_face_msgs/EmoPulse"
+    },
     "robot_facial_expression": {
       "name": "/jn0/emo_intensity",
       "type": "jn0_face_msgs/EmoIntensity"
