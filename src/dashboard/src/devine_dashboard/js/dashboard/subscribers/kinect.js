@@ -62,8 +62,8 @@ export default function InitKinectModule(devineTopics) {
     let confidence = getCurrentHistoryElement(history.confidence);
     let seg = getCurrentHistoryElement(history.segmentation, stamp);
     let image_length = history.image.length;
-
-    // writePositions(obj_pos_2d, obj_pos_3d); //TODO: Refactor
+    
+    writePositions(obj_pos_2d, obj_pos_3d);
 
     if (img != undefined) {
       delay.prop("max", image_length);
@@ -73,7 +73,7 @@ export default function InitKinectModule(devineTopics) {
         resetImage(image, imageObject);
 
         if (obj_pos_2d != undefined) {
-          // drawPositionFound(obj_pos_2d.data[0], imageSize.y - obj_pos_2d.data[1]); //TODO: Refactor
+          drawPositionFound(obj_pos_2d.point.x, imageSize.y - obj_pos_2d.point.y);
         }
 
         if (seg != undefined) {
@@ -193,15 +193,15 @@ export default function InitKinectModule(devineTopics) {
    */
   function writePositions(obj_pos_2d, obj_pos_3d) {
     if (obj_pos_2d != undefined) {
-      objectPos2d.innerText = `(${obj_pos_2d.data[0]}, ${obj_pos_2d.data[1]})`;
+      objectPos2d.innerText = `(${obj_pos_2d.point.x}, ${obj_pos_2d.point.y})`;
     }
 
     if (obj_pos_3d != undefined) {
       let cleanFloat = number => (number === null ? "N/A" : number.toFixed(2));
 
       objectPos3d.innerText =
-        `(${cleanFloat(obj_pos_3d.data[0])}, ` +
-        `${cleanFloat(obj_pos_3d.data[1])}, ${cleanFloat(obj_pos_3d.data[2])})`;
+        `(${cleanFloat(obj_pos_3d.pose.position.x)}, ` +
+        `${cleanFloat(obj_pos_3d.pose.position.y)}, ${cleanFloat(obj_pos_3d.pose.position.z)})`;
     }
   }
 
