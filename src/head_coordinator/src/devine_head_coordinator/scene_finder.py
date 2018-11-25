@@ -28,7 +28,7 @@ DELTA_TIME = 0.3
 DELTA_POS = 0.2
 TILT = -0.17  # TODO: Iterate over tilt too ?
 
-SPEAK_PUBLISHER = rospy.Publisher(TTS_QUERY_TOPIC, TtsQuery, queue_size=1)
+SPEAK_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=1)
 
 
 class SceneFinder(object):
