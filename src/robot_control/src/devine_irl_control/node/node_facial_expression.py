@@ -1,4 +1,5 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 """
 Simple ROS node that subscribes to objects_confidence and object_guess_success
 and publishes to robot_facial_expression to show facial emotions
