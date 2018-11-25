@@ -1,32 +1,48 @@
 {
     "welcome": [
-        "Welcome to the DEVINE GuessWhat game.",
-        "Greetings! My name is Johnny Zero"
+        "Welcome to the question game DEVINE!",
+        "Oh! Hello there, my name is Johnny Zero",
+        "Hey! You look like a funny human. I'm funny too!"
     ],
     "ask_to_play": [
         "Do you want to play the GuessWhat game with me?",
         "Wanna play a questions game?",
+        "Do you think you can beat me in a questions game?",
         "You bet you can beat me in a questions game?",
         "My calculations reveals that you are here to play with me. Shall we begin?"
     ],
     "asking_the_name": [
-        "What is your name?"
+        "What is your name?",
+        "Can you tell me your name?",
+        "Before we begin, how should I call you?"
     ],
-    "ready": [
-        "Are you ready to start {player_name}?"
+    "confirming_the_name": [
+        "Good {player_name}!",
+        "All right {player_name}!",
+        "Nice to meet you, {player_name}",
+        "Good!",
+        "All right!"
     ],
     "instructions": [
-        "Good! So now think about one of the objects on the table, and I will ask you some questions in order to find it."
+        "So now think about one of the objects on the table, and I will ask you some questions in order to find it.",
+        "Think about one of the objects on the table, and I will try to guess what it is."
     ],
-    "bye_bye": [
-        "All right, good bye."
+    "ready": [
+        "Are you ready to start {player_name}?",
+        "Now, {player_name}, are you ready to start?",
+        "Ready to play?"
     ],
     "ask_got_it_right": [
         "Is it the {object_name}?",
-        "Hmmm, I think it's the {object_name}. Did I get it right ?"
+        "Hmmm, I think it's the {object_name}. Did I get it right?"
     ],
     "ask_play_again": [
-        "Would you like to play again ?",
-        "Do you want to play again with me ?"
+        "Would you like to play again?",
+        "Do you want to play again with me?"
+    ],
+    "bye_bye": [
+        "All right {player_name}, good bye.",
+        "Thanks for coming by!",
+        "Ok, it was nice to meet you."
     ]
 }
