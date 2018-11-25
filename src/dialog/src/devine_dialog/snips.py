@@ -44,7 +44,8 @@ ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsAnswer, queue_size=10)
 def snips_ask_callback(data):
     """ Callback executed when a question is received from ROS """
     rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
-    args = {'init': {'text': data.text, 'canBeEnqueued': True}, 'customData': str(data)}
+    args = {'init': {'text': data.text, 'canBeEnqueued': True},
+            'customData': str(data)}
 
     # Switch to check what kind of data was received
     if data.answer_type == TTSAnswerType.NO_ANSWER.value:
@@ -99,6 +100,10 @@ def on_snips_message(_client, _userdata, msg):
     tts_answer.text = answer
 
     ROS_PUBLISHER.publish(tts_answer)
+
+    MQTT_CLIENT.publish('hermes/dialogueManager/endSession', json.dumps({
+        'sessionId': mqtt_topic['sessionId']
+    }))
 
 
 def create_ros_listener():
