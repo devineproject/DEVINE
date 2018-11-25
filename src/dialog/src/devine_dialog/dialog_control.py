@@ -40,7 +40,7 @@ class DialogControl():
     def __init__(self):
         dialogs_file = open(CONST_FILE)
         self.dialogs = json.loads(dialogs_file.read())
-        self.can_start = True
+        self.is_new_player = True
         self._look = Look()
 
     def send_sentence(self, sentence, answer_type, **format_args):
@@ -71,12 +71,13 @@ class DialogControl():
         while not rospy.is_shutdown():
             try:
                 self._look.at_human() # Blocks until a human is found
-                self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
-                answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
-                if not answer == 'yes':
-                    raise DialogControl.HumanDialogInterrupted()
+                if self.is_new_player:
+                    self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
+                    answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
+                    if not answer == 'yes':
+                        raise DialogControl.HumanDialogInterrupted()
 
-                player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
+                    player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
 
                 self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
                 if not self.wait_for_player('ready', player_name=player_name):
@@ -98,13 +99,15 @@ class DialogControl():
                 answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
                 if answer == 'no':
                     raise DialogControl.HumanDialogInterrupted()
-                START_NEW_GAME.publish(True)
+                
+                self.is_new_player = False
 
             except DialogControl.HumanDialogInterrupted:
+                self.is_new_player = True
                 self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
-                rospy.sleep(8)  # Sleep while the player leaves
+                rospy.sleep(8) # Sleep while the player leaves
             finally:
-                self.can_start = True
+                START_NEW_GAME.publish(True)
 
 
 def hook_listeners():
