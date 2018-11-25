@@ -16,18 +16,21 @@ export default function InitImgDispatcherModule(devineTopics) {
    * Resend an image to update the dashboard on user action.
    * @param {Topic} topic - The topic where to publish.
    */
-  let republish_from_img = function(topic) {
+  let republish_from_img = function(topics) {
     return function() {
       const image_topic = new RosTopic(devineTopics.masked_image);
       image_topic.subscribe(img => {
-        topic.publish(img);
+        for (let topic of topics) {
+          topic.publish(img);
+        }
         image_topic.unsubscribe();
         image_topic.removeAllListeners();
       });
     };
   };
 
-  $("#dispatch_segm").click(republish_from_img(topics.segmentation_image));
-  $("#dispatch_fea").click(republish_from_img(topics.features_image));
-  $("#dispatch_body").click(republish_from_img(topics.body_tracking_image));
+  $("#dispatch_segm").click(republish_from_img([topics.segmentation_image]));
+  $("#dispatch_fea").click(republish_from_img([topics.features_image]));
+  $("#dispatch_body").click(republish_from_img([topics.body_tracking_image]));
+  $("#dispatch_all").click(republish_from_img(Object.values(topics)));
 }
