@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ IRL-1 Constants: Contains the controller names, joint names and joint limits """
 __author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Félix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupré, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"

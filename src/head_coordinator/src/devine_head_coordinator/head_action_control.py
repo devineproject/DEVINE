@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """ Head Motor Controls Helper Library """
 import math
 import rospy
