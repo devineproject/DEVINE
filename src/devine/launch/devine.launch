@@ -11,6 +11,8 @@
 
   <group if="$(arg kinect)">
     <param name="/openni/driver/data_skip" value="6" /> <!-- 5Hz -->
+    <param name="/openni/rgb/image_rect_color/compressed/jpeg_quality" value="100" />
+    <param name="/openni/rgb/image_rect_mono/compressed/jpeg_quality" value="100" />
     <include file="$(find openni_launch)/launch/openni.launch">
       <arg name="camera"                          value="openni" />
       <arg name="publish_tf"                      value="false" /> <!-- Done by the IRL-1 repo -->
