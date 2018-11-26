@@ -30,15 +30,19 @@ class RobotFacialExpression(Enum):
     ANGER = 'Anger'
     JOY = 'Joy'
 
+NODE_NAME = 'facial_expression'
+TALKING_EXPRESSION_DURATION = 0.2
+
+# IN
+TTS_QUERY_TOPIC = topicname('tts_query')
+IS_POINTING_OBJECT_TOPIC = topicname('is_pointing_object')
 OBJECT_CONFIDENCE_TOPIC = topicname('objects_confidence')
 GAME_SUCCESS_TOPIC = topicname('object_guess_success')
+
+# OUT
 ROBOT_TALKING_EXPRESSION_TOPIC = topicname('robot_talking_expression')
 ROBOT_FACIAL_EXPRESSION_TOPIC = topicname('robot_facial_expression')
 FACIAL_EXPRESSION_COMPLETED = topicname('robot_facial_expression_completed')
-TTS_QUERY_TOPIC = topicname('tts_query')
-
-NODE_NAME = 'facial_expression'
-TALKING_EXPRESSION_DURATION = 0.2
 
 class FacialExpression(object):
     """ Subscribes to object confidence and publishes facial expressions for a specific duration """
@@ -46,8 +50,7 @@ class FacialExpression(object):
     FACIAL_EXPRESSION_DURATION = 10
 
     def __init__(self):
-        self.showing_emotion = False
-        self.confidence = None
+        self.initialize_flags()
 
         self.robot_expression_publisher = rospy.Publisher(ROBOT_FACIAL_EXPRESSION_TOPIC,
                                                           EmoIntensity, queue_size=1)
@@ -65,6 +68,14 @@ class FacialExpression(object):
 
         rospy.Subscriber(GAME_SUCCESS_TOPIC, Bool,
                          self.on_game_success)
+
+        rospy.Subscriber(IS_POINTING_OBJECT_TOPIC, Bool, self.on_pointing_object)
+
+    def initialize_flags(self):
+        """ helper function to reset all flags for a next game """
+        self.showing_emotion = False
+        self.confidence = None
+        self.game_success = False
 
     def on_tts_query(self, query):
         """ Callback on new tts query. Shows talking expression to robot """
@@ -90,10 +101,16 @@ class FacialExpression(object):
         self.confidence = max(objects_confidence.data)
 
     def on_game_success(self, game_success):
-        """ Callback on end game. Shows emotion depending on success and confidence """
-        expression = self.get_facial_expression(self.confidence, game_success.data)
-        if expression is not None and not self.showing_emotion:
-            self.show_facial_expression_for(expression, self.FACIAL_EXPRESSION_DURATION)
+        """ Callback on end game. initialize the game success var """
+        self.game_success = game_success.data
+
+    def on_pointing_object(self, is_pointing_object):
+        """ callback on when the robot points the object. Shows a facial expression
+            depending on the game's result """
+        if is_pointing_object: # Not sure we need this
+            expression = self.get_facial_expression(self.confidence, self.game_success)
+            if expression is not None and not self.showing_emotion:
+                self.show_facial_expression_for(expression, self.FACIAL_EXPRESSION_DURATION)
 
     def show_facial_expression_for(self, expression, duration):
         """ Publishes the expression for a specific duration"""
@@ -113,8 +130,7 @@ class FacialExpression(object):
         self.robot_expression_publisher.publish(face_expression)
 
         # Initialize for a new game
-        self.showing_emotion = False
-        self.confidence = None
+        self.initialize_flags()
         rospy.sleep(0.5)
         self.expression_completed_pub.publish(True)
 
