@@ -59,3 +59,11 @@ body > div {
   padding-top: 3px;
   padding-bottom: 3px;
 }
+
+.no-padding {
+  padding: 0;
+}
+
+.with-padding {
+  padding: 1.25rem;
+}

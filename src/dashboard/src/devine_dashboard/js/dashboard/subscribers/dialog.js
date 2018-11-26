@@ -32,13 +32,15 @@ export default function initDialogModule(devineTopics) {
         if (query.answered) {
           continue;
         }
+
         new RosTopic(devineTopics.tts_answer).publish(
           new ROSLIB.Message({
-            text: answer,
-            uid: query.uid,
-            answer_type: answer_types.YES_NO
+            original_query: query,
+            probability: 1.0,
+            text: answer
           })
         );
+        
         answerField.val("");
         query.answered = true;
         query_answered = true;
