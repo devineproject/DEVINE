@@ -77,7 +77,7 @@ export default function InitKinectModule(devineTopics) {
         }
 
         if (seg != undefined) {
-          drawObjectsRectangles(seg.objects, confidence.data);
+          drawObjectsRectangles(seg.objects, confidence ? confidence.data : undefined);
         }
 
         if (body_tracking != undefined) {
