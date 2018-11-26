@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """ Inverse kinematics: from 3D position, compute joints position needed """
-__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Félix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupré, Antoine Mercier-Nicol"
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"
-__credits__ = ["Simon Brodeur", "François Ferland", "Jean Rouat"]
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
 __license__ = "BSD"
 __version__ = "1.0.0"
 __email__ = "devine.gegi-request@listes.usherbrooke.ca"
@@ -40,5 +40,5 @@ def arms_pan_tilt(controller, obj_x, obj_y, obj_z):
 def head_pan_tilt(obj_x, obj_y, obj_z):
     """ Inverse Kinematic for head pan and tils joints """
     pan = math.atan2(obj_y, obj_x)
-    tilt = math.atan2(obj_z, obj_x) #TODO: Inverse en simulation?
+    tilt = -math.atan2(obj_z, obj_x)
     return [pan, tilt]

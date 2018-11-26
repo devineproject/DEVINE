@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """ IRL-1 Constants: Contains the controller names, joint names and joint limits """
-__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Félix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupré, Antoine Mercier-Nicol"
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"
-__credits__ = ["Simon Brodeur", "François Ferland", "Jean Rouat"]
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
 __license__ = "BSD"
 __version__ = "1.0.0"
 __email__ = "devine.gegi-request@listes.usherbrooke.ca"
@@ -16,7 +16,8 @@ ROBOT_LINK = {
     'l_shoulder_fixed': '/L_shoulder_fixed_link',
     'r_shoulder_fixed': '/R_shoulder_fixed_link',
     'r_frame_tool': '/R_frame_tool_link',
-    'l_frame_tool': '/L_frame_tool_link'
+    'l_frame_tool': '/L_frame_tool_link',
+    'l_eye': '/head_l_eye_link',
 }
 
 ROBOT_CONTROLLER = {

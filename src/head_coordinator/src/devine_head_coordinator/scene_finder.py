@@ -3,9 +3,9 @@
 """ Node to find the scene """
 from __future__ import division
 
-__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Félix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupré, Antoine Mercier-Nicol"
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"
-__credits__ = ["Simon Brodeur", "François Ferland", "Jean Rouat"]
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
 __license__ = "BSD"
 __version__ = "1.0.0"
 __email__ = "devine.gegi-request@listes.usherbrooke.ca"
@@ -28,7 +28,7 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
-TILT = -0.17  # TODO: Iterate over tilt too ?
+TILT = 0.25  # TODO: Iterate over tilt too ?
 
 SPEAK_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=1)
 
