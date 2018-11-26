@@ -139,7 +139,7 @@ class Controller(object):
         head_joints_position = None
 
         try:
-            tf_pose_stamp = self.tf_listener.transformPose('/head_l_eye_link',
+            tf_pose_stamp = self.tf_listener.transformPose(irl_constant.ROBOT_LINK['l_eye'],
                                                            self.head_data)
             tf_position = tf_pose_stamp.pose.position
 
@@ -204,12 +204,14 @@ def main():
     is_arms_activated = rospy.get_param('~is_arms_activated')
     is_grippers_activated = rospy.get_param('~is_grippers_activated')
 
-    if rospy.get_param('~is_sim'):
+    is_sim = rospy.get_param('~is_sim')
+    if is_sim:
         # Wait for gazebo before initializing controllers
         rospy.wait_for_service('gazebo/set_physics_properties')
 
     controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
-    #Movement(controller)
+    if is_sim:
+        Movement(controller)
 
     rospy.spin()
 

@@ -16,7 +16,8 @@ ROBOT_LINK = {
     'l_shoulder_fixed': '/L_shoulder_fixed_link',
     'r_shoulder_fixed': '/R_shoulder_fixed_link',
     'r_frame_tool': '/R_frame_tool_link',
-    'l_frame_tool': '/L_frame_tool_link'
+    'l_frame_tool': '/L_frame_tool_link',
+    'l_eye': '/head_l_eye_link',
 }
 
 ROBOT_CONTROLLER = {
