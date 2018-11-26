@@ -16,13 +16,12 @@ from guesswhat.models.qgen.qgen_wrapper import QGenWrapper
 from guesswhat.models.looper.basic_looper import BasicLooper
 from guesswhat.data_provider.guesswhat_dataset import Game
 from guesswhat.data_provider.guesswhat_tokenizer import GWTokenizer
-from guesswhat.data_provider.looper_batchifier import LooperBatchifier
 from guesswhat.data_provider.questioner_batchifier import QuestionerBatchifier
 
 from modelwrappers import GuesserROSWrapper, OracleROSWrapper
 from devine_config import topicname
 from devine_common import ros_utils
-from devine_image_processing.msg import SegmentedImage, SceneObject, VGG16Features
+from devine_image_processing.msg import SegmentedImage, VGG16Features
 
 EVAL_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/eval.json')
 GUESS_CONF_PATH = ros_utils.get_fullpath(__file__, '../../config/guesser.json')
@@ -165,29 +164,28 @@ class GuessWhatNode(object):
             self.status.publish('Starting new game')
 
             objects = list(map(self.segmented_image_to_img_obj,
-                            enumerate(seg.objects)))
-
+                               enumerate(seg.objects)))
             game = Game(id=0,
                         object_id=0,
                         objects=objects,
                         qas=[],
                         image={'id': 0, 'width': self.image_dim[0],
-                            'height': self.image_dim[1], 'coco_url': ''},
+                               'height': self.image_dim[1], 'coco_url': ''},
                         status='false',
                         which_set=None,
                         image_builder=ImgFeaturesBuilder(feats),
                         crop_builder=None)
 
             looper = BasicLooper(self.eval_config,
-                                guesser_wrapper=guesser_wrapper,
-                                qgen_wrapper=qgen_wrapper,
-                                oracle_wrapper=oracle_wrapper,
-                                tokenizer=self.tokenizer,
-                                batch_size=1)
+                                 guesser_wrapper=guesser_wrapper,
+                                 qgen_wrapper=qgen_wrapper,
+                                 oracle_wrapper=oracle_wrapper,
+                                 tokenizer=self.tokenizer,
+                                 batch_size=1)
 
             iterator = SingleGameIterator(self.tokenizer, game)
             looper.process(sess, iterator,
-                        mode='greedy', store_games=True) #beam_search, sampling or greedy
+                           mode='greedy', store_games=True) #beam_search, sampling or greedy
 
             self._resolve_choice(seg.header, looper)
 
@@ -230,7 +228,6 @@ def main():
     rospy.init_node('guesswhat')
     node = GuessWhatNode()
     node.start_session()
-
 
 if __name__ == '__main__':
     main()

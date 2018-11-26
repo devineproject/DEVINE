@@ -53,25 +53,25 @@
     </group>
 
     <group if="$(eval arg('robot_control') and arg('kinect'))">
-      <node name="pos_lib" pkg="devine_common" type="pos_lib.py" respawn="true" />
+      <node name="pos_lib" pkg="devine_common" type="pos_lib.py" required="true" />
     </group>
 
     <group if="$(arg dialog)">
-      <node name="snips" pkg="devine_dialog" type="snips.py" respawn="true" />
-      <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" respawn="true" />
+      <node name="snips" pkg="devine_dialog" type="snips.py" required="true" />
+      <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" required="true" />
     </group>
 
     <group if="$(arg image_processing)">
-      <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" respawn="true" />
-      <node name="depth_mask" pkg="devine_image_processing" type="mask.py" respawn="true" />
-      <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" respawn="true" />
-      <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" respawn="true" />
-      <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" respawn="true" />
+      <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" required="true" />
+      <node name="depth_mask" pkg="devine_image_processing" type="mask.py" required="true" />
+      <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" required="true" />
+      <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" required="true" />
+      <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" required="true" />
     </group>
 
     <group if="$(arg head_coordinator)">
-      <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" respawn="true" />
-      <node name="human_finder" pkg="devine_head_coordinator" type="human_finder.py" respawn="true" />
+      <node name="scene_finder" pkg="devine_head_coordinator" type="scene_finder.py" required="true" />
+      <node name="human_finder" pkg="devine_head_coordinator" type="human_finder.py" required="true" />
     </group>
 
     <group if="$(arg dashboard)">
@@ -81,7 +81,7 @@
     </group>
 
     <group if="$(arg guesswhat)">
-      <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" respawn="true" />
+      <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" required="true" />
     </group>
   </group>
 </launch>
