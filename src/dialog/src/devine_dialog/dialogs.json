@@ -7,16 +7,17 @@
     "ask_to_play": [
         "Do you want to play the GuessWhat game with me?",
         "Wanna play a questions game?",
-        "Do you think you can beat me in a questions game?",
+        "Do you think you can beat me in a guessing game?",
         "You bet you can beat me in a questions game?",
         "My calculations reveals that you are here to play with me. Shall we begin?"
     ],
     "asking_the_name": [
         "What is your name?",
-        "Before we begin, how should I call you?"
+        "Before we begin, how should I call you?",
+        "How should I refer to you during the game?"
     ],
     "confirming_the_name": [
-        "Good {player_name}!",
+        "Sounds good, {player_name}.",
         "All right {player_name}!",
         "Nice to meet you, {player_name}",
         "Good!",
@@ -37,11 +38,14 @@
     ],
     "ask_play_again": [
         "Would you like to play again?",
-        "Do you want to play again with me?"
+        "Do you want to play again with me?",
+        "Would you like to play another game with me?"
     ],
     "bye_bye": [
         "All right {player_name}, good bye.",
+        "All right {player_name}, until next time.",
         "Thanks for coming by!",
-        "Ok, it was nice to meet you."
+        "Ok, it was nice to meet you.",
+        "It was nice meeting you! Thank you for playing with me."
     ]
 }
