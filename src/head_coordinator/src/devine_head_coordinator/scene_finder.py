@@ -28,7 +28,7 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
-TILT = -0.17  # TODO: Iterate over tilt too ?
+TILT = 0.25  # TODO: Iterate over tilt too ?
 
 SPEAK_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=1)
 

@@ -40,5 +40,5 @@ def arms_pan_tilt(controller, obj_x, obj_y, obj_z):
 def head_pan_tilt(obj_x, obj_y, obj_z):
     """ Inverse Kinematic for head pan and tils joints """
     pan = math.atan2(obj_y, obj_x)
-    tilt = math.atan2(obj_z, obj_x) #TODO: Inverse en simulation?
+    tilt = -math.atan2(obj_z, obj_x)
     return [pan, tilt]
