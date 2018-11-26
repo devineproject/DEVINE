@@ -68,17 +68,18 @@ class DialogControl():
         is_pointing_blocker = ros_utils.TopicBlocker(IS_POINTING_OBJECT_TOPIC, Bool)
         expression_done_blocker = ros_utils.TopicBlocker(EXPRESSION_DONE_TOPIC, Bool)
 
-
         while not rospy.is_shutdown():
             try:
                 self._look.at_human() # Blocks until a human is found
                 if self.is_new_player:
+                    player_name = ''
                     self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
                     answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
                     if not answer == 'yes':
                         raise DialogControl.HumanDialogInterrupted()
 
                     player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
+                    self.send_sentence('confirming_the_name', TTSAnswerType.NO_ANSWER, player_name=player_name)
 
                 self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
                 if not self.wait_for_player('ready', player_name=player_name):
@@ -88,7 +89,6 @@ class DialogControl():
                 READY_TO_PLAY_PUBLISHER.publish(player_name)
 
                 object_found = object_category_blocker.wait_for_message().data
-
                 is_pointing_blocker.wait_for_message()
 
                 answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
@@ -100,12 +100,12 @@ class DialogControl():
                 answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
                 if answer == 'no':
                     raise DialogControl.HumanDialogInterrupted()
-                
+
                 self.is_new_player = False
 
             except DialogControl.HumanDialogInterrupted:
                 self.is_new_player = True
-                self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
+                self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER, player_name=player_name)
                 rospy.sleep(8) # Sleep while the player leaves
             finally:
                 START_NEW_GAME.publish(True)
