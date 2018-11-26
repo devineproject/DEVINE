@@ -37,6 +37,7 @@ MQTT_CLIENT = mqtt.Client()
 # Topics
 TTS_QUERY = topicname('tts_query')
 TTS_ANSWER = topicname('tts_answer')
+INTENT_NOT_RECOGNIZED = 'hermes/dialogueManager/intentNotRecognized'
 
 # ROS
 ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsAnswer, queue_size=10)
@@ -58,9 +59,24 @@ def snips_ask_callback(data):
     elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
         args['init']['type'] = 'action'
         args['init']['intentFilter'] = [SNIPS_TOPICS['name']]
-
+    args['init']['sendIntentNotRecognized'] = True # test
     MQTT_CLIENT.publish(
         'hermes/dialogueManager/startSession', json.dumps(args))
+
+def on_intent_not_recognized(_client, _userdata, msg):
+    """ Callback on intent not recognized """
+    payload = json.loads(msg.payload)
+    rospy.logwarn(payload)
+    #session_id = payload['sessionId']
+    custom_data = payload['customData']
+    #site_id = payload['siteId']
+    #inputs = payload['input']
+
+    tts_answer = TtsAnswer()
+    tts_answer.original_query = TtsQuery(*yaml.load(custom_data).values())
+    tts_answer.probability = 0
+    ROS_PUBLISHER.publish(tts_answer)
+
 
 
 def on_snips_connect(*_):
@@ -71,6 +87,7 @@ def on_snips_connect(*_):
     for topic in SNIPS_TOPICS.values():
         rospy.loginfo('Subscribe to topic: %s', topic)
         MQTT_CLIENT.subscribe('hermes/intent/' + topic)
+    MQTT_CLIENT.message_callback_add(INTENT_NOT_RECOGNIZED, on_intent_not_recognized)
 
 
 # Args: client, userdata, msg
