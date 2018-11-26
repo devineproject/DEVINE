@@ -14,27 +14,31 @@ from enum import Enum
 import rospy
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery, TtsAnswer
+from devine_common import ros_utils
 
 TTS_ANSWER_TOPIC = topicname('tts_answer')
-CONST_FILE = ros_utils.get_fullpath(__file__, 'dialogs.json')
-DIALOGS = None
-with open(CONST_FILE) as DIALOGS_FILE:
-    DIALOGS = json.loads(DIALOGS_FILE.read())
 
 class TTSAnswerType(Enum):
     NO_ANSWER = 0
     YES_NO = 1
     PLAYER_NAME = 2
 
+def load_dialogs():
+    """ Load dialogs from json file """
+    with open(ros_utils.get_fullpath(__file__, 'dialogs.json')) as file:
+        return json.loads(file.read())
+
 def wait_for_answer(answer_type, message_uid):
-    '''Wait on the TTS answer topic for the answer to the question'''
+    """ Wait on the TTS answer topic for the answer to the question """
     while not rospy.is_shutdown():
         answer = rospy.wait_for_message(TTS_ANSWER_TOPIC, TtsAnswer, timeout=None)
         if answer.original_query.uid == message_uid:
             return answer.text if answer.probability > 0.4 else None
 
 def send_speech(tts_publisher, message, answer_type):
-    '''Convert text string to speech using the snips topic'''
+    """ Convert text string to speech using the snips topic """
+    dialogs = load_dialogs()
+
     msg = TtsQuery()
     msg.text = message
     msg.uid = uuid.uuid4().int & 0xFFFFFFFF #32 LSB of random uid
@@ -43,7 +47,7 @@ def send_speech(tts_publisher, message, answer_type):
     if answer_type != TTSAnswerType.NO_ANSWER:
         answer = wait_for_answer(answer_type, msg.uid)
         if answer is None:
-            repeat_query = random.choice(DIALOGS['did_not_understand']) + random.choice(DIALOGS['say_again'])
+            repeat_query = random.choice(dialogs['did_not_understand']) + random.choice(dialogs['say_again'])
             return send_speech(tts_publisher, repeat_query + message.replace(repeat_query, ""), answer_type)
         return answer
     return None
