@@ -1,9 +1,9 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 """ Node to control robot joints """
-__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Félix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupré, Antoine Mercier-Nicol"
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"
-__credits__ = ["Simon Brodeur", "François Ferland", "Jean Rouat"]
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
 __license__ = "BSD"
 __version__ = "1.0.0"
 __email__ = "devine.gegi-request@listes.usherbrooke.ca"
@@ -85,6 +85,7 @@ class Controller(object):
         """ On topic /object_location, compute and move joints """
         if self.arm_data != msg:
             self.arm_data = msg
+            self.arm_data.header.stamp = rospy.Time.now() - rospy.rostime.Duration(0.1) # TODO: what if head moves ? FIXME
             if self.is_arms_activated:
                 if msg.pose.position != (0, 0, 0):
                     # TODO: add decision left/right arms in ik.py
@@ -138,7 +139,7 @@ class Controller(object):
         head_joints_position = None
 
         try:
-            tf_pose_stamp = self.tf_listener.transformPose(irl_constant.ROBOT_LINK['neck_pan'],
+            tf_pose_stamp = self.tf_listener.transformPose('/head_l_eye_link',
                                                            self.head_data)
             tf_position = tf_pose_stamp.pose.position
 
@@ -208,7 +209,7 @@ def main():
         rospy.wait_for_service('gazebo/set_physics_properties')
 
     controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
-    Movement(controller)
+    #Movement(controller)
 
     rospy.spin()
 

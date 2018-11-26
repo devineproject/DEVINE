@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = u'DEVINE'
-copyright = u'2018, Ismael Balafrej, Julien Chouinard-Beaupré, Félix Labelle, Adam Létourneau, Félix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay'
-author = u'Ismael Balafrej, Julien Chouinard-Beaupré, Félix Labelle, Adam Létourneau, Félix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay'
+copyright = u'2018, Ismael Balafrej, Julien Chouinard-Beaupre, Félix Labelle, Adam Létourneau, Felix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay'
+author = u'Ismael Balafrej, Julien Chouinard-Beaupre, Félix Labelle, Adam Létourneau, Felix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay'
 
 # The short X.Y version
 version = u''
@@ -139,7 +139,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'DEVINE.tex', u'DEVINE Documentation',
-     u'Ismael Balafrej, Julien Chouinard-Beaupré, Félix Labelle, Adam Létourneau, Félix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay', 'manual'),
+     u'Ismael Balafrej, Julien Chouinard-Beaupre, Félix Labelle, Adam Létourneau, Felix Martel-Denis, Éric Matte, Antoine Mercier-Nicol, Jordan Prince Tremblay', 'manual'),
 ]
 
 
