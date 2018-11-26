@@ -72,7 +72,7 @@ class DialogControl():
             try:
                 self._look.at_human() # Blocks until a human is found
                 if self.is_new_player:
-                    player_name = ""
+                    player_name = ''
                     self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
                     answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
                     if not answer == 'yes':
@@ -80,7 +80,7 @@ class DialogControl():
 
                     player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
                     self.send_sentence('confirming_the_name', TTSAnswerType.NO_ANSWER, player_name=player_name)
-    
+
                 self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
                 if not self.wait_for_player('ready', player_name=player_name):
                     raise DialogControl.HumanDialogInterrupted()
@@ -89,7 +89,6 @@ class DialogControl():
                 READY_TO_PLAY_PUBLISHER.publish(player_name)
 
                 object_found = object_category_blocker.wait_for_message().data
-
                 is_pointing_blocker.wait_for_message()
 
                 answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
@@ -101,7 +100,7 @@ class DialogControl():
                 answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
                 if answer == 'no':
                     raise DialogControl.HumanDialogInterrupted()
-                
+
                 self.is_new_player = False
 
             except DialogControl.HumanDialogInterrupted:
