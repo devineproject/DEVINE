@@ -24,6 +24,11 @@ generate_messages(
   std_msgs
 )
 
+configure_file(src/devine_dialog/static/dialogs.json
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/${PROJECT_NAME}/static/dialogs.json
+  COPYONLY
+)
+
 ###################################
 ## catkin specific configuration ##
 ###################################

@@ -33,14 +33,14 @@
         "Ready to play?"
     ],
     "did_not_understand": [
-       "I am sorry I did not undertand what you said.",
-       "I didn't catch that last thing you said.",
-       "I didn't quite get that."
+       "I am sorry I did not understand what you said. ",
+       "I didn't catch that last thing you said. ",
+       "I didn't quite get that. "
     ],
     "say_again": [
-        "Say again.",
-        "Can you please repeat that?",
-        "What did you say?"
+        "Say again. ",
+        "Can you please repeat that? ",
+        "What did you say? "
      ],
     "ask_got_it_right": [
         "Is it the {object_name}?",
