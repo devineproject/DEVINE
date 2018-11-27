@@ -7,26 +7,21 @@ __version__ = "1.0.0"
 __email__ = "devine.gegi-request@listes.usherbrooke.ca"
 __status__ = "Production"
 
-import json
 import random
 import uuid
 from enum import Enum
 import rospy
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery, TtsAnswer
-from devine_common import ros_utils
+from devine_dialog.load_dialogs import load_dialogs
 
 TTS_ANSWER_TOPIC = topicname('tts_answer')
+DIALOGS = load_dialogs()
 
 class TTSAnswerType(Enum):
     NO_ANSWER = 0
     YES_NO = 1
     PLAYER_NAME = 2
-
-def load_dialogs():
-    """ Load dialogs from json file """
-    with open(ros_utils.get_fullpath(__file__, 'dialogs.json')) as file:
-        return json.loads(file.read())
 
 def wait_for_answer(answer_type, message_uid):
     """ Wait on the TTS answer topic for the answer to the question """
@@ -37,8 +32,6 @@ def wait_for_answer(answer_type, message_uid):
 
 def send_speech(tts_publisher, message, answer_type):
     """ Convert text string to speech using the snips topic """
-    dialogs = load_dialogs()
-
     msg = TtsQuery()
     msg.text = message
     msg.uid = uuid.uuid4().int & 0xFFFFFFFF #32 LSB of random uid
@@ -47,7 +40,7 @@ def send_speech(tts_publisher, message, answer_type):
     if answer_type != TTSAnswerType.NO_ANSWER:
         answer = wait_for_answer(answer_type, msg.uid)
         if answer is None:
-            repeat_query = random.choice(dialogs['did_not_understand']) + random.choice(dialogs['say_again'])
+            repeat_query = random.choice(DIALOGS['did_not_understand']) + random.choice(DIALOGS['say_again'])
             return send_speech(tts_publisher, repeat_query + message.replace(repeat_query, ""), answer_type)
         return answer
     return None

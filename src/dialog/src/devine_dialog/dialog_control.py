@@ -15,7 +15,8 @@ import random
 from std_msgs.msg import String, Bool
 import rospy
 from devine_dialog.msg import TtsQuery
-from devine_dialog import TTSAnswerType, send_speech, load_dialogs
+from devine_dialog.load_dialogs import load_dialogs
+from devine_dialog import TTSAnswerType, send_speech
 from devine_config import topicname
 from devine_common import ros_utils
 from devine_head_coordinator.look import Look
