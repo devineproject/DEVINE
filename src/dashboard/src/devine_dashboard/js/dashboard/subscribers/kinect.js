@@ -33,14 +33,22 @@ export default function InitKinectModule(devineTopics) {
 
   let history = {
     position: 1,
+    confidence: [],
     image: []
   };
 
   /* Subscribe to every topics */
   Object.keys(topics).forEach(topic => {
-    history[topic] = [];
+    if (history[topic] === undefined) {
+      history[topic] = [];
+    }
     subscribeAndBind(topics[topic], history[topic]);
   });
+
+  /** Special case, reset confidence each game */
+  topics.segmentation.subscribe(function(confidence, _) {
+    confidence.length = 0;
+  }.bind(this, history.confidence));
 
   /** Handle image changed */
   function imageSourceChanged() {
@@ -59,7 +67,7 @@ export default function InitKinectModule(devineTopics) {
     let obj_pos_2d = getCurrentHistoryElement(history.object_position_2d, stamp);
     let obj_pos_3d = getCurrentHistoryElement(history.object_position_3d, stamp);
     let body_tracking = getCurrentHistoryElement(history.body_tracking);
-    let confidence = getCurrentHistoryElement(history.confidence);
+    let confidence = history.position == 1 ? getCurrentHistoryElement(history.confidence) : undefined;
     let seg = getCurrentHistoryElement(history.segmentation, stamp);
     let image_length = history.image.length;
     

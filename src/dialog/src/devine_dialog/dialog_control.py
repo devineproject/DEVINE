@@ -15,6 +15,7 @@ import random
 from std_msgs.msg import String, Bool
 import rospy
 from devine_dialog.msg import TtsQuery
+from devine_dialog.load_dialogs import load_dialogs
 from devine_dialog import TTSAnswerType, send_speech
 from devine_config import topicname
 from devine_common import ros_utils
@@ -32,15 +33,12 @@ READY_TO_PLAY_PUBLISHER = rospy.Publisher(topicname('player_name'), String, queu
 GUESS_SUCCEEDED = rospy.Publisher(topicname('object_guess_success'), Bool, queue_size=1)
 START_NEW_GAME = rospy.Publisher(topicname('new_game'), Bool, queue_size=1)
 
-CONST_FILE = ros_utils.get_fullpath(__file__, 'dialogs.json')
-
 
 class DialogControl():
     """ Class that control the dialog of the game """
 
     def __init__(self):
-        dialogs_file = open(CONST_FILE)
-        self.dialogs = json.loads(dialogs_file.read())
+        self.dialogs = load_dialogs()
         self.is_new_player = True
         self._look = Look()
 

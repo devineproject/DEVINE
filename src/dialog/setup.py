@@ -14,5 +14,6 @@ from catkin_pkg.python_setup import generate_distutils_setup
 setup_args = generate_distutils_setup()
 setup_args['packages'] = ['devine_dialog']
 setup_args['package_dir'] = {'': 'src'}
+setup_args['package_data'] = {'': ['*.json']}
 
 setup(**setup_args)
