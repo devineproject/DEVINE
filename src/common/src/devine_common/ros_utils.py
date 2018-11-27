@@ -25,7 +25,11 @@ if IS_PYTHON2:
         """ Convert x, y, z, roll, pitch, yaw to PoseStamped """
 
         pose = PoseStamped()
-        pose.header.stamp = stamp or rospy.Time.now() - rospy.rostime.Duration(0.1)
+        new_time = rospy.Time.now()
+        if new_time.to_sec() > 0.1:
+            new_time = new_time - rospy.rostime.Duration(0.1)
+
+        pose.header.stamp = stamp or new_time
         pose.header.frame_id = ref_frame
         pose.pose.position.x = x
         pose.pose.position.y = y

@@ -44,7 +44,8 @@ class Controller(object):
     def __init__(self, is_head_activated=True, is_arms_activated=True, is_gripper_activated=True):
         self.arm_data = None
         self.head_data = None
-        self.time = 10 #TODO: Calc speed
+        self.arm_joints_position = [0,0,0,0]
+        self.time = 10
         self.admittance_service = None
         self.tf_listener = tf.TransformListener()
         self.is_arms_activated = is_arms_activated
@@ -105,12 +106,27 @@ class Controller(object):
             self.arm_data = msg
             self.arm_data.header.stamp = rospy.Time.now() - rospy.rostime.Duration(0.1) # TODO: what if head moves ? FIXME
             if self.is_arms_activated:
-                if msg.pose.position != (0, 0, 0):
+                if msg.pose.position.x != 0 and msg.pose.position.y != 0 and msg.pose.position.z != 0:
                     # TODO: add decision left/right arms in ik.py
                     arm_decision = 'left'
-                    joints_position = self.calcul_arm(arm_decision)
-                    self.move({'arm_' + arm_decision: joints_position},
-                              self.time)
+                    previous_arm_joints_position = self.arm_joints_position
+                    self.arm_joints_position = self.calcul_arm(arm_decision)
+
+                    # TODO: better internal collision handling
+                    if self.arm_joints_position[0] < -0.6:
+                        self.arm_joints_position[0] = -0.6
+                    if self.arm_joints_position[0] > 1.22:
+                        self.arm_joints_position[0] = 1.22
+                    if self.arm_joints_position[1] < -1.67:
+                        self.arm_joints_position[1] = -1.67
+                    if self.arm_joints_position[1] > 0:
+                        self.arm_joints_position[1] = 0
+
+                    diff_arm_joints_position = max(abs(self.arm_joints_position[0]), abs(previous_arm_joints_position[0]), abs(self.arm_joints_position[1]), abs(previous_arm_joints_position[1]))
+                    diff_time = diff_arm_joints_position * 5
+
+                    self.move({'arm_' + arm_decision: self.arm_joints_position},
+                              diff_time)
                 else:
                     self.move_init(10)
 
@@ -172,11 +188,13 @@ class Controller(object):
 
     def move_init(self, time):
         """ Move joints to initial position """
-        self.move({
-            'head': [0, 0],
-            'arm_left':  [0, 0, 0, 0],
-            'arm_right':  [0, 0, 0, 0]
-        }, time)
+        moves = {}
+
+        if self.is_arms_activated:
+            moves['arm_left'] = [0, 0, 0, 0]
+            moves['arm_right'] = [0, 0, 0, 0]
+
+        self.move(moves, time)
 
     def move(self, controller_joints_positions, time):
         """ Move joints """
@@ -228,7 +246,7 @@ def main():
     is_sim = rospy.get_param('~is_sim')
     if is_sim:
         # Wait for gazebo before initializing controllers
-        rospy.wait_for_service('gazebo/set_physics_properties')
+        rospy.wait_for_service('/gazebo/set_physics_properties')
 
     controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
     if is_sim:
