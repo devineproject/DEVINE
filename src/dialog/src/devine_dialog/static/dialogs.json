@@ -57,5 +57,14 @@
         "Thanks for coming by!",
         "Ok, it was nice to meet you.",
         "It was nice meeting you! Chow."
+    ],
+    "robot_won": [
+        "YaY!",
+        "I won!",
+        "I told you that I would win!"
+    ],
+    "robot_lost": [
+        "Awww!",
+        "So close!"
     ]
 }

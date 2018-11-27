@@ -76,7 +76,8 @@ class DialogControl():
                         raise DialogControl.HumanDialogInterrupted()
 
                     player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
-                    self.send_sentence('confirming_the_name', TTSAnswerType.NO_ANSWER, player_name=player_name)
+                    self.send_sentence('confirming_the_name',
+                                       TTSAnswerType.NO_ANSWER, player_name=player_name)
 
                 self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
                 if not self.wait_for_player('ready', player_name=player_name):
@@ -88,9 +89,15 @@ class DialogControl():
                 object_found = object_category_blocker.wait_for_message().data
                 is_pointing_blocker.wait_for_message()
 
-                answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
+                answer = self.send_sentence('ask_got_it_right', 
+                                            TTSAnswerType.YES_NO, object_name=object_found)
 
-                GUESS_SUCCEEDED.publish(answer == 'yes')
+                if answer == 'yes':
+                    GUESS_SUCCEEDED.publish(True)
+                    self.send_sentence('robot_won', TTSAnswerType.NO_ANSWER)
+                else:
+                    GUESS_SUCCEEDED.publish(False)
+                    self.send_sentence('robot_lost', TTSAnswerType.NO_ANSWER)
 
                 expression_done_blocker.wait_for_message()
 
