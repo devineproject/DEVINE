@@ -52,7 +52,7 @@ class Controller(object):
         self.is_sim = rospy.get_param('~is_sim')
         rospy.loginfo('Waiting for controllers')
 
-        if not self.is_sim:
+        if not self.is_sim and self.is_arms_activated:
             self.admittance_service = Admittance()
             self.admittance_service.set_admittance(
                 'L', [LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE])
@@ -90,7 +90,7 @@ class Controller(object):
     def on_guess_success_callback(self, _msg):
         """ Callback when the robot knows if he points the right or wrong object """
         self.move_init(10)
-        if not self.is_sim:
+        if not self.is_sim and self.is_arms_activated:
             self.admittance_service.set_admittance(
                 'L', [LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE])
 
@@ -123,7 +123,7 @@ class Controller(object):
                         self.arm_joints_position[1] = 0
 
                     diff_arm_joints_position = max(abs(self.arm_joints_position[0]), abs(previous_arm_joints_position[0]), abs(self.arm_joints_position[1]), abs(previous_arm_joints_position[1]))
-                    diff_time = diff_arm_joints_position * 5
+                    diff_time = diff_arm_joints_position * 3
 
                     self.move({'arm_' + arm_decision: self.arm_joints_position},
                               diff_time)
@@ -201,7 +201,7 @@ class Controller(object):
         move_gripper = False
 
         times = get_joints_time(controller_joints_positions, time)
-        if not self.is_sim:
+        if not self.is_sim and self.is_arms_activated:
             self.admittance_service.set_admittance(
                 'L', [HIGH_ADMITTANCE, HIGH_ADMITTANCE, HIGH_ADMITTANCE, HIGH_ADMITTANCE])
 

@@ -19,9 +19,7 @@
     "confirming_the_name": [
         "Sounds good, {player_name}.",
         "All right {player_name}!",
-        "Nice to meet you, {player_name}",
-        "Good!",
-        "All right!"
+        "Nice to meet you, {player_name}"
     ],
     "instructions": [
         "So now think about one of the objects on the table, and I will ask you some questions in order to find it.",
@@ -43,7 +41,6 @@
         "What did you say? "
      ],
     "ask_got_it_right": [
-        "Is it the {object_name}?",
         "Hmmm, I think it's the {object_name}. Did I get it right?"
     ],
     "ask_play_again": [
@@ -59,12 +56,11 @@
         "It was nice meeting you! Chow."
     ],
     "robot_won": [
-        "YaY!",
-        "I won!",
+        "YaY! I won!",
         "I told you that I would win!"
     ],
     "robot_lost": [
-        "Awww!",
-        "So close!"
+        "Awww! You won this time.",
+        "So close! I will win the next one."
     ]
 }

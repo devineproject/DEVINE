@@ -28,7 +28,7 @@ BOTTOM_RIGHT_TOPIC = '/bottom_right'
 
 DELTA_TIME = 0.3
 DELTA_POS = 0.2
-TILT = 0.25  # TODO: Iterate over tilt too ?
+TILT = 0.30  # TODO: Iterate over tilt too ?
 
 SPEAK_PUBLISHER = rospy.Publisher(topicname('tts_query'), TtsQuery, queue_size=1)
 
@@ -64,7 +64,7 @@ class SceneFinder(object):
 
         rate = rospy.Rate(1/DELTA_TIME)
         not_in_bound_ctr = 0
-        direction = 1
+        direction = -1
         while not rospy.is_shutdown():
             [pan, tilt] = self.joint_ctrl.get_position()
             tilt = TILT

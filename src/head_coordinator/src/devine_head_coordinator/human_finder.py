@@ -44,7 +44,7 @@ class LookAtHumanActionServer(object):
         self._feedback = LookAtHumanFeedback()
         self._result = LookAtHumanResult()
         self._ctrl = head_action_control.HeadActionCtrl(
-            [-0.5, 0.5], [-0.17, 0.79], -0.1, 0, [None, 0])
+            [0.3, 1.15], [-0.17, 0.79], -0.2, 0, [None, 0])
         iter_time = 0.5
         self.iter_rate = rospy.Rate(1/iter_time)
         self._as.start()

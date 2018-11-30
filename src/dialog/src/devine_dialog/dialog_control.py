@@ -89,6 +89,8 @@ class DialogControl():
                 object_found = object_category_blocker.wait_for_message().data
                 is_pointing_blocker.wait_for_message()
 
+                self._look.at_human()
+
                 answer = self.send_sentence('ask_got_it_right', 
                                             TTSAnswerType.YES_NO, object_name=object_found)
 

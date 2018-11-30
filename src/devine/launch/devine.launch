@@ -6,7 +6,8 @@
   <arg name="dialog" default="$(arg launch_all)"/>
   <arg name="dashboard" default="$(arg launch_all)" />
   <arg name="guesswhat" default="$(arg launch_all)" />
-  <arg name="image_processing" default="$(arg launch_all)" />
+  <arg name="image_processing_robot" default="$(arg launch_all)" />
+  <arg name="image_processing_gpu" default="$(arg launch_all)" />
   <arg name="head_coordinator" default="$(arg launch_all)" />
 
   <group if="$(arg kinect)">
@@ -26,7 +27,7 @@
   </group>
 
   <!-- April tags detection library -->
-  <group if="$(arg image_processing)">
+  <group if="$(arg image_processing_robot)">
     <include file="$(find apriltags2_ros)/launch/continuous_detection.launch">
       <arg name="camera_name" value="/openni/rgb" />
       <arg name="image_topic" value="image_rect_mono" />
@@ -60,10 +61,13 @@
       <node name="dialog_control" pkg="devine_dialog" type="dialog_control.py" required="true" />
     </group>
 
-    <group if="$(arg image_processing)">
+    <group if="$(arg image_processing_robot)">
       <node name="img_dispatcher" pkg="devine_image_processing" type="image_dispatcher.py" required="true" />
       <node name="depth_mask" pkg="devine_image_processing" type="mask.py" required="true" />
       <node name="features_extraction" pkg="devine_image_processing" type="features_extraction.py" required="true" />
+    </group>
+
+    <group if="$(arg image_processing_gpu)">
       <node name="image_segmentation" pkg="devine_image_processing" type="segmentation.py" required="true" />
       <node name="body_tracking" pkg="devine_image_processing" type="body_tracking.py" required="true" />
     </group>

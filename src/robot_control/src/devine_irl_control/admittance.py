@@ -49,3 +49,5 @@ class Admittance():
         for i, service_proxy in enumerate(service_proxies):
             rospy.loginfo("Sending to service '{0}' m=0, b=0, k={1}".format(services[i], values[i]))
             service_proxy(0, 0, values[i])
+
+        rospy.sleep(0.5) #Wait to validate new admittnace
