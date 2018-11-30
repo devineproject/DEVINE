@@ -1,6 +1,18 @@
 {
   "topics": {
-    "raw_image": {
+    "image": {
+      "name": "/openni/rgb/image_rect_color",
+      "type": "sensor_msgs/Image"
+    },
+    "camera_info": {
+      "name": "/openni/rgb/camera_info",
+      "type": "sensor_msgs/CameraInfo"
+    },
+    "depth": {
+      "name": "/openni/depth/image_rect",
+      "type": "sensor_msgs/Image"
+    },
+    "compressed_image": {
       "name": "/openni/rgb/image_rect_color/compressed",
       "type": "sensor_msgs/CompressedImage"
     },
@@ -23,6 +35,10 @@
     "start_scene_detection": {
       "name": "start_scene_detection",
       "type": "std_msgs/Bool"
+    },
+    "masked_image": {
+      "name": "image/masked_image",
+      "type": "sensor_msgs/CompressedImage"
     },
     "features_extraction_image": {
       "name": "image/features_extraction",
@@ -82,7 +98,7 @@
     },
     "tts_answer": {
       "name": "tts/answer",
-      "type": "devine_dialog/TtsQuery"
+      "type": "devine_dialog/TtsAnswer"
     },
     "objects_confidence": {
       "name": "objects_confidence",
@@ -120,6 +136,10 @@
       "name": "end_of_game/",
       "type": "std_msgs/Bool"
     },
+    "robot_talking_expression": {
+      "name": "/jn0/emo_pulse",
+      "type": "jn0_face_msgs/EmoPulse"
+    },
     "robot_facial_expression": {
       "name": "/jn0/emo_intensity",
       "type": "jn0_face_msgs/EmoIntensity"
@@ -131,6 +151,10 @@
     "new_game": {
       "name": "new_game",
       "type": "std_msgs/Bool"
+    },
+    "eyes": {
+      "name": "/jn0/eyes_target",
+      "type": "geometry_msgs/Point"
     }
   },
   "constants": {

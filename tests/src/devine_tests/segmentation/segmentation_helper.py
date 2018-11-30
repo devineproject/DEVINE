@@ -1,10 +1,18 @@
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
+
 import json
 from collections import Counter
 from sensor_msgs.msg import CompressedImage
 from devine_config import topicname
 import rospy
 from devine_common import image_utils, ros_utils
-from std_msgs.msg import String
+from devine_image_processing.msg import SegmentedImage
 
 IMAGE_TOPIC = topicname("segmentation_image")
 SEGMENTATION_IMAGE_TOPIC = topicname("objects")
@@ -23,8 +31,8 @@ def segment_image(image):
     IMAGE_PUB.publish(image[IMAGE_MSG])
     # receive data
     while True:
-        data = rospy.wait_for_message(SEGMENTATION_IMAGE_TOPIC, String)
-        stamp = json.loads(data.data)["timestamp"]
+        data = rospy.wait_for_message(SEGMENTATION_IMAGE_TOPIC, SegmentedImage)
+        stamp = data.header.stamp.to_nsec()
         if LAST_STAMP is None or stamp != LAST_STAMP:
             LAST_STAMP = stamp
             break
@@ -51,8 +59,7 @@ def load_test_images(file, test_filepath):
 
 def get_segmented_objets(data):
     """ Extract a list of the segmented objects found in the given ros data """
-    json_data = json.loads(data.data)
-    return [object["category"] for object in json_data["objects"]]
+    return [obj.category_name for obj in data.objects]
 
 
 def get_missed_objects(expected_objects, actual_objects):

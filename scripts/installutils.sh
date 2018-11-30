@@ -97,7 +97,7 @@ install_base() {
 
   if [ ! -f IRL-1 ]
   then
-    git clone --branch ctrl_import https://github.com/introlab/IRL-1.git
+    git clone https://github.com/introlab/IRL-1.git
   fi
 
   if [ ! -f apriltags2_ros ]

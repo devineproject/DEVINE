@@ -1,8 +1,3 @@
-About the tests
-###############
-
-The tests are made using `Python unittest <https://docs.python.org/3/library/unittest.html>`_.
-
 Running the unit tests with catkin
 ##################################
 
@@ -25,9 +20,3 @@ Each one of these files can run individually like so:
 .. code-block:: bash
 
     $ python DEVINE/tests/src/devine_tests/*/test_*.py
-
-
-Adding test cases
-#################
-
-To add a test case, simply copy the `testcase_template.py` into your test folder, then import your test case into `test_suite.py`.

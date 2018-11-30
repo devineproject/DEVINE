@@ -1,5 +1,12 @@
 #! /usr/bin/env python2
 """import mscoco images to validate pipeline"""
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 import argparse
 import random
@@ -16,9 +23,6 @@ from devine_common.image_utils import image_to_ros_msg
 
 FEATURE_IMAGE_TOPIC = topicname('features_extraction_image')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
-RESTART_TOPIC = topicname('end_of_game')
-TTS_ANSWER_TOPIC = topicname('tts_answer')
-TTS_QUERY_TOPIC = topicname('tts_query')
 CATEGORY_TOPIC = topicname('guess_category')
 
 

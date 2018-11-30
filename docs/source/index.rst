@@ -34,20 +34,37 @@ Global installation process for the project can be found here
     :maxdepth: 2
    
     installation/index
+    
 
-ROS
-===
-
-In this section you will find:
-
-* Tips'n tricks for ROS
-* Specific informations on our ROS modules
+All DEVINE modules
+==================
 
 .. toctree::
     :glob:
     :maxdepth: 1
    
-    ros/index
+    modules/*/index
+
+
+Tests
+=====
+
+.. toctree::
+    :glob:
+    :maxdepth: 2
+   
+    tests/index
+
+
+Cheat Sheet
+===========
+
+.. toctree::
+    :glob:
+    :maxdepth: 2
+   
+    cheat-sheet/index
+
 
 .. _DEVINE GitHub: https://github.com/FelixMartel/DEVINE
 .. _DEVINE website: https://devine.gel.usherbrooke.ca/

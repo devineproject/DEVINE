@@ -16,11 +16,17 @@ catkin_python_setup()
 add_message_files(
   FILES
   TtsQuery.msg
+  TtsAnswer.msg
 )
 
 generate_messages(
   DEPENDENCIES
   std_msgs
+)
+
+configure_file(src/devine_dialog/static/dialogs.json
+  ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_PYTHON_DESTINATION}/${PROJECT_NAME}/static/dialogs.json
+  COPYONLY
 )
 
 ###################################

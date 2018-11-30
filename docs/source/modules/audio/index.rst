@@ -30,9 +30,9 @@ Usage
 .. code-block:: bash
 
   roscore #start ROS master
-  rosrun devine_dialog snips.py #run snips node
+  rosrun devine_dialog snips.py __ns:=devine #run snips node
   sam watch
-  rostopic echo /answer #listen to the answers
+  rostopic echo /devine/tts/answer #listen to the answers
 
 
 

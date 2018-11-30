@@ -28,8 +28,8 @@ Usage
 
 .. code-block:: bash
 
-    rosrun devine_image_processing segmentation.py
-    rosrun devine_image_processing features_extraction.py
+    rosrun devine_image_processing segmentation.py __ns:=devine
+    rosrun devine_image_processing features_extraction.py __ns:=devine
 
 .. _tf-pose-estimation: https://github.com/ildoonet/tf-pose-estimation
 .. _Mask R-CNN: https://github.com/matterport/Mask_RCNN

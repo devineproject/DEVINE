@@ -21,10 +21,12 @@ Pre requirement Installation
 
 .. code-block:: bash
 
-    roslaunch openni_launch openni.launch 
+    roslaunch devine devine.launch launch_all:=false kinect:=true dashboard:=true
 
 
-3. View Data You can use the dashboard or the image_view package:
+3. View Data 
+
+You can use the dashboard (http://localhost:8080) or the image_view package:
 
 .. code-block:: bash
 
@@ -45,26 +47,6 @@ ROS Installation
     roscd
     cd ..
     catkin_make
-
-Usage
-=====
-
-.. code-block:: bash
-
-    rosrun devine_kinect pos_lib.py #run devine_kinect node
-
-.. code-block:: bash
-
-    #publish a location:
-    rostopic pub /object_found std_msgs/Int32MultiArray "layout:
-    dim: []
-    data_offset: 0
-    data: [320,240]"
-
-.. code-block:: bash
-
-    #listen to calculated positions
-    rostopic echo /object_location
 
 .. _Kinect for a Xbox 360: https://en.wikipedia.org/wiki/Kinect#Kinect_for_Xbox_360_(2010)
 .. _OpenNI documentation: http://wiki.ros.org/openni_launch/

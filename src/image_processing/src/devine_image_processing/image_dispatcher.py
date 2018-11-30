@@ -1,5 +1,13 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 """ Image dispatching node """
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 from threading import RLock
 from enum import IntEnum
@@ -11,9 +19,10 @@ from devine_config import topicname
 from blur_detection import is_image_blurry
 from ros_image_processor import ImageProcessor, ROSImageProcessingWrapper
 
-# Topics
-IMAGE_TOPIC = topicname('raw_image')
+# IN
+IMAGE_TOPIC = topicname('masked_image')
 
+# OUT
 BODY_TRACKING_IMAGE_TOPIC = topicname('body_tracking_image')
 ZONE_DETECTION_IMAGE_TOPIC = topicname('zone_detection_image_in')
 SEGMENTATION_IMAGE_TOPIC = topicname('segmentation_image')
@@ -110,7 +119,7 @@ class ImageDispatcher(ImageProcessor):
             SmartImagePublisher(ZONE_DETECTION_IMAGE_TOPIC, zone_detection_validator, throttle_rate=0.5),
             SmartImagePublisher(SEGMENTATION_IMAGE_TOPIC, seg_validator),
             SmartImagePublisher(FEATURES_EXTRACTION_IMAGE_TOPIC, features_validator),
-            SmartImagePublisher(None, restart_validator),
+            SmartImagePublisher(BODY_TRACKING_IMAGE_TOPIC, restart_validator, throttle_rate=0.5)
         ]
 
         self.pub_index = 0

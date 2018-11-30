@@ -1,6 +1,13 @@
 #!/usr/bin/env python2
-
+# -*- coding: utf-8 -*-
 """ Node to control robot joints """
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 import rospy
 import tf
@@ -15,18 +22,21 @@ from devine_irl_control.movement import Movement
 from devine_irl_control.controllers import TrajectoryClient
 from devine_irl_control.gripper import Gripper
 from devine_irl_control import ik
+from devine_irl_control.admittance import Admittance
 
 ROBOT_NAME = irl_constant.ROBOT_NAME
+LOW_ADMITTANCE = 3
+HIGH_ADMITTANCE = 15
 
 # IN
 TOPIC_OBJECT_LOCATION = topicname('guess_location_world')
 TOPIC_HEAD_LOOK_AT = topicname('robot_look_at')
 TOPIC_HEAD_JOINT_STATE = topicname('robot_head_joint_traj_point')
+GUESS_SUCCESS = topicname('object_guess_success')
 
 # OUT
 TOPIC_IS_POINTING = topicname('is_pointing_object')
 TOPIC_IS_LOOKING = topicname('is_looking')
-
 
 class Controller(object):
     """ Arms, head and gripper controller """
@@ -34,11 +44,18 @@ class Controller(object):
     def __init__(self, is_head_activated=True, is_arms_activated=True, is_gripper_activated=True):
         self.arm_data = None
         self.head_data = None
-        self.time = 1 #TODO: Calc speed
+        self.arm_joints_position = [0,0,0,0]
+        self.time = 10
+        self.admittance_service = None
         self.tf_listener = tf.TransformListener()
         self.is_arms_activated = is_arms_activated
-
+        self.is_sim = rospy.get_param('~is_sim')
         rospy.loginfo('Waiting for controllers')
+
+        if not self.is_sim and self.is_arms_activated:
+            self.admittance_service = Admittance()
+            self.admittance_service.set_admittance(
+                'L', [LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE])
 
         if is_gripper_activated:
             self.gripper_right = Gripper(ROBOT_NAME, 'right')
@@ -58,6 +75,8 @@ class Controller(object):
             rospy.signal_shutdown(err)
 
         rospy.Subscriber(TOPIC_OBJECT_LOCATION, PoseStamped, self.arm_pose_callback)
+        rospy.Subscriber(GUESS_SUCCESS, Bool, self.on_guess_success_callback)
+
         self.pub_is_pointing = rospy.Publisher(TOPIC_IS_POINTING,
                                                Bool, queue_size=1)
         if is_head_activated:
@@ -67,6 +86,13 @@ class Controller(object):
                              self.head_joint_traj_point_callback)
             self.pub_is_looking = rospy.Publisher(TOPIC_IS_LOOKING,
                                                   Bool, queue_size=1)
+    
+    def on_guess_success_callback(self, _msg):
+        """ Callback when the robot knows if he points the right or wrong object """
+        self.move_init(10)
+        if not self.is_sim and self.is_arms_activated:
+            self.admittance_service.set_admittance(
+                'L', [LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE, LOW_ADMITTANCE])
 
     def head_joint_traj_point_callback(self, msg):
         """ On topic /head_joint_traj_point, move head """
@@ -78,17 +104,33 @@ class Controller(object):
         """ On topic /object_location, compute and move joints """
         if self.arm_data != msg:
             self.arm_data = msg
+            self.arm_data.header.stamp = rospy.Time.now() - rospy.rostime.Duration(0.1) # TODO: what if head moves ? FIXME
             if self.is_arms_activated:
-                if msg.pose.position != (0, 0, 0):
+                if msg.pose.position.x != 0 and msg.pose.position.y != 0 and msg.pose.position.z != 0:
                     # TODO: add decision left/right arms in ik.py
                     arm_decision = 'left'
-                    joints_position = self.calcul_arm(arm_decision)
-                    self.move({'arm_' + arm_decision: joints_position},
-                              self.time)
+                    previous_arm_joints_position = self.arm_joints_position
+                    self.arm_joints_position = self.calcul_arm(arm_decision)
+
+                    # TODO: better internal collision handling
+                    if self.arm_joints_position[0] < -0.6:
+                        self.arm_joints_position[0] = -0.6
+                    if self.arm_joints_position[0] > 1.22:
+                        self.arm_joints_position[0] = 1.22
+                    if self.arm_joints_position[1] < -1.67:
+                        self.arm_joints_position[1] = -1.67
+                    if self.arm_joints_position[1] > 0:
+                        self.arm_joints_position[1] = 0
+
+                    diff_arm_joints_position = max(abs(self.arm_joints_position[0]), abs(previous_arm_joints_position[0]), abs(self.arm_joints_position[1]), abs(previous_arm_joints_position[1]))
+                    diff_time = diff_arm_joints_position * 3
+
+                    self.move({'arm_' + arm_decision: self.arm_joints_position},
+                              diff_time)
                 else:
                     self.move_init(10)
 
-            self.pub_is_pointing.publish(True)
+        self.pub_is_pointing.publish(True)
 
     def head_pose_callback(self, msg):
         """ On topic /look_at, compute and move joints """
@@ -101,7 +143,7 @@ class Controller(object):
             else:
                 self.move_init(10)
 
-            self.pub_is_looking.publish(True)
+        self.pub_is_looking.publish(True)
 
     def calcul_arm(self, controller):
         """ Get arm translation from TF and apply inverse kinematic """
@@ -131,7 +173,7 @@ class Controller(object):
         head_joints_position = None
 
         try:
-            tf_pose_stamp = self.tf_listener.transformPose(irl_constant.ROBOT_LINK['neck_pan'],
+            tf_pose_stamp = self.tf_listener.transformPose(irl_constant.ROBOT_LINK['l_eye'],
                                                            self.head_data)
             tf_position = tf_pose_stamp.pose.position
 
@@ -146,17 +188,22 @@ class Controller(object):
 
     def move_init(self, time):
         """ Move joints to initial position """
-        self.move({
-            'head': [0, 0],
-            'arm_left':  [0, 0, 0, 0],
-            'arm_right':  [0, 0, 0, 0]
-        }, time)
+        moves = {}
+
+        if self.is_arms_activated:
+            moves['arm_left'] = [0, 0, 0, 0]
+            moves['arm_right'] = [0, 0, 0, 0]
+
+        self.move(moves, time)
 
     def move(self, controller_joints_positions, time):
         """ Move joints """
         move_gripper = False
 
         times = get_joints_time(controller_joints_positions, time)
+        if not self.is_sim and self.is_arms_activated:
+            self.admittance_service.set_admittance(
+                'L', [HIGH_ADMITTANCE, HIGH_ADMITTANCE, HIGH_ADMITTANCE, HIGH_ADMITTANCE])
 
         for key in controller_joints_positions:
             getattr(self, key).clear()
@@ -196,12 +243,14 @@ def main():
     is_arms_activated = rospy.get_param('~is_arms_activated')
     is_grippers_activated = rospy.get_param('~is_grippers_activated')
 
-    if rospy.get_param('~is_sim'):
+    is_sim = rospy.get_param('~is_sim')
+    if is_sim:
         # Wait for gazebo before initializing controllers
-        rospy.wait_for_service('gazebo/set_physics_properties')
+        rospy.wait_for_service('/gazebo/set_physics_properties')
 
     controller = Controller(is_head_activated, is_arms_activated, is_grippers_activated)
-    Movement(controller)
+    if is_sim:
+        Movement(controller)
 
     rospy.spin()
 

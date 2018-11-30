@@ -26,17 +26,27 @@ export default function initDialogModule(devineTopics) {
   function publish() {
     const answer = answerField.val();
     if (answer !== "") {
-      const query = queries[queries.length - 1];
-      if (query) {
+      let query_answered = false;
+      for (let i = queries.length - 1; i >= 0; --i) {
+        const query = queries[i];
+        if (query.answered) {
+          continue;
+        }
+
         new RosTopic(devineTopics.tts_answer).publish(
           new ROSLIB.Message({
-            text: answer,
-            uid: query.uid,
-            answer_type: answer_types.YES_NO
+            original_query: query,
+            probability: 1.0,
+            text: answer
           })
         );
+        
         answerField.val("");
-      } else {
+        query.answered = true;
+        query_answered = true;
+      }
+
+      if (!query_answered) {
         cons.log("No TTS query to answer");
       }
     }
@@ -61,10 +71,10 @@ export default function initDialogModule(devineTopics) {
   topics.ttsAnswer.subscribe(message => {
     let query_answered = false;
     for (let i in queries) {
-      if (queries[i].uid == message.uid) {
+      if (queries[i].uid == message.original_query.uid) {
         queries = queries.splice(i, 1);
         query_answered = true;
-        cons.log(`Answer STT (${message.uid}): ${message.text}`);
+        cons.log(`Answer STT (${message.original_query.uid}): ${message.text}`);
         break;
       }
     }

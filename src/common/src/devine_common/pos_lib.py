@@ -1,14 +1,27 @@
 #!/usr/bin/env python2
+# -*- coding: utf-8 -*-
 """
 Position library for DEVINE using openni
+
+
+
 
 ROS Topics
 """
 from __future__ import division  # python 2 float division support
+
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
+
 import rospy
 import tf
 import message_filters
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import PointCloud2, CompressedImage
 from sensor_msgs import point_cloud2
 from geometry_msgs.msg import PoseStamped, PointStamped
 
@@ -21,8 +34,9 @@ CAM_FRAME_OPTICAL = constant('cam_frame_optical')
 IMAGE_DEPTH_TOPIC = topicname('image_depth')
 OBJECT_IMAGE_LOCATION_TOPIC = topicname('guess_location_image')
 OBJECT_WORLD_LOCATION_TOPIC = topicname('guess_location_world')
+SEG_IMAGE_TOPIC = topicname('segmentation_image')
 
-ROS_PUBLISHER = rospy.Publisher(OBJECT_WORLD_LOCATION_TOPIC, PoseStamped, queue_size=10)
+ROS_PUBLISHER = rospy.Publisher(OBJECT_WORLD_LOCATION_TOPIC, PoseStamped, queue_size=1)
 
 
 def plot_openni_3d_data_matrix(data):
@@ -44,12 +58,23 @@ class PosLib(object):
         self.tf_listener = tf.TransformListener()
 
         message_filters.ApproximateTimeSynchronizer([
-            message_filters.Subscriber(obj_pos_topic, PointStamped),
+            message_filters.Subscriber(SEG_IMAGE_TOPIC, CompressedImage),
             message_filters.Subscriber(depth_topic, PointCloud2)
-        ], 1, 0.5).registerCallback(self.do_point_transform)
+        ], 1, 0.5).registerCallback(self._save_point_cloud)
 
-    def do_point_transform(self, position_to_transform, point_cloud):
+        rospy.Subscriber(obj_pos_topic, PointStamped, self.do_point_transform, queue_size=1)
+        self.point_cloud = None
+
+    def _save_point_cloud(self, _, point_cloud):
+        self.point_cloud = point_cloud
+
+    def do_point_transform(self, position_to_transform):
         """ Do the 2d -> 3d transformation if we got the necessary information """
+
+        point_cloud = self.point_cloud
+        if point_cloud is None:
+            rospy.logerr('Error while getting the point cloud')
+            return
 
         rospy.loginfo('Received a new pointcloud and 2D position, image size: %ix%i',
                       point_cloud.width, point_cloud.height)
@@ -69,6 +94,8 @@ class PosLib(object):
         ROS_PUBLISHER.publish(ros_packet)
         rospy.loginfo('Object 3D position calculated: (%.2f, %.2f, %.2f)',
                       pos_xyz[0], pos_xyz[1], pos_xyz[2])
+
+        self.point_cloud = None
 
 
 def main():

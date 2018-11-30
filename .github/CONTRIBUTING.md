@@ -60,25 +60,10 @@ git-pylint-commit-hook --pylintrc PATH_TO_DEVINE_REPO/.pylintrc --limit 8.0 --py
 
 ### Understand Pylint outputs
 
-Once Pylint is done analyzing the **.py** files, it can output 5 different types of messages
-
-
-  * (C) convention, for programming standard violation
-  * (R) refactor, for bad code smell
-  * (W) warning, for python specific problems
-  * (E) error, for much probably bugs in the code
-  * (F) fatal, if an error occurred which prevented pylint from doing
-
-Sometimes the default output for the messages need a bit more info. Lets use this line as an exemple:
-
-```
-"C:  1: Missing docstring (missing-docstring)"
-```
-
 Any time you don't understand a message, you can get more information on it with the **--help-msg** command. Following the exemple line of code above, you can type:
 
 ```
-$ pylint --help-msg=missing-docstring
+$ pylint --help-msg='Insert the message name'
 ```
 
-More on it [here](https://pylint.readthedocs.io/en/latest/tutorial.html)
+More info is avaiable [here](https://pylint.readthedocs.io/en/latest/tutorial.html)

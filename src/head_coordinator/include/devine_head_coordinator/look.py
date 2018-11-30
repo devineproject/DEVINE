@@ -1,4 +1,12 @@
+# -*- coding: utf-8 -*-
 """ Head mover helper library """
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 import rospy
 import actionlib
@@ -14,7 +22,7 @@ class Look(object):
 
     def __init__(self):
         self._human_finder_client = actionlib.SimpleActionClient(
-            'devine_human_finder', LookAtHumanAction)
+            'human_finder', LookAtHumanAction)
         self._human_finder_client.wait_for_server()
         self.humans_count = 0
         self._start_scene_publisher = rospy.Publisher(SCENE_DETECTION_TOPIC, Bool, queue_size=1)

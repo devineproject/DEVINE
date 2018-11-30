@@ -1,0 +1,66 @@
+{
+    "welcome": [
+        "Welcome to the question game DEVINE!",
+        "Oh! Hello there, my name is Johnny Zero",
+        "Hey! You look like a funny human. I'm funny too!"
+    ],
+    "ask_to_play": [
+        "Do you want to play the GuessWhat game with me?",
+        "Wanna play a questions game?",
+        "Do you think you can beat me in a guessing game?",
+        "You bet you can beat me in a questions game?",
+        "My calculations reveals that you are here to play with me. Shall we begin?"
+    ],
+    "asking_the_name": [
+        "What is your name?",
+        "Before we begin, how should I call you?",
+        "How should I refer to you during the game?"
+    ],
+    "confirming_the_name": [
+        "Sounds good, {player_name}.",
+        "All right {player_name}!",
+        "Nice to meet you, {player_name}"
+    ],
+    "instructions": [
+        "So now think about one of the objects on the table, and I will ask you some questions in order to find it.",
+        "Think about one of the objects on the table, and I will try to guess what it is."
+    ],
+    "ready": [
+        "Are you ready to start {player_name}?",
+        "Now, {player_name}, are you ready to start?",
+        "Ready to play?"
+    ],
+    "did_not_understand": [
+       "I am sorry I did not understand what you said. ",
+       "I didn't catch that last thing you said. ",
+       "I didn't quite get that. "
+    ],
+    "say_again": [
+        "Say again. ",
+        "Can you please repeat that? ",
+        "What did you say? "
+     ],
+    "ask_got_it_right": [
+        "Hmmm, I think it's the {object_name}. Did I get it right?"
+    ],
+    "ask_play_again": [
+        "Would you like to play again?",
+        "Do you want to play again with me?",
+        "Would you like to play another game with me?"
+    ],
+    "bye_bye": [
+        "All right {player_name}, good bye.",
+        "All right {player_name}, until next time.",
+        "Thanks for coming by!",
+        "Ok, it was nice to meet you.",
+        "It was nice meeting you! Chow."
+    ],
+    "robot_won": [
+        "YaY! I won!",
+        "I told you that I would win!"
+    ],
+    "robot_lost": [
+        "Awww! You won this time.",
+        "So close! I will win the next one."
+    ]
+}

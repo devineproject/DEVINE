@@ -1,4 +1,12 @@
+# -*- coding: utf-8 -*-
 """ Joints controllers """
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 import rospy
 import actionlib
@@ -22,7 +30,7 @@ class CommandPublisher(object):
     def __init__(self, robot_name, controller_name):
         topic = '/'.join(['', robot_name, controller_name, 'command'])
         self._pub = rospy.Publisher(topic, Float64, queue_size=10)
-        rospy.wait_for_message('/'.join([robot_name, 'joint_states']), JointState)
+        rospy.wait_for_message('/'.join(['', robot_name, 'joint_states']), JointState)
 
     def publish(self, position):
         """ Publish joint position """

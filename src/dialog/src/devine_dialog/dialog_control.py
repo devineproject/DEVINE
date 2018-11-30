@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ Dialog controller of the DEVINE project - Decides when and what to send to the TTS engine """
+__author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
+__copyright__ = "Copyright 2018, DEVINE Project"
+__credits__ = ["Simon Brodeur", "Francois Ferland", "Jean Rouat"]
+__license__ = "BSD"
+__version__ = "1.0.0"
+__email__ = "devine.gegi-request@listes.usherbrooke.ca"
+__status__ = "Production"
 
 import json
 import time
@@ -7,7 +15,7 @@ import random
 from std_msgs.msg import String, Bool
 import rospy
 from devine_dialog.msg import TtsQuery
-from devine_dialog import TTSAnswerType, send_speech
+from devine_dialog import TTSAnswerType, send_speech, load_dialogs
 from devine_config import topicname
 from devine_common import ros_utils
 from devine_head_coordinator.look import Look
@@ -24,16 +32,13 @@ READY_TO_PLAY_PUBLISHER = rospy.Publisher(topicname('player_name'), String, queu
 GUESS_SUCCEEDED = rospy.Publisher(topicname('object_guess_success'), Bool, queue_size=1)
 START_NEW_GAME = rospy.Publisher(topicname('new_game'), Bool, queue_size=1)
 
-CONST_FILE = ros_utils.get_fullpath(__file__, 'dialogs.json')
-
 
 class DialogControl():
     """ Class that control the dialog of the game """
 
     def __init__(self):
-        dialogs_file = open(CONST_FILE)
-        self.dialogs = json.loads(dialogs_file.read())
-        self.can_start = True
+        self.dialogs = load_dialogs()
+        self.is_new_player = True
         self._look = Look()
 
     def send_sentence(self, sentence, answer_type, **format_args):
@@ -56,15 +61,23 @@ class DialogControl():
 
     def loop(self):
         """ When a human is detected, begin the robot/human dialog """
+        object_category_blocker = ros_utils.TopicBlocker(OBJECT_CATEGORY_TOPIC, String)
+        is_pointing_blocker = ros_utils.TopicBlocker(IS_POINTING_OBJECT_TOPIC, Bool)
+        expression_done_blocker = ros_utils.TopicBlocker(EXPRESSION_DONE_TOPIC, Bool)
+
         while not rospy.is_shutdown():
             try:
                 self._look.at_human() # Blocks until a human is found
-                self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
-                answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
-                if not answer == 'yes':
-                    raise DialogControl.HumanDialogInterrupted()
+                if self.is_new_player:
+                    player_name = ''
+                    self.send_sentence('welcome', TTSAnswerType.NO_ANSWER)
+                    answer = self.send_sentence('ask_to_play', TTSAnswerType.YES_NO)
+                    if not answer == 'yes':
+                        raise DialogControl.HumanDialogInterrupted()
 
-                player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
+                    player_name = self.send_sentence('asking_the_name', TTSAnswerType.PLAYER_NAME)
+                    self.send_sentence('confirming_the_name',
+                                       TTSAnswerType.NO_ANSWER, player_name=player_name)
 
                 self.send_sentence('instructions', TTSAnswerType.NO_ANSWER)
                 if not self.wait_for_player('ready', player_name=player_name):
@@ -73,26 +86,35 @@ class DialogControl():
                 self._look.at_scene()
                 READY_TO_PLAY_PUBLISHER.publish(player_name)
 
-                object_found = rospy.wait_for_message(OBJECT_CATEGORY_TOPIC, String).data
+                object_found = object_category_blocker.wait_for_message().data
+                is_pointing_blocker.wait_for_message()
 
-                rospy.wait_for_message(IS_POINTING_OBJECT_TOPIC, Bool)
+                self._look.at_human()
 
-                answer = self.send_sentence('ask_got_it_right', TTSAnswerType.YES_NO, object_name=object_found)
+                answer = self.send_sentence('ask_got_it_right', 
+                                            TTSAnswerType.YES_NO, object_name=object_found)
 
-                GUESS_SUCCEEDED.publish(answer == 'yes')
+                if answer == 'yes':
+                    GUESS_SUCCEEDED.publish(True)
+                    self.send_sentence('robot_won', TTSAnswerType.NO_ANSWER)
+                else:
+                    GUESS_SUCCEEDED.publish(False)
+                    self.send_sentence('robot_lost', TTSAnswerType.NO_ANSWER)
 
-                rospy.wait_for_message(EXPRESSION_DONE_TOPIC, Bool)
+                expression_done_blocker.wait_for_message()
 
                 answer = self.send_sentence('ask_play_again', TTSAnswerType.YES_NO)
                 if answer == 'no':
                     raise DialogControl.HumanDialogInterrupted()
-                START_NEW_GAME.publish(True)
+
+                self.is_new_player = False
 
             except DialogControl.HumanDialogInterrupted:
-                self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER)
-                rospy.sleep(8)  # Sleep while the player leaves
+                self.is_new_player = True
+                self.send_sentence('bye_bye', TTSAnswerType.NO_ANSWER, player_name=player_name)
+                rospy.sleep(8) # Sleep while the player leaves
             finally:
-                self.can_start = True
+                START_NEW_GAME.publish(True)
 
 
 def hook_listeners():
