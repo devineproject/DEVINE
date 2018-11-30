@@ -1,7 +1,7 @@
-.. _ros-segmentation:
+.. _ros-feature-extraction:
 
-Segmentation
-############
+Feature extraction
+##################
 
 Description
 ===========

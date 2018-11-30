@@ -1,6 +1,6 @@
-.. _ros-segmentation:
+.. _ros-depth-mask:
 
-Segmentation
+Depth mask
 ############
 
 Description
