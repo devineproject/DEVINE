@@ -69,7 +69,6 @@ class SnipsRosWrapper(mqtt.Client):
         if 'sessionStarted' in topic:
             self.queries[session_id] = original_query['uid']
         elif 'sessionEnded' in topic:
-            print(payload['termination']['reason'])
             if payload['termination']['reason'] == 'intentNotRecognized':
                 # Snips repeated 3 times the question, and the answer wasn't understood
                 tts_answer = TtsAnswer()
