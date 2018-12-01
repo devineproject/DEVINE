@@ -5,7 +5,7 @@ Snips ROS integration
 
 ROS Topics
 tts_query -> query as TtsQuery input
-tts_answer -> answer as TtsQuery output
+tts_answer -> answer as TtsAnswer output
 """
 __author__ = "Jordan Prince Tremblay, Ismael Balafrej, Felix Labelle, Felix Martel-Denis, Eric Matte, Adam Letourneau, Julien Chouinard-Beaupre, Antoine Mercier-Nicol"
 __copyright__ = "Copyright 2018, DEVINE Project"
@@ -21,12 +21,12 @@ import rospy
 import paho.mqtt.client as mqtt
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery, TtsAnswer
-from devine_dialog import TTSAnswerType, send_speech
+from devine_dialog import TTSAnswerType
 
 # Snips settings
 SNIPS_HOST = 'localhost'
 SNIPS_PORT = 1883
-SNIPS_TOPICS = {
+SNIPS_INTENT = {
     'yes': 'Devine-UdeS:Yes',
     'no': 'Devine-UdeS:No',
     'na': 'Devine-UdeS:NA',
@@ -38,97 +38,107 @@ MQTT_CLIENT = mqtt.Client()
 TTS_QUERY = topicname('tts_query')
 TTS_ANSWER = topicname('tts_answer')
 
-# ROS
-ROS_PUBLISHER = rospy.Publisher(TTS_ANSWER, TtsAnswer, queue_size=10)
 
+class SnipsRosWrapper(mqtt.Client):
+    def __init__(self):
+        self._publisher = rospy.Publisher(TTS_ANSWER, TtsAnswer, queue_size=10)
+        rospy.Subscriber(TTS_QUERY, TtsQuery, self.on_query)
+        rospy.Subscriber(TTS_ANSWER, TtsAnswer, self.on_answer)
+        super(SnipsRosWrapper, self).__init__()
+        self.connect(SNIPS_HOST, SNIPS_PORT)
+        self.queries = {}
 
-def snips_ask_callback(data):
-    """ Callback executed when a question is received from ROS """
-    rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
-    args = {'init': {'text': data.text, 'canBeEnqueued': True},
-            'customData': str(data)}
+    def on_connect(self, _client, _userdata, _flags, _rc):
+        """ Callback executed when snips is connected """
+        rospy.loginfo('Connected to snips at %s:%i', SNIPS_HOST, SNIPS_PORT)
 
-    # Switch to check what kind of data was received
-    if data.answer_type == TTSAnswerType.NO_ANSWER.value:
-        args['init']['type'] = 'notification'
-    elif data.answer_type == TTSAnswerType.YES_NO.value:
-        args['init']['type'] = 'action'
-        args['init']['intentFilter'] = [SNIPS_TOPICS['yes'],
-                                        SNIPS_TOPICS['no'], SNIPS_TOPICS['na']]
-    elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
-        args['init']['type'] = 'action'
-        args['init']['intentFilter'] = [SNIPS_TOPICS['name']]
+        for intent in SNIPS_INTENT.values():
+            rospy.loginfo('Subscribed to intent: %s', intent)
+            self.subscribe('hermes/intent/' + intent)
 
-    MQTT_CLIENT.publish(
-        'hermes/dialogueManager/startSession', json.dumps(args))
+        self.subscribe('hermes/dialogueManager/sessionStarted')
+        self.subscribe('hermes/dialogueManager/sessionEnded')
 
+    def on_message(self, _client, _userdata, msg):
+        """ Callback executed when an mqtt message is received """
+        topic = msg.topic
+        payload = json.loads(msg.payload)
+        session_id = payload['sessionId']
+        original_query = yaml.load(payload['customData'])
 
-def on_snips_connect(*_):
-    """ Callback executed when snips is connected
-    Inputs: client, userdata, flags, connection_result
-    """
-    rospy.loginfo('Connected to snips at %s:%i', SNIPS_HOST, SNIPS_PORT)
-    for topic in SNIPS_TOPICS.values():
-        rospy.loginfo('Subscribe to topic: %s', topic)
-        MQTT_CLIENT.subscribe('hermes/intent/' + topic)
-
-
-# Args: client, userdata, msg
-def on_snips_message(_client, _userdata, msg):
-    """ Callback executed when snips receive an answer """
-    # Parse the json response
-    mqtt_topic = json.loads(msg.payload)
-    intent_name = mqtt_topic['intent']['intentName']
-    intent_probability = mqtt_topic['intent']['probability']
-
-    rospy.loginfo('Detected intent %s with a probability of %f',
-                  intent_name, intent_probability)
-
-    original_query = yaml.load(mqtt_topic['customData'])
-
-    # Get the raw text from the recognition
-    answer = intent_name.split(':')[-1].lower()
-    if intent_name == SNIPS_TOPICS['name']:
-        slots = mqtt_topic['slots']
-        if slots:
-            answer = slots[0]['rawValue']
+        if 'sessionStarted' in topic:
+            self.queries[session_id] = original_query['uid']
+        elif 'sessionEnded' in topic:
+            print(payload['termination']['reason'])
+            if payload['termination']['reason'] == 'intentNotRecognized':
+                # Snips repeated 3 times the question, and the answer wasn't understood
+                tts_answer = TtsAnswer()
+                tts_answer.original_query = TtsQuery(*original_query.values())
+                tts_answer.probability = 0
+                tts_answer.text = ''
+                self._publisher.publish(tts_answer)
+            else:
+                del self.queries[session_id]  # Session ended correctly
         else:
-            answer = ''
+            intent_name = payload['intent']['intentName']
+            intent_probability = payload['intent']['probability']
+            rospy.loginfo('Detected intent %s with a probability of %f',
+                          intent_name, intent_probability)
+            answer = intent_name.split(':')[-1].lower()
+            if intent_name == SNIPS_INTENT['name']:
+                slots = payload['slots']
+                if slots:
+                    answer = slots[0]['rawValue']
+                else:
+                    answer = ''
+            tts_answer = TtsAnswer()
+            tts_answer.original_query = TtsQuery(*original_query.values())
+            tts_answer.probability = intent_probability
+            tts_answer.text = answer
+            self._publisher.publish(tts_answer)
+            self.publish('hermes/dialogueManager/endSession', json.dumps({
+                'sessionId': session_id
+            }))
 
-    tts_answer = TtsAnswer()
-    tts_answer.original_query = TtsQuery(*original_query.values())
-    tts_answer.probability = intent_probability
-    tts_answer.text = answer
+    def on_disconnect(self, _client, _userdata, _rc):
+        rospy.logwarn('Disconnected from snips')
+        self.loop_start()  # Try to connect again
 
-    ROS_PUBLISHER.publish(tts_answer)
+    def on_query(self, data):
+        """ Callback when receiving a query from ros """
+        rospy.loginfo('%s received: %s', rospy.get_name(), data.text)
+        args = {'init': {'text': data.text, 'canBeEnqueued': True},
+                'customData': str(data)}
 
-    MQTT_CLIENT.publish('hermes/dialogueManager/endSession', json.dumps({
-        'sessionId': mqtt_topic['sessionId']
-    }))
+        # Switch to check what kind of data was received
+        if data.answer_type == TTSAnswerType.NO_ANSWER.value:
+            args['init']['type'] = 'notification'
+        elif data.answer_type == TTSAnswerType.YES_NO.value:
+            args['init']['type'] = 'action'
+            args['init']['intentFilter'] = [SNIPS_INTENT['yes'],
+                                            SNIPS_INTENT['no'], SNIPS_INTENT['na']]
+        elif data.answer_type == TTSAnswerType.PLAYER_NAME.value:
+            args['init']['type'] = 'action'
+            args['init']['intentFilter'] = [SNIPS_INTENT['name']]
+
+        self.publish('hermes/dialogueManager/startSession', json.dumps(args))
+
+    def on_answer(self, data):
+        """ If somebody else took care of the answer, delete it from the snips buffer """
+        for i in self.queries:
+            if self.queries[i] == data.original_query.uid:
+                self.publish('hermes/dialogueManager/endSession', json.dumps({
+                    'sessionId': i
+                }))
 
 
-def create_ros_listener():
-    """ Create the ROS listeners """
-    rospy.Subscriber(TTS_QUERY, TtsQuery, snips_ask_callback)
-
-
-def on_snips_disconnect():
-    """ Callback executed when snips is disconnected """
-    rospy.loginfo('Disconnected from snips')
-    MQTT_CLIENT.loop_start()
-
-
-def setup_snips():
-    """ Snips setup function """
-    MQTT_CLIENT.on_connect = on_snips_connect
-    MQTT_CLIENT.on_message = on_snips_message
-    MQTT_CLIENT.on_disconnect = on_snips_disconnect
-    MQTT_CLIENT.connect(SNIPS_HOST, SNIPS_PORT)
+def main():
+    """ Starting point of this file """
+    rospy.init_node('snips')
+    wrapper = SnipsRosWrapper()
+    wrapper.loop_start()
+    rospy.spin()
 
 
 if __name__ == '__main__':
-    rospy.init_node('snips')
-    setup_snips()
-    create_ros_listener()
-    MQTT_CLIENT.loop_start()
-    rospy.spin()
+    main()
