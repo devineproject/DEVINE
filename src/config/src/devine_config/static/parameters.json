@@ -155,6 +155,10 @@
     "eyes": {
       "name": "/jn0/eyes_target",
       "type": "geometry_msgs/Point"
+    },
+    "joystick": {
+      "name": "joy",
+      "type": "sensor_msgs/Joy"
     }
   },
   "constants": {
