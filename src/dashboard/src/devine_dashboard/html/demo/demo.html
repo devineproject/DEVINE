@@ -1,0 +1,13 @@
+{% import 'demo/macros/camera_feed.html' as camera_macro %}
+
+<div class="row">
+    <div class="col-sm-2">
+        {% include 'dashboard/console.html' %}
+    </div>
+    <div class="col-sm-5">
+        {{ camera_macro.camera('Live feed', 'live_feed') }}
+    </div>
+    <div class="col-sm-5">
+        {{ camera_macro.camera('Objects segmentation', 'segmentation_feed') }}
+    </div>
+</div>

@@ -1,6 +1,6 @@
-import ROSLIB from "roslib";
 import $ from "jquery";
 import dashboard from "./dashboard/dashboard";
+import demo from "./demo/demo";
 import scoreboard from "./scoreboard/scoreboard";
 
 try {
@@ -17,9 +17,13 @@ $.getJSON("/topics", function(topics) {
     case "scoreboard":
       scoreboard(topics);
       break;
-    case "index": //Passthrough as default
-    default:
+    case "debug":
       dashboard(topics);
+      break;
+    case "index": //Passthrough as default
+    case "demo":
+    default:
+      demo(topics);
       break;
   }
 });

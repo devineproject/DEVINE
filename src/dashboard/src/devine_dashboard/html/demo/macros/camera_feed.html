@@ -1,0 +1,12 @@
+{% macro camera(title, id) -%}
+
+<div class="card mb-3 border-info">
+  <h3 class="card-header">
+    <span>{{ title }}</span>
+  </h3>
+  
+  <canvas id="{{ id }}" style="max-width:none" width="640" height="480"></canvas>
+
+</div>
+
+{%- endmacro %}

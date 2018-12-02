@@ -12,7 +12,9 @@
 
 <body>
   <div class="container-fluid">
-    {% if path == "index" %}
+    {% if path == "index" or path == "demo" %}
+      {% include 'demo/demo.html' %} 
+    {% elif path == "debug" %}
       {% include 'dashboard/dashboard.html' %} 
     {% elif path == "scoreboard" %}
       {% include 'scoreboard/scoreboard.html' %} 
