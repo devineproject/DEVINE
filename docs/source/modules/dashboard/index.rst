@@ -26,21 +26,12 @@ The process will listen and update whenever there is a change in the code.
 Manual installation
 ============
 
-1. Install dependencies
-
 .. code-block:: bash
 
     sudo npm i -g webpack
     npm install
     pip3 install -r requirements.txt
     sudo apt-get install ros-kinetic-rosbridge-server
-
-2. Launch
-
-.. code-block:: bash
-
-    roslaunch rosbridge_server rosbridge_websocket.launch
-    npm run start
 
 
 Adding a view
