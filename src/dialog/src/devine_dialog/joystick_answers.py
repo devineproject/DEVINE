@@ -13,6 +13,22 @@ JOYSTICK_TOPIC = topicname('joystick')
 TTS_QUERY_TOPIC = topicname('tts_query')
 TTS_ANSWER_TOPIC = topicname('tts_answer')
 
+# See http://wiki.ros.org/joy
+LOGITECH_JOYSTICK_BTN_MAP = {
+    'X': 0,
+    'A': 1,
+    'B': 2,
+    'Y': 3,
+    'LB': 4,
+    'RB': 5,
+    'LT': 6,
+    'RT': 7,
+    'back': 8,
+    'start': 9,
+    'LStick': 10,
+    'RStick': 11,
+}
+
 class JoystickTTSAnswerer(object):
     def __init__(self):
         rospy.init_node('JoystickTTSAnswerer')
@@ -32,16 +48,14 @@ class JoystickTTSAnswerer(object):
 
     def _on_joystick_msg(self, data):
         if self.current_query is not None:
-            a_btn = data.buttons[1]
-            b_btn = data.buttons[2]
-            y_btn = data.buttons[3]
             answer = None
-            if a_btn == 1:
+            if data.buttons[LOGITECH_JOYSTICK_BTN_MAP['A']] == 1:
                 answer = 'yes'
-            elif b_btn == 1:
+            elif data.buttons[LOGITECH_JOYSTICK_BTN_MAP['B']] == 1:
                 answer = 'no'
-            elif y_btn == 1:
+            elif data.buttons[LOGITECH_JOYSTICK_BTN_MAP['Y']] == 1:
                 answer = 'na'
+
             if answer is not None:
                 msg = TtsAnswer()
                 msg.original_query.uid = self.current_query
