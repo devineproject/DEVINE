@@ -7,8 +7,13 @@ const ANSWER_TYPES = {
   PLAYER_NAME: 2
 };
 
-/** Control how the dialog will be shown on the demo page */
 export default class QueriesAndAnswers {
+  /**
+   * Control how the dialog will be shown on the demo page.
+   * @param {dict} devineTopics - The list of ros topics.
+   * @param {func} queryCallback - Callback when a query is received.
+   * @param {func} answerCallBack - Callback when an answer is received.
+   */
   constructor(devineTopics, queryCallback, answerCallBack) {
     this.topics = {
       ttsQuery: new RosTopic(devineTopics.tts_query),
@@ -23,7 +28,11 @@ export default class QueriesAndAnswers {
     this.answerCallBack = answerCallBack;
   }
 
-  /** Return true if query is answered */
+  /**
+   * Control how the dialog will be shown on the demo page.
+   * @param {string} text - The text to send.
+   * @return {boolean} True if query is answered.
+   */
   publishAnswer(text) {
     if (text === "") {
       return false;
@@ -51,6 +60,10 @@ export default class QueriesAndAnswers {
     return query_answered;
   }
 
+  /**
+   * Callback when a query message is received.
+   * @param {object} message - The reply.
+   */
   onQueryReceived(message) {
     if (message.answer_type !== ANSWER_TYPES.NO_ANSWER) {
       this.queries.push(message);
@@ -58,6 +71,10 @@ export default class QueriesAndAnswers {
     this.queryCallback(message);
   }
 
+  /**
+   * Callback when a answer message is received.
+   * @param {object} message - The reply.
+   */
   onAnswerReceived(message) {
     let isQueryAnswered = false;
     for (let i in this.queries) {
@@ -67,7 +84,6 @@ export default class QueriesAndAnswers {
         break;
       }
     }
-
     this.answerCallBack(message, isQueryAnswered);
   }
 }

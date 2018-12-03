@@ -16,6 +16,7 @@ export default class Dialog {
     this.setupShortcutKeys();
   }
 
+  /** Hook to html elements for user's answer shortcuts. */
   setupShortcutKeys() {
     const sendYes = () => this.queriesAndAnswers.publishAnswer("yes");
     const sendNo = () => this.queriesAndAnswers.publishAnswer("no");
@@ -48,20 +49,37 @@ export default class Dialog {
     });
   }
 
+  /**
+   * Callback when a query message is received.
+   * @param {object} message - The reply.
+   */
   onQuery(message) {
     this.devineCons.log(message.text);
   }
 
+  /**
+   * Callback when a answer message is received.
+   * @param {object} message - The reply.
+   * @param {boolean} isQueryAnswered - Indicate if this reply has answered a query.
+   */
   onAnswer(message, isQueryAnswered) {
     this.playerCons.log(isQueryAnswered
       ? message.text
       : `Message without any query: ${message.text}`);
   }
 
+  /**
+   * Callback when a guess category message is received.
+   * @param {object} message - The reply.
+   */
   onGuessCategory(message) {
     this.devineCons.log(`Game ended! Found the ${message.data}.`);
   }
 
+  /**
+   * Callback when a guesswhat status message is received.
+   * @param {object} message - The reply.
+   */
   onGuessWhatStatus(message) {
     this.devineCons.log(`GuessWhat state: ${message.data}`);
   }
