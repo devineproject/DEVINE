@@ -2,6 +2,7 @@ import { RosTopic } from "./ros";
 import { distinctColors } from "../vars/colors";
 import $ from "jquery";
 
+/** @see CocoPairs in tf_pose/common.py */
 const BODY_PARTS = {
   EYES: {
     LEFT: 15,
@@ -274,8 +275,6 @@ export default class CanvasDrawer {
    * Map body part with one another (e.g.: ear with eye).
    * Adaptation and refactor of function draw_humans in tf_pose/estimator.py
    * @param {array} humans - The list of humans detected.
-   *
-   * @see CocoPairs in tf_pose/common.py
    */
   _drawBodyTracking(humans) {
     for (let i in humans) {

@@ -25,7 +25,7 @@ export default function CreateDemo(devineTopics) {
 
     let seconds = 3;
     countdown = setInterval(() => {
-      if (seconds === 0) {
+      if (seconds <= 0) {
         reconnectToRos();
         clearInterval(countdown);
       }

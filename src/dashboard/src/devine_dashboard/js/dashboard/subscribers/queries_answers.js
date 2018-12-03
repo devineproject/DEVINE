@@ -55,6 +55,7 @@ export default class QueriesAndAnswers {
       
       query.answered = true;
       query_answered = true;
+      break;
     }
 
     return query_answered;

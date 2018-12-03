@@ -18,7 +18,7 @@ export class RosTopic extends ROSLIB.Topic {
   }
 }
 
-/** Try to reconnecto to ROS */
+/** Try to reconnect to ROS */
 export function reconnectToRos() {
   ros.connect(rosUrl);
   btnReconnect.hide();
