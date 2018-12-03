@@ -1,6 +1,7 @@
 import $ from "jquery";
 import Dialog from "./dialog";
 import CanvasDrawer from "../dashboard/canvas_drawer";
+import { ros, reconnectToRos } from "../dashboard/ros";
 
 /**
  * Generate the demo dashboard.
@@ -15,5 +16,27 @@ export default function CreateDemo(devineTopics) {
   
     live_feed.changeImageSource('image_raw');
     segmentation_feed.changeImageSource('segmentation_image');
+  });
+
+  let countdown;
+  function tryAutomaticReconnect() {
+    $('#reconnection-modal').modal({ backdrop: 'static'});
+
+    let seconds = 3;
+    countdown = setInterval(() => {
+      if (seconds === 0) {
+        reconnectToRos();
+        clearInterval(countdown);
+      }
+
+      $('#connection-timeout').text(seconds);
+      seconds--;
+    }, 1000);
+  }
+
+  ros.on("close", () => tryAutomaticReconnect());
+  ros.on("connection", () => {
+    clearInterval(countdown);
+    $('#reconnection-modal').modal('hide');
   });
 }
