@@ -19,6 +19,7 @@ export default function CreateDemo(devineTopics) {
   });
 
   let countdown;
+  /** On connection lost, try to reconnect each 3 seconds. */
   function tryAutomaticReconnect() {
     $('#reconnection-modal').modal({ backdrop: 'static'});
 

@@ -1,4 +1,4 @@
-{% macro console(title='Console', showReconnectButton=true) -%}
+{% macro console(title='Console', showReconnectButton=true, showDialogInputs=false) -%}
 
 <div class="console card border-success mb-3">
     <h3 class="card-header">
@@ -9,10 +9,31 @@
         {% if showReconnectButton %}
         <button id="reconnect_to_ros" type="button" class="btn btn-primary float-right" style="display: none;">Reconnect</button>
         {% endif %}
+        
+        {% if showDialogInputs %}
+        {{ dialogInputs() }}
+        {% endif %}
     </h3>
 
     <div class="card-body no-padding">
         <pre id="console" class="mb-0 with-padding"></pre>
+    </div>
+</div>
+
+{%- endmacro %}
+
+
+{% macro dialogInputs() -%}
+
+<div class="input-group dialog-inputs float-right">
+    <div class="input-group-prepend">
+        <div class="input-group-text">Answer</div>
+    </div>
+    <input id="dialog_answer" placeholder="name" type="text" class="form-control" style="border: none;">
+    <div class="input-group-append">
+        <button id="dialog_publish" type="button" class="btn btn-primary">Send</button>
+        <button id="dialog_publish_yes" type="button" class="btn btn-info">Yes</button>
+        <button id="dialog_publish_no" type="button" class="btn btn-warning">No</button>
     </div>
 </div>
 

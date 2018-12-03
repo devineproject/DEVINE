@@ -88,6 +88,18 @@ body > div {
   height: calc(100% - 32px);
   border-color: #F39C12 !important;
 }
+.demo .dialog .console .card-body {
+  position: relative;
+}
+.demo .dialog #console {
+  max-width: none;
+  height: 100%;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+}
 
 .demo {
   height: calc(100vh - 1.2rem);
@@ -98,4 +110,17 @@ body > div {
   grid-template-areas:
     "live   seg"
     "dialog dialog";
+}
+
+.dialog-inputs {
+  width: 400px;
+  margin-right: 16px;
+  padding: 0 !important;
+  height: 31px;
+}
+.dialog-inputs .input-group-text {
+  background-color: #303030;
+}
+.dialog-inputs button {
+  line-height: 1;
 }

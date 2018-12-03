@@ -15,8 +15,8 @@ export default class QueriesAndAnswers {
       ttsAnswer: new RosTopic(devineTopics.tts_answer)
     };
 
-    this.topics.ttsQuery.subscribe(this.onQueryReceived);
-    this.topics.ttsAnswer.subscribe(this.onAnswerReceived);
+    this.topics.ttsQuery.subscribe(m => this.onQueryReceived(m));
+    this.topics.ttsAnswer.subscribe(m => this.onAnswerReceived(m));
 
     this.queries = [];
     this.queryCallback = queryCallback;
