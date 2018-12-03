@@ -1,5 +1,5 @@
-import { RosTopic } from "../ros";
-import { distinctColors } from "../../vars/colors";
+import { RosTopic } from "./ros";
+import { distinctColors } from "../vars/colors";
 import $ from "jquery";
 
 const BODY_PARTS = {
@@ -29,7 +29,17 @@ const BODY_PARTS = {
 };
 
 export default class CanvasDrawer {
-  constructor(devineTopics, canvasId) {
+  /**
+   * Class who draws over a selected canvas element.
+   * @param {dict} devineTopics - The list of ros topics.
+   * @param {string} canvasId - The html element canvas id.
+   * @param {func|undefined} updatePositionsCallback - Object found callback.
+   * @param {func|undefined} updateDelayLengthCallback - Current delay lenght callback.
+   */
+  constructor(devineTopics, canvasId, updatePositionsCallback=undefined, updateDelayLengthCallback=undefined) {
+    this.updatePositionsCallback = updatePositionsCallback;
+    this.updateDelayLengthCallback = updateDelayLengthCallback;
+
     this.topics = {
       image_raw: new RosTopic(devineTopics.compressed_image),
       segmentation_image: new RosTopic(devineTopics.segmentation_image),
@@ -44,17 +54,86 @@ export default class CanvasDrawer {
 
     this.canvas = this._getCanvas(canvasId);
     this.canvasSize = { x: 640, y: 480 };
-    this.drawNoFeed();
+    this._drawNoFeed();
     
     this.history = this._initHistoryBuffers();
     this.changeImageSource('image_raw');
 
-    /** Special case, reset confidence each game */
-    this.topics.segmentation.subscribe(function(confidence, _) {
-      confidence.length = 0;
-    }.bind(this, this.history.buffers.confidence));
+    this._initConfidenceReset();
   }
 
+  /** Draw current image on canvas */
+  draw() {
+    // TODO: const draw = throttle(function draw() {}, 100);
+    let currentImage = this._getCurrentHistoryElement(this.history.image);
+    let stamp = currentImage ? currentImage.header.stamp : null;
+    let obj_pos_2d = this._getCurrentHistoryElement(this.history.buffers.object_position_2d, stamp);
+    let obj_pos_3d = this._getCurrentHistoryElement(this.history.buffers.object_position_3d, stamp);
+    let body_tracking = this._getCurrentHistoryElement(this.history.buffers.body_tracking);
+    let confidence = this.history.position == 1 ? this._getCurrentHistoryElement(this.history.buffers.confidence) : undefined;
+    let segmentation = this._getCurrentHistoryElement(this.history.buffers.segmentation, stamp);
+    
+    if (this.updatePositionsCallback) {
+      this.updatePositionsCallback(obj_pos_2d, obj_pos_3d);
+    }
+
+    if (currentImage != undefined) {
+      if (this.updateDelayLengthCallback) {
+        this.updateDelayLengthCallback(this.history.image.length);
+      }
+
+      let imageObject = new Image();
+      imageObject.onload = () => {
+        this._resetCanvas(imageObject);
+
+        if (obj_pos_2d != undefined) {
+          this._drawPositionFound(obj_pos_2d.point.x, this.canvasSize.y - obj_pos_2d.point.y);
+        }
+
+        if (segmentation != undefined) {
+          this._drawObjectsRectangles(segmentation.objects, confidence ? confidence.data : undefined);
+        }
+
+        if (body_tracking != undefined) {
+          this._drawBodyTracking(JSON.parse(body_tracking.data));
+        }
+      };
+      imageObject.src = "data:image/" + currentImage.format + ";base64, " + currentImage.data;
+    }
+  }
+
+  /**
+   * Change the history position.
+   * @param {number} position - The new position.
+   */
+  setHistoryPosition(position) {
+    this.history.position = position;
+    this.draw();
+  }
+
+  /**
+   * Switch camera image source.
+   * @param {string} newSource - The image source to use.
+   */
+  changeImageSource(newSource) {
+    switch (newSource) {
+      case 'segmentation_image':
+      case 'body_tracking_image':
+      case 'zone_detection_image':
+      case 'image_raw':
+        this.history.image = this.history.buffers[newSource];
+        break;
+      default:
+        this.history.image = this.history.buffers['image_raw'];
+        break;
+    }
+  }
+  
+  /**
+   * Retreive the selected canvas html element.
+   * @param {number} id - The canvas id.
+   * @return {object} The element.
+   */
   _getCanvas(id) {
     const canvas = $(id)[0];
     if (!canvas) {
@@ -64,8 +143,11 @@ export default class CanvasDrawer {
     }
   }
 
+  /** 
+   * Subscribe all buffers to every topics
+   * @return {object} The initialized history.
+   */
   _initHistoryBuffers() {
-    /* Subscribe to every topics */
     let buffers = {};
     Object.keys(this.topics).forEach(topic => {
       if (buffers[topic] === undefined) {
@@ -79,6 +161,13 @@ export default class CanvasDrawer {
       image: [],
       buffers: buffers
     };
+  }
+
+  /** Special case, reset confidence each game */
+  _initConfidenceReset() {
+    this.topics.segmentation.subscribe(function(confidence, _) {
+      confidence.length = 0;
+    }.bind(this, this.history.buffers.confidence));
   }
 
   /**
@@ -95,26 +184,11 @@ export default class CanvasDrawer {
     this.draw();
   }
 
-  changeImageSource(newSource) {
-    switch (newSource) {
-      case 'segmentation_image':
-      case 'body_tracking_image':
-      case 'zone_detection_image':
-      case 'image_raw':
-        this.imageSource = newSource;
-        break;
-      default:
-        this.imageSource = 'image_raw';
-        break;
-    }
-    this.history.image = this.history.buffers[this.imageSource];
-  }
-
   /**
    * Set the image canvas color brush for further drawing.
    * @param {string} color - The new color.
    */
-  setColor(color) {
+  _setColor(color) {
     if (color) {
       this.canvas.strokeStyle = color;
       this.canvas.fillStyle = color;
@@ -122,8 +196,8 @@ export default class CanvasDrawer {
   }
 
   /** Draw an old-school style ne camera feed warning */
-  drawNoFeed() {
-    this.setColor("red");
+  _drawNoFeed() {
+    this._setColor("red");
     this.canvas.font = "bold 20pt Arial";
     this.canvas.fillText("< No Camera Feed />", 190, this.canvasSize.y / 2);
   }
@@ -133,8 +207,8 @@ export default class CanvasDrawer {
    * @param {int} x - X coordinate.
    * @param {int} y - Y coordinate.
    */
-  drawPositionFound(x, y) {
-    this.setColor("#3498DB");
+  _drawPositionFound(x, y) {
+    this._setColor("#3498DB");
     this.canvas.fillText("Found!", x + 8, y - 8);
     this.canvas.fillRect(x - 3, y - 3, 6, 6);
     this.canvas.fillRect(x - 20, y - 1, 40, 2);
@@ -146,9 +220,9 @@ export default class CanvasDrawer {
    * @param {array} objects - The list of objects.
    * @param {int|undefined} confidence - The confidence value, if an object was found.
    */
-  drawObjectsRectangles(objects, confidence) {
+  _drawObjectsRectangles(objects, confidence) {
     for (var i = 0; i < objects.length; i++) {
-      this.setColor(distinctColors[i % 14]);
+      this._setColor(distinctColors[i % 14]);
 
       this.canvas.beginPath();
       let {x_offset, y_offset, height, width} = objects[i].bounding_box;
@@ -172,7 +246,7 @@ export default class CanvasDrawer {
    * Clear the canvas and reset the image.
    * @param {object} imageObject - The image data.
    */
-  resetCanvas(imageObject) {
+  _resetCanvas(imageObject) {
     this.canvas.clearRect(0, 0, this.canvasSize.x, this.canvasSize.y);
     this.canvas.drawImage(imageObject, 0, 0);
     this.canvas.font = "bold 12pt Arial";
@@ -184,7 +258,7 @@ export default class CanvasDrawer {
    * @param {array} historyArray - The array to take the element from.
    * @return {object} The element.
    */
-  getCurrentHistoryElement(historyArray, stamp=null) {
+  _getCurrentHistoryElement(historyArray, stamp=null) {
     if (!stamp) {
       // Return latest element if there is no stamp
       return historyArray[historyArray.length - this.history.position];
@@ -196,11 +270,6 @@ export default class CanvasDrawer {
     }
   }
 
-  setHistoryPosition(position) {
-    this.history.position = position;
-    this.draw();
-  }
-
   /**
    * Map body part with one another (e.g.: ear with eye).
    * Adaptation and refactor of function draw_humans in tf_pose/estimator.py
@@ -208,7 +277,7 @@ export default class CanvasDrawer {
    *
    * @see CocoPairs in tf_pose/common.py
    */
-  drawBodyTracking(humans) {
+  _drawBodyTracking(humans) {
     for (let i in humans) {
       let centers = {};
 
@@ -227,7 +296,7 @@ export default class CanvasDrawer {
         if (!centers[pair[0]] || !centers[pair[1]]) {
           continue;
         }
-        this.setColor(distinctColors[j % 14]);
+        this._setColor(distinctColors[j % 14]);
         this.canvas.beginPath();
         this.canvas.moveTo(centers[pair[0]].x, centers[pair[0]].y);
         this.canvas.lineTo(centers[pair[1]].x, centers[pair[1]].y);
@@ -245,40 +314,6 @@ export default class CanvasDrawer {
 
       drawEye(BODY_PARTS.EYES.LEFT);
       drawEye(BODY_PARTS.EYES.RIGHT);
-    }
-  }
-
-  draw() {
-    let currentImage = this.getCurrentHistoryElement(this.history.image);
-    let stamp = currentImage ? currentImage.header.stamp : null;
-    let obj_pos_2d = this.getCurrentHistoryElement(this.history.buffers.object_position_2d, stamp);
-    // let obj_pos_3d = this.getCurrentHistoryElement(this.history.buffers.object_position_3d, stamp);
-    let body_tracking = this.getCurrentHistoryElement(this.history.buffers.body_tracking);
-    let confidence = this.history.position == 1 ? this.getCurrentHistoryElement(this.history.buffers.confidence) : undefined;
-    let segmentation = this.getCurrentHistoryElement(this.history.buffers.segmentation, stamp);
-    
-    // this.writePositions(obj_pos_2d, obj_pos_3d);
-
-    if (currentImage != undefined) {
-      // delay.prop("max", this.history.image.length);
-      let imageObject = new Image();
-
-      imageObject.onload = () => {
-        this.resetCanvas(imageObject);
-
-        if (obj_pos_2d != undefined) {
-          this.drawPositionFound(obj_pos_2d.point.x, this.canvasSize.y - obj_pos_2d.point.y);
-        }
-
-        if (segmentation != undefined) {
-          this.drawObjectsRectangles(segmentation.objects, confidence ? confidence.data : undefined);
-        }
-
-        if (body_tracking != undefined) {
-          this.drawBodyTracking(JSON.parse(body_tracking.data));
-        }
-      };
-      imageObject.src = "data:image/" + currentImage.format + ";base64, " + currentImage.data;
     }
   }
 }
