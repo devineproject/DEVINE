@@ -13,26 +13,12 @@ body > div {
   color: #fff !important;
 }
 
-#console {
-  overflow-x: auto;
-  height: 630px;
-  max-width: 500px;
-  background-color: transparent;
-  border: none;
-  color: white;
-  white-space: normal;
-}
-
 .card {
   margin-top: 16px;
 }
 
 .card-header {
   color: white;
-}
-
-#kinect_image {
-  background-color: grey;
 }
 
 .custom-checkbox {
@@ -55,7 +41,7 @@ body > div {
   z-index: 0 !important;
 }
 
-.card .console .float-right {
+.console .card-header .float-right {
   padding-top: 3px;
   padding-bottom: 3px;
 }
@@ -66,4 +52,21 @@ body > div {
 
 .with-padding {
   padding: 1.25rem;
+}
+
+.dashboard #console {
+  height: 630px;
+}
+
+#console {
+  overflow-x: auto;
+  max-width: 500px;
+  background-color: transparent;
+  border: none;
+  color: white;
+  white-space: normal;
+}
+
+.camera canvas {
+  background-color: grey;
 }

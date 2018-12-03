@@ -13,15 +13,15 @@ try {
 }
 
 $.getJSON("/topics", function(topics) {
-  switch (window.route) {
-    case "scoreboard":
+  switch (window.location.pathname) {
+    case "/scoreboard":
       scoreboard(topics);
       break;
-    case "debug":
+    case "/debug":
       dashboard(topics);
       break;
-    case "index": //Passthrough as default
-    case "demo":
+    case "/": //Passthrough as default
+    case "/demo":
     default:
       demo(topics);
       break;

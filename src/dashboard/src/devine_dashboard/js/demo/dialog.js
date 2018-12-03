@@ -11,6 +11,20 @@ export default class Dialog {
 
     this.devineCons = new LogConsole("DEVINE", "#F39C12");
     this.playerCons = new LogConsole("Player", "#00BC8C");
+
+    this.setupShortcutKeys();
+  }
+
+  setupShortcutKeys() {
+    document.onkeypress = event => {
+      if (event.keyCode === 121) {
+        // Y key pressed
+        this.queriesAndAnswers.publishAnswer("yes");
+      } else if (event.keyCode === 110) {
+        // N key pressed
+        this.queriesAndAnswers.publishAnswer("no");
+      }
+    };
   }
 
   onQuery(message) {

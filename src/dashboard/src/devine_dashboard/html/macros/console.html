@@ -1,10 +1,19 @@
-<div class="card border-success mb-3">
-    <h3 class="card-header console">
-        Console
+{% macro console(title='Console', showReconnectButton=true) -%}
+
+<div class="console card border-success mb-3">
+    <h3 class="card-header">
+        {{ title }}
+
         <button id="clear_console" type="button" class="btn btn-secondary float-right">Clear</button>
+        
+        {% if showReconnectButton %}
         <button id="reconnect_to_ros" type="button" class="btn btn-primary float-right" style="display: none;">Reconnect</button>
+        {% endif %}
     </h3>
+
     <div class="card-body no-padding">
         <pre id="console" class="mb-0 with-padding"></pre>
     </div>
 </div>
+
+{%- endmacro %}

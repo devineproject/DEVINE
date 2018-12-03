@@ -1,13 +1,14 @@
-{% import 'demo/macros/camera_feed.html' as camera_macro %}
+{% import 'macros/camera_feed.html' as camera_macro %}
+{% import 'macros/console.html' as console_macro %}
 
 <div class="row">
-    <div class="col-sm-2">
-        {% include 'dashboard/console.html' %}
-    </div>
-    <div class="col-sm-5">
+    <div class="col-sm-6">
         {{ camera_macro.camera('Live feed', 'live_feed') }}
     </div>
-    <div class="col-sm-5">
+    <div class="col-sm-6">
         {{ camera_macro.camera('Objects segmentation', 'segmentation_feed') }}
+    </div>
+    <div class="col-sm-12">
+        {{ console_macro.console('Dialog', false) }}
     </div>
 </div>
