@@ -42,7 +42,7 @@ export default function InitKinectModule(devineTopics) {
     if (history[topic] === undefined) {
       history[topic] = [];
     }
-    subscribeAndBind(topics[topic], history[topic]);
+    topics[topic].subscribe(handleTopicData.bind(this, history[topic]));
   });
 
   /** Special case, reset confidence each game */
@@ -284,16 +284,6 @@ export default function InitKinectModule(devineTopics) {
         image.stroke();
       }
     }
-  }
-
-
-  /**
-   * Subscribe to a given topic and hook the callback.
-   * @param {Topic} topic - The topic.
-   * @param {array} historyArray - The history array to use in the callback.
-   */
-  function subscribeAndBind(topic, historyArray) {
-    topic.subscribe(handleTopicData.bind(this, historyArray));
   }
 
   /**
