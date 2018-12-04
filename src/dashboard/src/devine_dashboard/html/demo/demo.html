@@ -1,0 +1,27 @@
+{% import 'macros/camera_feed.html' as camera_macro %}
+{% import 'macros/console.html' as console_macro %}
+
+<div class="demo">
+    <div class="modal fade" id="reconnection-modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Connection to ROS lost</h5>
+            </div>
+            <div class="modal-body">
+                Trying to reconnect in <b><span id="connection-timeout"></span></b> sec...
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="live-feed">
+        {{ camera_macro.camera('Live feed', 'live_feed') }}
+    </div>
+    <div class="segmentation">
+        {{ camera_macro.camera('Objects segmentation', 'segmentation_feed') }}
+    </div>
+    <div class="dialog">
+        {{ console_macro.console('Dialog', false, true) }}
+    </div>
+</div>
