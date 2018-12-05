@@ -70,6 +70,9 @@ body > div {
 .camera canvas {
   background-color: grey;
 }
+.demo .camera canvas {
+  width: 100%;
+}
 
 
 .demo .live-feed {
@@ -102,10 +105,12 @@ body > div {
 }
 
 .demo {
+  padding-left: 6%;
+  padding-right: 6%;
   height: calc(100vh - 1.2rem);
   display: grid;
   grid-column-gap: 32px;
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "live   seg"
