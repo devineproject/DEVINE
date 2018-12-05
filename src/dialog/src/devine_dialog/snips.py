@@ -22,6 +22,7 @@ import paho.mqtt.client as mqtt
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery, TtsAnswer
 from devine_dialog import TTSAnswerType
+from threading import Lock
 
 # Snips settings
 SNIPS_HOST = 'localhost'
@@ -47,6 +48,7 @@ class SnipsRosWrapper(mqtt.Client):
         super(SnipsRosWrapper, self).__init__()
         self.connect(SNIPS_HOST, SNIPS_PORT)
         self.queries = {}
+        self.query_mutex = Lock()
 
     def on_connect(self, _client, _userdata, _flags, _rc):
         """ Callback executed when snips is connected """
@@ -67,7 +69,9 @@ class SnipsRosWrapper(mqtt.Client):
         original_query = yaml.load(payload['customData'])
 
         if 'sessionStarted' in topic:
+            self.query_mutex.acquire()
             self.queries[session_id] = original_query['uid']
+            self.query_mutex.release()
         elif 'sessionEnded' in topic:
             if payload['termination']['reason'] == 'intentNotRecognized':
                 # Snips repeated 3 times the question, and the answer wasn't understood
@@ -77,7 +81,9 @@ class SnipsRosWrapper(mqtt.Client):
                 tts_answer.text = ''
                 self._publisher.publish(tts_answer)
             else:
+                self.query_mutex.acquire()
                 del self.queries[session_id]  # Session ended correctly
+                self.query_mutex.release()
         else:
             intent_name = payload['intent']['intentName']
             intent_probability = payload['intent']['probability']
@@ -124,11 +130,13 @@ class SnipsRosWrapper(mqtt.Client):
 
     def on_answer(self, data):
         """ If somebody else took care of the answer, delete it from the snips buffer """
+        self.query_mutex.acquire()
         for i in self.queries:
             if self.queries[i] == data.original_query.uid:
                 self.publish('hermes/dialogueManager/endSession', json.dumps({
                     'sessionId': i
                 }))
+        self.query_mutex.release()
 
 
 def main():
