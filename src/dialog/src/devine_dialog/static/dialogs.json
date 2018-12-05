@@ -28,8 +28,7 @@
     "ready": [
         "Are you ready to start {player_name}?",
         "Now, {player_name}, are you ready to start?",
-        "Ready to play?",
-        "All set {player_name}?"
+        "Ready to play?"
     ],
     "did_not_understand": [
        "I am sorry I did not understand what you said. ",
@@ -42,31 +41,26 @@
         "What did you say? "
      ],
     "ask_got_it_right": [
-        "Hmmm, I think it's the {object_name}. Did I get it right?",
-        "Tough one! My guess is that it is the {object_name}. Am I right {player_name}?",
-        "I am pretty sure your object is the {object_name}. Can you confirm?"
+        "Hmmm, I think it's the {object_name}. Did I get it right?"
     ],
     "ask_play_again": [
-        "Would you like to play again {player_name}?",
+        "Would you like to play again?",
         "Do you want to play again with me?",
-        "Would you like to play another game with me?",
-        "How about another round?"
+        "Would you like to play another game with me?"
     ],
     "bye_bye": [
-        "All right {player_name}, thank you for playing with me.",
-        "Until next time!",
+        "All right {player_name}, good bye.",
+        "All right {player_name}, until next time.",
         "Thanks for coming by!",
         "Ok, it was nice to meet you.",
-        "It was nice meeting you {player_name}! Chow."
+        "It was nice meeting you! Chow."
     ],
     "robot_won": [
-        "Hurray! I won!",
-        "I told you that I would win!",
-        "Yay! I am almost unbeatable at this!"
+        "YaY! I won!",
+        "I told you that I would win!"
     ],
     "robot_lost": [
         "Awww! You won this time.",
-        "So close! I will win the next one.",
-        "You were lucky! I will get you next time."
+        "So close! I will win the next one."
     ]
 }
