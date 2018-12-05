@@ -16,6 +16,11 @@ export default function CreateDemo(devineTopics) {
   
     live_feed.changeImageSource('image_raw');
     segmentation_feed.changeImageSource('segmentation_image');
+
+    $(window).resize(function(){
+      const aspectRatio = 480 / 640;
+      $('.camera canvas').height($('.camera canvas').width() * aspectRatio);
+   });
   });
 
   let countdown;
