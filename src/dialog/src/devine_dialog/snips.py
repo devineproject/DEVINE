@@ -22,7 +22,7 @@ import paho.mqtt.client as mqtt
 from devine_config import topicname
 from devine_dialog.msg import TtsQuery, TtsAnswer
 from devine_dialog import TTSAnswerType
-from threading import Lock
+from threading import RLock
 
 # Snips settings
 SNIPS_HOST = 'localhost'
@@ -48,7 +48,7 @@ class SnipsRosWrapper(mqtt.Client):
         super(SnipsRosWrapper, self).__init__()
         self.connect(SNIPS_HOST, SNIPS_PORT)
         self.queries = {}
-        self.query_mutex = Lock()
+        self.query_mutex = RLock()
 
     def on_connect(self, _client, _userdata, _flags, _rc):
         """ Callback executed when snips is connected """
