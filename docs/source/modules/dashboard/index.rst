@@ -8,10 +8,23 @@ The dashboard is a web based project where we integrate all of the ROS nodes and
 You can subscribe to any ROS topic and see what is being send on any topic and you can also send information to them.
 It's main goal is to allow us to verify that the whole DEVINE system works in harmony.
 
-Installation
-============
+It can also be used to demo the project.
 
-1. Install dependencies
+
+Usage
+=====
+
+Once the project is installed on your machine, you can simply launch the dashboard like so:
+
+.. code-block:: bash
+
+    roslaunch devine devine.launch launch_all:=false dashboard:=true
+
+The process will listen and update whenever there is a change in the code.
+
+
+Manual installation
+============
 
 .. code-block:: bash
 
@@ -20,23 +33,11 @@ Installation
     pip3 install -r requirements.txt
     sudo apt-get install ros-kinetic-rosbridge-server
 
-2. Build
-
-.. code-block:: bash
-
-    npm run build
-
-Usage
-=====
-
-.. code-block:: bash
-
-    roslaunch rosbridge_server rosbridge_websocket.launch
 
 Adding a view
 =============
 
-Create an html layout for your view (Uikit is your friend) e.g `views/myview.html`. Or reuse one similar to yours.
+Create an html layout for your view. E.g: `views/myview.html`. Or reuse one similar to yours.
 
 `include` it in `views/index.html`, keep these class attributes `uk-width-expand` `command-view` and change the name attribute.
 

@@ -1,6 +1,9 @@
-<div class="row">
+{% import 'macros/camera_feed.html' as kinect_macro %}
+{% import 'macros/console.html' as console_macro %}
+
+<div class="dashboard row">
   <div class="col-sm">
-    {% include 'dashboard/console.html' %}
+    {{ console_macro.console() }}
   </div>
   <div class="col-sm">
     {% include 'dashboard/publisher.html' %} 
@@ -8,6 +11,6 @@
     {% include 'dashboard/subscribers/image_dispatcher.html' %} 
   </div>
   <div class="col-sm">
-    {% include 'dashboard/subscribers/kinect.html' %}
+    {{ kinect_macro.camera('Kinect Camera', 'kinect_image', true) }}
   </div>
 </div>

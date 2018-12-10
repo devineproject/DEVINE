@@ -4,11 +4,13 @@
   <arg name="robot_control" default="$(arg launch_all)"/>
   <arg name="kinect" default="$(arg launch_all)"/>
   <arg name="dialog" default="$(arg launch_all)"/>
+  <arg name="joystick" default="$(arg launch_all)"/>
   <arg name="dashboard" default="$(arg launch_all)" />
   <arg name="guesswhat" default="$(arg launch_all)" />
   <arg name="image_processing_robot" default="$(arg launch_all)" />
   <arg name="image_processing_gpu" default="$(arg launch_all)" />
   <arg name="head_coordinator" default="$(arg launch_all)" />
+  <arg name="joy_dev" default="/dev/input/js0" />
 
   <group if="$(arg kinect)">
     <param name="/openni/driver/data_skip" value="6" /> <!-- 5Hz -->
@@ -85,6 +87,12 @@
 
     <group if="$(arg guesswhat)">
       <node name="guesswhat" pkg="devine_guesswhat" type="guesswhat_node.py" required="true" />
+    </group>
+
+    <group if="$(arg joystick)">
+      <param name="joy_node/dev" value="$(arg joy_dev)" />
+      <node name="joystick" pkg="joy" type="joy_node" />
+      <node name="joystick_dialog_ctrl" pkg="devine_dialog" type="joystick_answers.py" required="true" />
     </group>
   </group>
 </launch>
