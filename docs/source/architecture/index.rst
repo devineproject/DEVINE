@@ -9,7 +9,7 @@ This allow the project to run on a real robot, while rendering heavy tasks like 
     :maxdepth: 1
 
     distributed/index
-    sequence_diagram/index
+    sequence-diagrams/index
     image_pipeline/index
 
 You can also check out the diagrams below in order to learn the basics on how each DEVINE modules interacts with each others:

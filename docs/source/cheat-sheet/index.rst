@@ -52,7 +52,7 @@ All DEVINE modules:
     :glob:
     :maxdepth: 1
    
-    modules/*/index
+    ../modules/*/index
 
 
 Tests
@@ -62,4 +62,4 @@ Tests
     :glob:
     :maxdepth: 1
    
-    tests/index
+    ../tests/index
