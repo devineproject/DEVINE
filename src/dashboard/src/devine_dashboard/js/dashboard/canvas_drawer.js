@@ -95,7 +95,7 @@ export default class CanvasDrawer {
           this._drawObjectsRectangles(segmentation.objects, confidence ? confidence.data : undefined);
         }
 
-        if (body_tracking != undefined) {
+        if (body_tracking != undefined && ['image_raw', 'body_tracking_image'].includes(this.imageSource)) {
           this._drawBodyTracking(JSON.parse(body_tracking.data));
         }
       };
@@ -122,12 +122,13 @@ export default class CanvasDrawer {
       case 'body_tracking_image':
       case 'zone_detection_image':
       case 'image_raw':
-        this.history.image = this.history.buffers[newSource];
+        this.imageSource = newSource;
         break;
       default:
-        this.history.image = this.history.buffers['image_raw'];
+        this.imageSource = 'image_raw';
         break;
     }
+    this.history.image = this.history.buffers[this.imageSource];
   }
   
   /**
