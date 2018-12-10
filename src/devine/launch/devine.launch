@@ -92,9 +92,7 @@
     <group if="$(arg joystick)">
       <param name="joy_node/dev" value="$(arg joy_dev)" />
       <node name="joystick" pkg="joy" type="joy_node" />
-      <group if="$(arg dialog)">
-        <node name="joystick_dialog_ctrl" pkg="devine_dialog" type="ros.py" required="true" />
-      </group>
+      <node name="joystick_dialog_ctrl" pkg="devine_dialog" type="joystick_answers.py" required="true" />
     </group>
   </group>
 </launch>
