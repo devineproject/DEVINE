@@ -66,5 +66,5 @@ Cheat Sheet
     cheat-sheet/index
 
 
-.. _DEVINE GitHub: https://github.com/devineproject/DEVINE
-.. _DEVINE website: https://devineproject.github.io/
+.. _DEVINE GitHub: https://github.com/FelixMartel/DEVINE
+.. _DEVINE website: https://devine.gel.usherbrooke.ca/
