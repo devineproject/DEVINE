@@ -24,7 +24,7 @@ The process will listen and update whenever there is a change in the code.
 
 
 Manual installation
-============
+===================
 
 .. code-block:: bash
 
