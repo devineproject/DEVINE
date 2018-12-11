@@ -18,7 +18,7 @@ Once the project is installed on your machine, you can simply launch the dashboa
 
 .. code-block:: bash
 
-    roslaunch devine devine.launch launch_all:=false dashboard:=true
+    $ roslaunch devine devine.launch launch_all:=false dashboard:=true
 
 The process will listen and update whenever there is a change in the code.
 
@@ -28,10 +28,10 @@ Manual installation
 
 .. code-block:: bash
 
-    sudo npm i -g webpack
-    npm install
-    pip3 install -r requirements.txt
-    sudo apt-get install ros-kinetic-rosbridge-server
+    $ sudo npm i -g webpack
+    $ npm install
+    $ pip3 install -r requirements.txt
+    $ sudo apt-get install ros-kinetic-rosbridge-server
 
 
 Adding a view

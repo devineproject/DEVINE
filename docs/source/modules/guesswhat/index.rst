@@ -13,37 +13,37 @@ Installation
 
 Since guesswhat is not yet a proper python module, it has to be added to your python path::
 
-  git clone --recursive https://github.com/GuessWhatGame/guesswhat.git /tmp/somewhere
-  export PYTHONPATH=/tmp/somewhere/src:$PYTHONPATH
+  $ git clone --recursive https://github.com/GuessWhatGame/guesswhat.git /tmp/somewhere
+  $ export PYTHONPATH=/tmp/somewhere/src:$PYTHONPATH
 
 Also install python dependencies::
 
-  pip3 install -r requirements.txt
+  $ pip3 install -r requirements.txt
 
 Build this ROS package using::
 
-  catkin_make -C ~/catkin_ws
+  $ catkin_make -C ~/catkin_ws
 
 Usage
 =====
 
 Roslaunch::
 
-  roslaunch devine launch_all:=false guesswhat:=true
+  $ roslaunch devine launch_all:=false guesswhat:=true
 
 Monitor questions::
 
-  > rostopic echo /devine/tts/query
-  text: "is it a person ?"
-  uid: 1234
-  answer_type: 1
-  ---
+  $ rostopic echo /devine/tts/query
+    text: "is it a person ?"
+    uid: 1234
+    answer_type: 1
+    ---
 
 Send some test inputs::
 
-  cd example
-  python3 example.py
+  $ cd example
+  $ python3 example.py
 
 Reply::
 
-  rostopic pub /devine/tts/answer devine_dialog/TtsAnswer '{original_query: {text: "is it a person ?", uid: 1234, answer_type: 1}, probability: 1.0, text: "yes"}'
+  $ rostopic pub /devine/tts/answer devine_dialog/TtsAnswer '{original_query: {text: "is it a person ?", uid: 1234, answer_type: 1}, probability: 1.0, text: "yes"}'
