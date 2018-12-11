@@ -19,18 +19,8 @@ Upon confirmation, IRL-1 begins to ask them questions.
 After five questions, the robot reveals its guess.
 The player validates IRL-1’s guess, IRL-1 reacts accordingly and then concludes the game.
 
+
 Accessing the documentation
 ===========================
 
-If you already have ``Docker`` installed, simply navigate to ``/docs`` and run the following command to start a sphinx server at port :8000.
-
-.. code-block:: bash
-    
-    ./serve_doc.sh
-
-For local environment installation, please refer to our `Documentation Readme`_ 
-
-For all the documentation goodness: `Documentation`_.
-
-.. _Documentation: /docs/source/index.rst
-.. _Documentation Readme: /docs/README.rst
+https://devine.readthedocs.io/

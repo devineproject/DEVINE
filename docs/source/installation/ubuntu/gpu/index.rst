@@ -20,8 +20,8 @@ You should have most of theses already.
 
 .. code-block:: bash
 
-    sudo apt-get install build-essential cmake git unzip zip python-pip python3-pip python-virtualenv swig python-wheel libcurl3-dev curl python-dev python3-dev python-numpy python3-numpy
-    sudo apt-get install linux-headers-$(uname -r)
+    $ sudo apt-get install build-essential cmake git unzip zip python-pip python3-pip python-virtualenv swig python-wheel libcurl3-dev curl python-dev python3-dev python-numpy python3-numpy
+    $ sudo apt-get install linux-headers-$(uname -r)
 
 .. _step_1:
 
@@ -41,26 +41,26 @@ Do not worry, `Nvidia` drivers will be installed with `CUDA` later on.
 
 .. code-block:: bash
 
-    sudo apt-get purge nvidia*
-    sudo apt-get purge cuda* # You may need to manually purge them, for example sudo apt-get purge cuda-cusparse-9-0
-    dpkg -l | grep '^rc' | awk '{print $2}' | grep cuda | sudo xargs dpkg --purge   # verify the output first so you don't delete something else...
-    dpkg -l | grep '^rc' | awk '{print $2}' | grep nvidia | sudo xargs dpkg --purge # verify the output first so you don't delete something else...
-    sudo apt-get autoremove
-    sudo apt-get autoclean
-    sudo rm -rf /usr/local/cuda*
+    $ sudo apt-get purge nvidia*
+    $ sudo apt-get purge cuda* # You may need to manually purge them, for example sudo apt-get purge cuda-cusparse-9-0
+    $ dpkg -l | grep '^rc' | awk '{print $2}' | grep cuda | sudo xargs dpkg --purge   # verify the output first so you don't delete something else...
+    $ dpkg -l | grep '^rc' | awk '{print $2}' | grep nvidia | sudo xargs dpkg --purge # verify the output first so you don't delete something else...
+    $ sudo apt-get autoremove
+    $ sudo apt-get autoclean
+    $ sudo rm -rf /usr/local/cuda*
 
 * Uninstall any TensorFlow installation
 
 .. code-block:: bash
 
-    pip uninstall tensorflow
-    pip uninstall tensorflow-gpu
+    $ pip uninstall tensorflow
+    $ pip uninstall tensorflow-gpu
 
 * reboot!
 
 .. code-block:: bash
 
-    sudo reboot
+    $ sudo reboot
 
 Step 1 - Install CUDA 
 =====================
@@ -71,29 +71,29 @@ You can download CUDA from `Nvidia` website and manually install it, but it is p
 
 .. code-block:: bash
 
-    curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
-    sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
-    sudo dpkg -i ./cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
-    sudo apt-get update
-    sudo apt-get install cuda-9-0 # this may take a while (~1.7G)
+    $ curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+    $ sudo apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
+    $ sudo dpkg -i ./cuda-repo-ubuntu1604_9.0.176-1_amd64.deb
+    $ sudo apt-get update
+    $ sudo apt-get install cuda-9-0 # this may take a while (~1.7G)
 
 * reboot!
 
 .. code-block:: bash
 
-    sudo reboot
+    $ sudo reboot
 
 * Verify installation
 
 .. code-block:: bash
 
-    nvidia-smi # should return a list of GPUs with some metrics. Make sure the driver's version shown on the top is > 384.x
+    $ nvidia-smi # should return a list of GPUs with some metrics. Make sure the driver's version shown on the top is > 384.x
 
 .. image:: nvidia-smi_output.png
 
 .. code-block:: bash
 
-    nvcc -V # should return the CUDA compiler version installed. Make sure the version is 9.0
+    $ nvcc -V # should return the CUDA compiler version installed. Make sure the version is 9.0
 
     # example
 
@@ -115,10 +115,10 @@ You may need to create a account if you do not have one yet.
 
 .. code-block:: bash
 
-    sudo tar -xzvf cudnn-9.0-linux-x64-v7.3.0.29.tgz
-    sudo cp cuda/include/cudnn.h /usr/local/cuda/include
-    sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
-    sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
+    $ sudo tar -xzvf cudnn-9.0-linux-x64-v7.3.0.29.tgz
+    $ sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+    $ sudo cp cuda/lib64/libcudnn* /usr/local/cuda/lib64
+    $ sudo chmod a+r /usr/local/cuda/include/cudnn.h /usr/local/cuda/lib64/libcudnn*
 
 * Update your bashrc. 
 
@@ -126,10 +126,10 @@ In the case you have different `CUDA` version installed, change the folder to th
 
 .. code-block:: bash
 
-    echo 'export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"' >> ~/.bashrc
-    echo 'export CUDA_HOME=/usr/local/cuda' >> ~/.bashrc
-    echo 'export PATH="$PATH:/usr/local/cuda/bin"' >> ~/.bashrc
-    . ~/.bashrc
+    $ echo 'export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"' >> ~/.bashrc
+    $ echo 'export CUDA_HOME=/usr/local/cuda' >> ~/.bashrc
+    $ echo 'export PATH="$PATH:/usr/local/cuda/bin"' >> ~/.bashrc
+    $ . ~/.bashrc
 
 Step 3 - Install TensorFlow GPU 
 ===============================
@@ -138,26 +138,26 @@ Step 3 - Install TensorFlow GPU
 
 .. code-block:: bash
 
-    pip uninstall tensorflow
+    $ pip uninstall tensorflow
 
 * Install `TensorFlow` with GPU support under `python3`
 
 .. code-block:: bash
 
-    python3 -m pip install --user tensorflow-gpu    
+    $ python3 -m pip install --user tensorflow-gpu    
 
 * Verify installation
 
 .. code-block:: bash
 
-    python3
+    $ python3
         import tensorflow as tf   
         hello = tf.constant('Hello, TensorFlow!')
         sess = tf.Session() # You should see some information about your GPU in the output
         print(sess.run(hello))
 
     # in another shell
-    nvidia-smi # you should see in the processe list python3
+    $ nvidia-smi # you should see in the processe list python3
 
 If you do not pass any verification steps, go back to :ref:`step_1`.
 
