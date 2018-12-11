@@ -6,30 +6,17 @@ Image disptacher
 Description
 ===========
 
-We currently use `Mask R-CNN`_ to detect and segment the objects of our images. It was coded using tensorflow and trained using MSCOCO, which means that the classes it uses to segment objects are compatible with GuessWhat?!
+The image dispatcher is responsible for distributing images from the kinect to the various modules that need them in the correct order. It takes raw images, checks them for blur, applies the depth mask and sends the processed images to be segmented and have their features extracted. 
 
-The segmentation node outputs a JSON which contains the class of the object, a box which delimits the object and a segmentation mask. It is is published on the `objects` topic. 
 
 ROS Installation
 ================
 
-1. Run the install script `source install_package.bash`
-2. Install `tf-pose-estimation`_ for python 2.
-3. Build the module using catkin_make:
-
-.. code-block:: bash
-
-    roscd
-    cd ..
-    catkin_make
+1. Run the install script `install.sh`
 
 Usage
 =====
 
 .. code-block:: bash
 
-    rosrun devine_image_processing segmentation.py __ns:=devine
-    rosrun devine_image_processing features_extraction.py __ns:=devine
-
-.. _tf-pose-estimation: https://github.com/ildoonet/tf-pose-estimation
-.. _Mask R-CNN: https://github.com/matterport/Mask_RCNN
+    rosrun devine_image_processing image_dispatcher.py __ns:=devine
