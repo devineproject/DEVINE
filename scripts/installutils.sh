@@ -72,7 +72,7 @@ install_base() {
   as_su apt-get install -y ros-kinetic-openni-launch ros-kinetic-openni-camera ros-kinetic-openni-description ros-kinetic-compressed-image-transport
   as_su apt-get install -y ros-kinetic-rosbridge-server
   as_su apt-get install -y ros-kinetic-joy
-  as_su apt-get install -y snips-platform-voice
+  as_su apt-get install -y snips-platform-voice=0.58.3
   ensure_data https://github.com/projetdevine/static/releases/download/v0.0.1/assistant.zip
   as_su unzip -o "$datapath/assistant.zip" -d /usr/share/snips
   as_su python2 -m pip install --upgrade pip setuptools wheel pyopenssl cryptography

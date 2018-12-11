@@ -9,20 +9,20 @@ We use `SNIPS` as our voice assistant to interact with the robot with the voice.
 ROS Installation
 ================
 
-Installation with SAM
+As `SNIPS` does not officially support Ubuntu Xenial, its intallation comes with a few caveat.
 
 1. Run ``$ sudo npm install -g snips-sam`` to install SAM
-2. Go to /usr/lib/node_modules/snips-sam/lib/session/ssh.js (or usr/local/lib/node_modules/snips-sam/lib/session/ssh.js) and change the line 426 to [...] ``$ echo “deb https://debian.snips.ai/stretch stable main”`` [...]
-3. Connect with ``$ sam connect localhost``
-4. ``$ sam init``
-5. If you get an error at this stage, add this line ``your_username ALL=(ALL) NOPASSWD: ALL`` at the end of your sudoers file with the command : ``$ sudo visudo``, then try again.
-6. Test the speaker with ``$ sam test speaker``
-7. Test the microphone with ``$ sam test microphone``
-8. If tests are not conclusive or quality is poor, try selecting a different speaker and microphone with : ``$ sam setup audio``
-9. Connect to DEVINE's snips account : ``$ sam login``, email: devine.gegi@listes.usherbrooke.ca , password is in Devine private repo
-10. Download the assistant : ``$ sam install assistant``
+2. Go to /usr/lib/node_modules/snips-sam/lib/session/ssh.js (or usr/local/lib/node_modules/snips-sam/lib/session/ssh.js) and change line 426 to [...] ``echo "deb https://debian.snips.ai/stretch stable main"`` [...]
+3. Install an upstream version of libc ``$ sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt-get update && sudo apt-get upgrade -y libstdc++6``
+4. Connect with ``$ sam connect localhost``
+5. ``$ sam init``
+6. If you get an error at this stage, add this line ``your_username ALL=(ALL) NOPASSWD: ALL`` at the end of your sudoers file with the command : ``$ sudo visudo``, then try again from step 4.
+7. Test the speaker with ``$ sam test speaker``
+8. Test the microphone with ``$ sam test microphone``
+9. If tests are not conclusive or quality is poor, try selecting a different speaker and microphone with : ``$ sam setup audio``
+10. Install our assistant ``$ wget https://github.com/projetdevine/static/releases/download/v0.0.1/assistant.zip && sudo unzip -o assistant.zip -d /usr/share/snips``
 
-
+Once the `SNIPS` team adds support for Ubuntu Xenial step 2 and 3 will not be necessary. Note that our assistant was tested for version 0.58.3 of the snips-platform-voice package.
 
 Usage
 ================
