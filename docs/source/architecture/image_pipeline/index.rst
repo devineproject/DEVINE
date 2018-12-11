@@ -1,5 +1,5 @@
-Image pipeline
-#####################
+Image Pipeline
+##############
 
 Being able to interface with GuessWhat?! and users requires taking inputs from the robot's Kinect 360 and processing them accordingly. The first link in the chain is the image dispatcher, which takes compressed images, validates that they are not blurred, and based on the game state, sends them onto the next node in the chain.
 
