@@ -16,5 +16,6 @@ You can also check out the diagrams below in order to learn the basics on how ea
 .. toctree::
     :maxdepth: 1
 
+    image_pipeline/index
     sequence-diagrams/index
 
