@@ -13,12 +13,12 @@ The body tracking node outputs the masked image. It is is published on the `sens
 ROS Installation
 ================
 
-1. Run the install script `install.sh`
+Run the install script `install.sh`
 
 Usage
 =====
 
 .. code-block:: bash
 
-    rosrun devine_image_processing mask.py __ns:=devine
+    $ rosrun devine_image_processing mask.py __ns:=devine
 

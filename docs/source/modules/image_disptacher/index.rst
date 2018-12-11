@@ -12,11 +12,11 @@ The image dispatcher is responsible for distributing images from the kinect to t
 ROS Installation
 ================
 
-1. Run the install script `install.sh`
+Run the install script `install.sh`
 
 Usage
 =====
 
 .. code-block:: bash
 
-    rosrun devine_image_processing image_dispatcher.py __ns:=devine
+  $ rosrun devine_image_processing image_dispatcher.py __ns:=devine

@@ -13,13 +13,13 @@ The feature extraction node outputs an array which contains the class of the obj
 ROS Installation
 ================
 
-1. Run the install script `source install_package.sh`
+Run the install script `source install_package.sh`
 
 Usage
 =====
 
 .. code-block:: bash
 
-    rosrun devine_image_processing features_extraction.py __ns:=devine
+   $ rosrun devine_image_processing features_extraction.py __ns:=devine
 
 .. _VGG-16: https://github.com/tensorflow/models/tree/master/research/slim

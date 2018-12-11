@@ -64,7 +64,7 @@ Below is a UML showing the sequence of interactions between the different module
     image_dispatcher -> feature_extraction : /devine/image/features_extraction (CompressedImage)
     scene_finder -> image_segmentation : /devine/image/segmentation (CompressedImage)
     image_segmentation -> GuessWhat : /devine/objects (SegmentedImage)
-    feature_segmentation -> GuessWhat : /devine/image_features (Float64MultiArray)
+    feature_segmentation -> GuessWhat : /devine/image_features (VGG16Features)
 
 
 

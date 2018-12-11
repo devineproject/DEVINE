@@ -13,13 +13,13 @@ The body tracking node outputs a JSON which contains a skeleton of all the peopl
 ROS Installation
 ================
 
-1. Run the install script `install.sh`
+Run the install script `install.sh`
 
 Usage
 =====
 
 .. code-block:: bash
 
-    rosrun devine_image_processing body_tracking.py __ns:=devine
+   $ rosrun devine_image_processing body_tracking.py __ns:=devine
 
 .. _tf-pose-estimation: https://github.com/ildoonet/tf-pose-estimation
