@@ -21,10 +21,7 @@ Environment Setup
 
 .. code-block:: bash
 
-    pip install sphinx
-    pip install sphinx-rtd-theme
-    pip install sphinxcontrib-plantuml
-    pip install graphviz
+    pip install -r requirements.txt --user
 
 Build
 -----
