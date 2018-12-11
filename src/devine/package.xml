@@ -5,7 +5,7 @@
   <description>The devine core base package</description>
   <maintainer email="devine.gegi@listes.usherbrooke.ca">DEVINE</maintainer>
   <author email="devine.gegi@listes.usherbrooke.ca">DEVINE</author>
-  <url>https://devine.gel.usherbrooke.ca</url>
+  <url>https://devineproject.github.io/</url>
   <license>BSD</license>
   <buildtool_depend>catkin</buildtool_depend>
   <depend>devine_common</depend>

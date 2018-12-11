@@ -6,8 +6,6 @@ Description
 
 We currently use `Mask R-CNN`_ to detect and segment the objects of our images.
 
-TODO: More in depth: https://trello.com/c/nuJhnfI9
-
 ROS Installation
 ================
 
