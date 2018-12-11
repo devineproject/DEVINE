@@ -29,7 +29,7 @@ Usage
 
 Roslaunch::
 
-  $ roslaunch devine launch_all:=false guesswhat:=true
+  $ roslaunch devine devine.launch launch_all:=false guesswhat:=true
 
 Monitor questions::
 
