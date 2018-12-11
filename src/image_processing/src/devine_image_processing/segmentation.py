@@ -37,7 +37,8 @@ MODEL_DIR = ros_utils.get_fullpath(__file__, 'logs')
 IMAGE_TOPIC = topicname('segmentation_image')
 SEGMENTATION_TOPIC = topicname('objects')
 
-SEGMENTATION_THRESHOLD = 0.8
+# This threshold removes objects with a lower confidence level
+SEGMENTATION_THRESHOLD = 0.7
 
 
 class RCNNSegmentation(ImageProcessor):
