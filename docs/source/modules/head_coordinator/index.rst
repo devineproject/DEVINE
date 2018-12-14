@@ -51,4 +51,4 @@ Example of april tags
     :alt: April tag #1 (bottom right)
     :class: april_tag
 
-These are examples of 36h11 tag ids #0 and #1. The tags must be 11cm wide when printed, and positioned in the top left and bottom right corners. It's also preferable that they directly face the camera to have the best accuracy possible.
+These are examples of 36h11 tag ids #0 and #1. The tags must be 11cm wide when printed, and positioned respectively in the top left and bottom right corners. It's also preferable that they directly face the camera to have the best accuracy possible.
