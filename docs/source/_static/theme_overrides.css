@@ -4,3 +4,8 @@
     max-width: 100%;
     margin: auto;
 }
+
+
+.april-tag img {
+    image-rendering: pixelated;
+}
